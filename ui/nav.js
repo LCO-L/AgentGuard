@@ -33,7 +33,7 @@
     "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
     "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(37,99,235,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
-    "#ag-help-fab{position:fixed;right:22px;bottom:88px;z-index:2147483000;width:46px;height:46px;" +
+    "#ag-help-fab{position:fixed;right:22px;bottom:96px;z-index:2147483647;width:46px;height:46px;" +
     "border-radius:50%;border:0;background:#16181D;color:#fff;font-size:20px;font-weight:800;cursor:pointer;" +
     "font-family:inherit;display:flex;align-items:center;justify-content:center;" +
     "box-shadow:0 8px 24px rgba(14,17,22,.28);transition:transform .16s cubic-bezier(.2,.7,.2,1),box-shadow .16s}" +

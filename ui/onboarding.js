@@ -33,7 +33,8 @@
     '<style>' +
     '#ag-onboard{position:fixed;inset:0;z-index:2147483200;display:none;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif}' +
     '#ag-onboard.on{display:block}' +
-    '#ag-onboard .veil{position:fixed;inset:0;background:transparent}' +
+    '#ag-onboard .veil{position:fixed;inset:0;background:transparent;transition:background .3s, backdrop-filter .3s}' +
+    '#ag-onboard .veil.blur{background:rgba(12,16,30,.42);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}' +
     '#ag-onboard .spot{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(12,16,30,.62);transition:all .3s cubic-bezier(.2,.7,.2,1);pointer-events:none;border:2.5px solid ' + BLUE + '}' +
     '#ag-onboard .spot.pulse{animation:agpulse 1.6s ease-out infinite}' +
     '@keyframes agpulse{0%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(37,99,235,.5)}70%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 14px rgba(37,99,235,0)}100%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(37,99,235,0)}}' +
@@ -75,6 +76,7 @@
     var el = step.sel ? document.querySelector(step.sel) : null;
     bub.classList.remove("show");
     if (step.center || !el) {
+      veil.classList.add("blur");   // 중앙(환영) 카드: 배경 딤+블러
       spot.style.width = "0"; spot.style.height = "0";
       spot.style.left = "50%"; spot.style.top = "-9999px";
       // 중앙 말풍선
@@ -83,6 +85,7 @@
       requestAnimationFrame(function () { bub.classList.add("show"); });
       return;
     }
+    veil.classList.remove("blur");   // 스포트라이트 단계: 대상은 선명, 주변만 딤(box-shadow)
     el.scrollIntoView({ block: "center", behavior: "smooth" });
     setTimeout(function () {
       var r = el.getBoundingClientRect();

@@ -14,7 +14,9 @@
     provider: "ollama",   // 기본 = 온디바이스(내 컴퓨터). 없으면 자동으로 오프라인 규칙 폴백
     ollamaUrl: "", ollamaModel: "",
     claudeKey: "", claudeModel: "",
-    openrouterKey: "", openrouterModel: ""
+    openrouterKey: "", openrouterModel: "",
+    blockMode: false,     // 기업 정책: 위험 시 전송 차단
+    orgTerms: ""          // 회사 전용 민감어(줄바꿈 구분) → 탐지·마스킹
   };
 
   function load() {
@@ -41,6 +43,7 @@
       if (c.ollamaModel) h["X-AI-Model"] = c.ollamaModel;
     }
     if (c.ollamaUrl) h["X-Ollama-Url"] = c.ollamaUrl;
+    if (c.orgTerms && c.orgTerms.trim()) h["X-AG-Org-Terms"] = encodeURIComponent(c.orgTerms.trim());
     return h;
   }
 
