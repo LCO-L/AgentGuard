@@ -113,11 +113,26 @@ def _overlaps(spans: list[Span], start: int, end: int) -> bool:
     return any(not (end <= s.start or start >= s.end) for s in spans)
 
 
-def find_spans(text: str) -> list[Span]:
-    """텍스트에서 비밀/개인정보 span 목록(offset 기준, 겹침 억제)."""
+def find_spans(text: str, org_terms: list[str] | None = None) -> list[Span]:
+    """텍스트에서 비밀/개인정보/회사기밀 span 목록(offset 기준, 겹침 억제).
+
+    org_terms: 회사 전용 민감어(기업 규칙). 리터럴로 잡아 마스킹 대상에 포함.
+    """
     spans: list[Span] = []
     if not text:
         return spans
+
+    # 0) 회사 전용 민감어(기업 규칙) — 리터럴·대소문자 무시. 가장 먼저(우선)
+    for term in (org_terms or []):
+        t = (term or "").strip()
+        if len(t) < 2:
+            continue
+        for m in re.finditer(re.escape(t), text, re.IGNORECASE):
+            if not _overlaps(spans, m.start(), m.end()):
+                spans.append(Span(m.start(), m.end(), "org", "ORG-TERM-01",
+                                  "회사 기밀", "high",
+                                  "회사 전용 민감어예요. AI로 보내기 전에 가려야 해요.",
+                                  text=m.group(0)))
 
     # 1) 명시적 시크릿 패턴(가장 확실 → 우선)
     for rid, label, rx in _SECRET_PATTERNS:
@@ -179,6 +194,7 @@ _LABEL_SLUG = {
     "개인 키(PEM)": "SECRET", "Slack 웹훅": "SECRET", "하드코딩된 비밀값": "SECRET",
     "주민등록번호": "RRN", "휴대폰 번호": "PHONE", "신용카드 번호": "CARD",
     "이메일 주소": "EMAIL", "계좌번호": "ACCOUNT", "여권번호": "PASSPORT",
+    "회사 기밀": "ORG",
 }
 
 

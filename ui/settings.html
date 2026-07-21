@@ -58,6 +58,16 @@
   .segb{flex:1;border:0;background:transparent;border-radius:10px;padding:11px;cursor:pointer;font-family:inherit;color:var(--ink);display:flex;flex-direction:column;gap:2px;align-items:center;transition:.12s;}
   .segb b{font-size:14.5px;font-weight:800;} .segb span{font-size:11px;color:var(--sub);}
   .segb.on{background:var(--accent);color:#fff;} .segb.on span{color:rgba(255,255,255,.9);}
+  .polrow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:var(--ink);}
+  .polrow>span:first-child{flex:1;line-height:1.5;}
+  .sw{position:relative;width:42px;height:24px;flex:0 0 auto;}
+  .sw input{opacity:0;width:0;height:0;position:absolute;}
+  .sw .tk{position:absolute;inset:0;background:#D1D5DB;border-radius:99px;transition:.2s;cursor:pointer;}
+  .sw .tk:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+  .sw input:checked + .tk{background:var(--accent);}
+  .sw input:checked + .tk:before{transform:translateX(18px);}
+  .body textarea{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;background:#fff;resize:vertical;width:100%;line-height:1.5;}
+  .hint2{font-size:11.5px;color:var(--sub);margin-top:5px;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -156,6 +166,23 @@
     </div>
   </div>
 
+  <!-- 기업 정책: 차단 모드 · 회사 전용 민감어 -->
+  <div class="wrap cards">
+    <div class="card">
+      <div class="chead">
+        <div class="ico">🛡️</div>
+        <div class="tt"><b>기업 정책</b><span>차단 모드 · 회사 전용 민감어</span></div>
+      </div>
+      <div class="body">
+        <label class="polrow"><span><b>차단 모드</b> — 위험(Critical·High)이 남으면 AI 전송을 막아요</span>
+          <span class="sw"><input type="checkbox" id="blockMode"><span class="tk"></span></span></label>
+        <div class="field"><label>회사 전용 민감어 (줄바꿈으로 여러 개)</label>
+          <textarea id="orgTerms" rows="3" placeholder="예)&#10;EMP-123456&#10;프로젝트-오로라&#10;corp.internal"></textarea>
+          <div class="hint2">여기 적은 단어는 AI로 보내기 전에 자동으로 <b>[ORG_1]</b>처럼 마스킹돼요.</div></div>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap"><div class="note">
     설정은 이 브라우저에만 저장됩니다. 대시보드와 보안 위젯이 이 설정을 함께 사용해요.<br>
     기본은 <b>온디바이스</b>예요. Ollama가 준비돼 있지 않으면 자동으로 오프라인 규칙으로 답합니다.
@@ -207,6 +234,11 @@
   $("#ollamaUrl").addEventListener("focus", e=>{ if(!e.target.value){ e.target.value="http://localhost:11434"; persist({ollamaUrl:e.target.value}); } });
   $("#claudeKey").oninput=e=>persist({claudeKey:e.target.value.trim()});
   $("#openrouterKey").oninput=e=>persist({openrouterKey:e.target.value.trim()});
+  // 기업 정책 wiring
+  $("#blockMode").checked=!!CFG.blockMode;
+  $("#blockMode").onchange=e=>persist({blockMode:e.target.checked});
+  $("#orgTerms").value=CFG.orgTerms||"";
+  $("#orgTerms").oninput=e=>persist({orgTerms:e.target.value});
   $("#ollamaModel").onchange=e=>persist({ollamaModel:e.target.value});
   $("#claudeModel").onchange=e=>persist({claudeModel:e.target.value});
   $("#openrouterModel").onchange=e=>persist({openrouterModel:e.target.value});
@@ -303,6 +335,15 @@
       },1200);
     };
   })();
+
+  // 온보딩 '온디바이스 켜기'로 넘어오면 자동으로 실행 + 스크롤(진짜 온디바이스 체험)
+  if((location.search||"").indexOf("ondevice=1")>=0){
+    try{ history.replaceState(null,"",location.pathname); }catch(e){}
+    setTimeout(function(){
+      var b=document.querySelector("#odBtn");
+      if(b){ b.scrollIntoView({behavior:"smooth",block:"center"}); b.click(); }
+    }, 600);
+  }
   </script>
 </body>
 </html>

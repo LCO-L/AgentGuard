@@ -38,21 +38,28 @@ def _color(c: dict) -> str:
     return "green"
 
 
-def inspect(text: str, kind: str = "auto") -> dict:
+def inspect(text: str, kind: str = "auto",
+            org_terms: list[str] | None = None) -> dict:
     """텍스트 인스펙션. 반환 dict(issues·summary·overall·score·masked·mapping)."""
     text = text or ""
 
     # 탐지: 레지스트리(모든 팩) — 단일 소스
     hits = registry.scan(text)
 
-    # 마스킹: 비밀/개인정보 토큰 배정(offset→token 매핑)
-    pii_spans = pii.find_spans(text)
+    # 마스킹: 비밀/개인정보/회사기밀 토큰 배정(offset→token 매핑)
+    pii_spans = pii.find_spans(text, org_terms)
     red = pii.redact(text, pii_spans)
     tok = {(s.start, s.end): s.token for s in pii_spans}
 
     issues = [Issue(h.start, h.end, h.category, h.rule_id, h.severity,
                     h.title, h.why, h.fix, h.suggestion,
                     tok.get((h.start, h.end), ""), h.decoded) for h in hits]
+    # 회사 전용 민감어(org)도 밑줄 이슈로 표시(마스킹 대상)
+    for s in pii_spans:
+        if s.kind == "org":
+            issues.append(Issue(s.start, s.end, "org", s.rule_id, s.severity,
+                                s.label, s.why, "환경변수·플레이스홀더로 대체하세요.",
+                                "", s.token, ""))
     issues.sort(key=lambda i: (i.start, -_SEV_RANK.get(i.severity, 0)))
 
     counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
@@ -68,5 +75,5 @@ def inspect(text: str, kind: str = "auto") -> dict:
         "issues": [asdict(i) for i in issues],
         "masked": red["masked"],
         "mapping": red["mapping"],
-        "has_secrets": any(i.category in ("secret", "pii") for i in issues),
+        "has_secrets": any(i.category in ("secret", "pii", "org") for i in issues),
     }

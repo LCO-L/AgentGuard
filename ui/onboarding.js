@@ -20,8 +20,8 @@
       body: "보안 에디터는 주민번호·API키를 <b>가려주고</b>, 위험한 코드에 밑줄을 그어 수정안을 알려줘요." },
     { sel: "#ag-topnav .agx", title: "④ 브라우저에 설치하기 🧩", pulse: true, ext: true,
       body: "확장을 설치하면 <b>어느 사이트에서든 우클릭</b>으로 바로 검사할 수 있어요." },
-    { sel: '#ag-topnav a[href="/settings"]', title: "⑤ 판단 엔진 고르기 ⚙️",
-      body: "<b>온디바이스</b>(내 컴퓨터)·Claude·OpenRouter 중 선택. 온디바이스는 완전 오프라인이에요." },
+    { center: true, icon: "🖥️", title: "핵심 — 진짜 ‘온디바이스’ AI", ondevice: true, pulse: true,
+      body: "AgentGuard는 <b>당신의 기기 안에서</b> Ollama로 직접 판단해요. 서버로 원문을 보내지 않아요.<br><b>지금 한 번만 켜보세요</b> — 이게 진짜 온디바이스예요." },
     { center: true, icon: "🎉", title: "준비 끝!",
       body: "이제 무엇이든 검사해보세요.<br>이 안내는 상단 <b>?</b> 버튼으로 언제든 다시 볼 수 있어요." },
   ];
@@ -72,6 +72,14 @@
       '</ol></div><a class="dl" href="/extension.zip" download>⬇️ 확장 다운로드</a>';
   }
 
+  function ondeviceHTML() {
+    return '<div class="steps"><ol>' +
+      '<li>버튼 하나로 Ollama가 <b>내 컴퓨터에</b> 준비돼요(4bit 소형 모델)</li>' +
+      '<li>검사·판단이 <b>인터넷 없이</b> 기기 안에서 이뤄져요</li>' +
+      '<li>원문·비밀값이 <b>기기 밖으로 안 나가요</b> 🔒</li>' +
+      '</ol></div><a class="dl" href="/settings?ondevice=1">🖥️ 온디바이스 실행 켜기 →</a>';
+  }
+
   function place(step) {
     var el = step.sel ? document.querySelector(step.sel) : null;
     bub.classList.remove("show");
@@ -112,7 +120,7 @@
     $(".ic").style.display = s.icon ? "block" : "none";
     $(".bub h4").textContent = s.title;
     $(".bub p").innerHTML = s.body;
-    $(".extra").innerHTML = s.ext ? extHTML() : "";
+    $(".extra").innerHTML = s.ext ? extHTML() : (s.ondevice ? ondeviceHTML() : "");
     $(".dots").innerHTML = STEPS.map(function (_, i) {
       return '<i class="' + (i === idx ? "on" : "") + '"></i>';
     }).join("");

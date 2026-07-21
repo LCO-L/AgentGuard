@@ -8,7 +8,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from api.deps import ai_config, verify_api_key
+from api.deps import ai_config, org_terms, verify_api_key
 from core.ai.backend import AIConfig
 from core.rulepacks import registry
 from services import inspect_service
@@ -28,19 +28,20 @@ class RedactRequest(BaseModel):
 
 
 @router.post("/inspect")
-def inspect(req: InspectRequest, cfg: AIConfig = Depends(ai_config)) -> dict:
-    return inspect_service.inspect_text(req.text, req.kind, cfg, req.explain)
+def inspect(req: InspectRequest, cfg: AIConfig = Depends(ai_config),
+            org: list[str] = Depends(org_terms)) -> dict:
+    return inspect_service.inspect_text(req.text, req.kind, cfg, req.explain, org)
 
 
 @router.post("/redact")
-def redact(req: RedactRequest) -> dict:
-    return inspect_service.redact_text(req.text)
+def redact(req: RedactRequest, org: list[str] = Depends(org_terms)) -> dict:
+    return inspect_service.redact_text(req.text, org)
 
 
 @router.post("/sanitize")
-def sanitize(req: RedactRequest) -> dict:
-    """AI 전송 전 정화 — 민감정보는 마스킹, 프롬프트 인젝션·은닉은 제거."""
-    return inspect_service.sanitize_text(req.text)
+def sanitize(req: RedactRequest, org: list[str] = Depends(org_terms)) -> dict:
+    """AI 전송 전 정화 — 민감정보(+회사기밀)는 마스킹, 프롬프트 인젝션·은닉은 제거."""
+    return inspect_service.sanitize_text(req.text, org)
 
 
 @router.get("/scenarios")

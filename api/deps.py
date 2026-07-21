@@ -6,6 +6,8 @@
 from __future__ import annotations
 
 import os
+import re
+from urllib.parse import unquote
 
 from fastapi import Header, HTTPException
 
@@ -40,6 +42,14 @@ def ai_config(
         "model": x_ai_model,
         "ollama_url": x_ollama_url,
     })
+
+
+def org_terms(x_ag_org_terms: str | None = Header(default=None)) -> list[str]:
+    """회사 전용 민감어(기업 규칙) — 줄바꿈/쉼표 구분·URL 인코딩 헤더 → 리스트."""
+    if not x_ag_org_terms:
+        return []
+    raw = unquote(x_ag_org_terms)
+    return [p.strip() for p in re.split(r"[\n,]+", raw) if p.strip()][:100]
 
 
 def check_size(data: bytes, filename: str = "") -> None:

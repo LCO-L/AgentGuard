@@ -14,8 +14,9 @@ from core.rulepacks import registry
 
 
 def inspect_text(text: str, kind: str = "auto",
-                 cfg: AIConfig | None = None, explain: bool = False) -> dict:
-    result = core_inspect.inspect(text, kind)
+                 cfg: AIConfig | None = None, explain: bool = False,
+                 org_terms: list[str] | None = None) -> dict:
+    result = core_inspect.inspect(text, kind, org_terms)
     if explain and result["issues"]:
         cfg = cfg or backend.resolve_config()
         note = _llm_summary(result, cfg)
@@ -24,9 +25,9 @@ def inspect_text(text: str, kind: str = "auto",
     return result
 
 
-def redact_text(text: str) -> dict:
+def redact_text(text: str, org_terms: list[str] | None = None) -> dict:
     """복원 가능 마스킹만 필요할 때(Outbound 전송 직전)."""
-    spans = pii.find_spans(text)
+    spans = pii.find_spans(text, org_terms)
     r = pii.redact(text, spans)
     return {
         "masked": r["masked"],
@@ -41,15 +42,15 @@ def redact_text(text: str) -> dict:
 _REMOVE_CATEGORIES = ("inject", "stego")
 
 
-def sanitize_text(text: str) -> dict:
+def sanitize_text(text: str, org_terms: list[str] | None = None) -> dict:
     """AI 전송 전 정화. 두 가지를 '다르게' 처리한다.
 
-    - 민감정보(secret·pii): 복원 가능 **마스킹**([SECRET_1] 등) — 뜻은 살리고 값만 가림
+    - 민감정보(secret·pii·org): 복원 가능 **마스킹**([SECRET_1] 등) — 뜻은 살리고 값만 가림
     - 프롬프트 인젝션·은닉(inject·stego): 민감정보가 아니라 공격이므로 **제거(제외)**
 
     반환: {sanitized, mapping(마스킹 복원용), masked, removed}
     """
-    pii_spans = pii.find_spans(text)
+    pii_spans = pii.find_spans(text, org_terms)
     red = pii.redact(text, pii_spans)  # 각 span에 token 배정 + mapping 생성
     hits = registry.scan(text)
 

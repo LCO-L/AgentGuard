@@ -165,7 +165,7 @@
 
     if(!issues.length){ coachBody.innerHTML='<div class="empty">✅ 지금은 위험 신호가 없어요.</div>'; return; }
     coachBody.innerHTML=issues.map((i,idx)=>{
-      const canMask=(i.category==="secret"||i.category==="pii");
+      const canMask=(i.category==="secret"||i.category==="pii"||i.category==="org");
       const canRemove=(i.category==="inject"||i.category==="stego");
       return `<div class="icard ${i.severity}">
         <div class="sev ${i.severity}">${i.severity} · ${cat(i.category)}</div>
@@ -186,12 +186,12 @@
     coachBody.querySelectorAll("[data-mask]").forEach(b=>b.onclick=()=>sanitizeAll());
     coachBody.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>sanitizeAll());
   }
-  function cat(c){return{secret:"비밀값",pii:"개인정보",vuln:"취약코드",agency:"과잉권한",inject:"인젝션",stego:"은닉"}[c]||c;}
+  function cat(c){return{secret:"비밀값",pii:"개인정보",org:"회사기밀",vuln:"취약코드",agency:"과잉권한",inject:"인젝션",stego:"은닉"}[c]||c;}
 
   // 정화: 민감정보는 마스킹(복원 가능), 프롬프트 인젝션·은닉은 제거(제외)
   async function sanitizeAll(){
     try{
-      const r=await fetch("/v1/sanitize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:ed.value})});
+      const r=await fetch("/v1/sanitize",{method:"POST",headers:{...AGConfig.headers(),"Content-Type":"application/json"},body:JSON.stringify({text:ed.value})});
       const d=await r.json();
       const total=(d.masked||0)+(d.removed||0);
       if(!total){ toast("정리할 민감정보·위험 지시가 없어요"); return false; }
@@ -204,9 +204,12 @@
   // 안전하게 전송
   $("#sendBtn").onclick=async()=>{
     if(!LAST){ toast("검사할 내용이 없어요"); return; }
-    const s=LAST.summary;
     await sanitizeAll();   // 민감정보 마스킹 + 프롬프트 인젝션·은닉 제거
-    const crit=s.critical||0;
+    await run();           // 정화 후 재검사 → 최신 상태로 판단
+    const s=(LAST&&LAST.summary)||{}, crit=s.critical||0, high=s.high||0;
+    if(AGConfig.load().blockMode && (crit+high)>0){
+      toast(`🚫 차단 모드: 위험 ${crit+high}건이 남아 전송이 차단됐어요`); return;
+    }
     if(crit>0){ if(!confirm(`Critical 위험 ${crit}건이 남아 있어요. 그래도 전송(클립보드 복사)할까요?`)) return; }
     try{ await navigator.clipboard.writeText(ed.value); toast("검사·정화된 내용을 클립보드에 복사했어요"); }
     catch(e){ toast("클립보드 복사는 브라우저 권한이 필요해요"); }
