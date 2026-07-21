@@ -48,21 +48,13 @@ def ai_test(cfg: AIConfig = Depends(ai_config)) -> dict:
 
 # ── 온디바이스 원클릭 실행 (Ollama 자동 기동 + 모델 자동 pull) ──
 
-def _local_only(request: Request) -> bool:
-    """온디바이스 자동 설치·실행은 로컬(설치형)에서만 허용 — 배포/원격 차단."""
-    host = request.client.host if request.client else ""
-    return bool(os.environ.get("AG_ONDEVICE")) or host in (
-        "127.0.0.1", "::1", "localhost", "testclient")
-
-
 @router.post("/ondevice/start")
-def ondevice_start(request: Request, model: str | None = None) -> dict:
-    """온디바이스 원클릭(설치→실행→모델). subprocess 안전을 위해 로컬 전용."""
-    if not _local_only(request):
-        return {"state": "blocked", "progress": 0,
-                "message": "온디바이스는 '설치형'(내 컴퓨터에서 실행)에서만 켤 수 있어요. "
-                           "이 웹 데모는 클라우드 서버라, 대신 Claude·OpenRouter 키를 넣거나 오프라인 규칙으로 검사하세요. "
-                           "(내 컴퓨터에서 ./install.sh 로 실행하면 이 버튼이 자동으로 Ollama를 준비해요.)"}
+def ondevice_start(model: str | None = None) -> dict:
+    """온디바이스 원클릭 — 누르면 '바로' 설치→실행→모델 준비를 시작한다.
+
+    실행 명령은 고정(ollama 설치·serve·pull)이라 임의 코드 실행이 아니다.
+    설치형(로컬)에선 완결되고, 클라우드는 리소스·권한 한계로 실패할 수 있으나 시도는 즉시 한다.
+    """
     from services import ondevice_service
     return ondevice_service.start(model)
 
