@@ -50,6 +50,15 @@
     document.head.appendChild(fav);
   }
 
+  // PWA/모바일 메타 — 모든 페이지에서 '홈 화면에 설치' + 앱처럼 표시(중복 가드)
+  function agMeta(sel, make) { if (!document.querySelector(sel)) document.head.appendChild(make()); }
+  agMeta('link[rel="manifest"]', function () { var l = document.createElement("link"); l.rel = "manifest"; l.href = "/manifest.webmanifest"; return l; });
+  agMeta('meta[name="theme-color"]', function () { var m = document.createElement("meta"); m.name = "theme-color"; m.content = "#2563EB"; return m; });
+  agMeta('meta[name="apple-mobile-web-app-capable"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; return m; });
+  agMeta('meta[name="apple-mobile-web-app-status-bar-style"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-status-bar-style"; m.content = "default"; return m; });
+  agMeta('meta[name="apple-mobile-web-app-title"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "AgentGuard"; return m; });
+  agMeta('link[rel="apple-touch-icon"]', function () { var l = document.createElement("link"); l.rel = "apple-touch-icon"; l.href = "/icon.svg"; return l; });
+
   var items = LINKS.map(function (l) {
     var on = (l[0] === "/" ? path === "/" : path.indexOf(l[0]) === 0);
     return '<a class="agi' + (on ? " on" : "") + '" href="' + l[0] + '">' +

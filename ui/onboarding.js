@@ -143,7 +143,8 @@
   if ((location.search || "").indexOf("tour=1") >= 0) {
     try { history.replaceState(null, "", location.pathname); } catch (e) {}
     setTimeout(start, 500);
-  } else if (first && p === "/") {
+  } else if (first && p === "/" && !/[?&](url|text|title)=/.test(location.search || "")) {
+    // 공유 시트로 들어와 자동 검사 중이면 투어를 띄우지 않음
     setTimeout(start, 700);
   }
 })();
