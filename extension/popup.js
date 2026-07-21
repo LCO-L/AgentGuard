@@ -1,6 +1,6 @@
 /* AgentGuard 익스텐션 팝업 — 지능적 설정(온디바이스/Claude/OpenRouter). */
 const DEF = {
-  apiBase: "http://localhost:8000", provider: "auto",
+  apiBase: "https://agentguard.maeum.io", provider: "ollama",
   ollamaUrl: "", ollamaModel: "", claudeKey: "", claudeModel: "",
   openrouterKey: "", openrouterModel: ""
 };
