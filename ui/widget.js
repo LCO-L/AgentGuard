@@ -120,13 +120,17 @@
 
   var launcher = document.createElement("button");
   launcher.className = "launcher";
-  launcher.innerHTML = '🛡️<span class="badge" id="ag-badge"></span>';
+  launcher.innerHTML = '<svg viewBox="0 0 512 512" width="34" height="34" aria-hidden="true" style="display:block">' +
+    '<g fill="#fff"><path d="M256 120 C206 128 176 168 184 216 L212 210 C207 176 228 150 256 145 C284 150 305 176 300 210 L328 216 C336 168 306 128 256 120 Z"/>' +
+    '<path fill-rule="evenodd" d="M196 206 C196 196 214 190 256 190 C298 190 316 196 316 206 L316 268 C316 312 292 346 256 362 C220 346 196 312 196 268 Z M242 232 L270 232 L265 264 L259 320 L256 332 L253 320 L247 264 Z"/></g>' +
+    '<circle cx="230" cy="250" r="9" fill="#22D3EE"/><circle cx="282" cy="250" r="9" fill="#22D3EE"/></svg>' +
+    '<span class="badge" id="ag-badge"></span>';
 
   var panel = document.createElement("div");
   panel.className = "panel";
   panel.innerHTML = `
     <div class="hd">
-      <div class="av">🛡️</div>
+      <div class="av"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true" style="display:block"><g fill="#fff"><path d="M256 120 C206 128 176 168 184 216 L212 210 C207 176 228 150 256 145 C284 150 305 176 300 210 L328 216 C336 168 306 128 256 120 Z"/><path fill-rule="evenodd" d="M196 206 C196 196 214 190 256 190 C298 190 316 196 316 206 L316 268 C316 312 292 346 256 362 C220 346 196 312 196 268 Z M242 232 L270 232 L265 264 L259 320 L256 332 L253 320 L247 264 Z"/></g><circle cx="230" cy="250" r="9" fill="#22D3EE"/><circle cx="282" cy="250" r="9" fill="#22D3EE"/></svg></div>
       <div class="t"><b>AgentGuard</b><span>온디바이스 보안 도우미</span></div>
       <button class="cog" title="AI 엔진 설정">⚙️</button>
       <button class="x" title="닫기">×</button>

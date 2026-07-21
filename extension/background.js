@@ -78,7 +78,7 @@ function notify(v, url) {
   const c = v.card || {};
   chrome.notifications.create({
     type: "basic",
-    iconUrl: "data:image/svg+xml;base64," + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" rx="14" fill="#5B5BD6"/><text x="32" y="44" font-size="34" text-anchor="middle">🛡️</text></svg>'),
+    iconUrl: "data:image/svg+xml;base64," + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" rx="14" fill="#2563EB"/><text x="32" y="44" font-size="34" text-anchor="middle">🛡️</text></svg>'),
     title: icon + " " + (c.headline || "위험한 다운로드일 수 있어요"),
     message: (c.action || "열기 전에 확인하세요") + "\n" + url.slice(0, 80),
     priority: 2
