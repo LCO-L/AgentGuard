@@ -2,4 +2,5 @@ fastapi
 uvicorn[standard]
 python-multipart
 olefile
+zstandard   # 온디바이스 자동설치: Ollama .tar.zst 압축해제(시스템 zstd 없는 서버 대비)
 # anthropic  # 선택: Claude 통역. 없으면 i18n_key 폴 백으로 자동 동작

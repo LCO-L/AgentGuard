@@ -169,7 +169,11 @@ def _install_macos_direct() -> bool:
 
 
 def _extract_tar_zst(path: str, outdir: str) -> bool:
-    """.tar.zst 추출 — 시스템 tar(zstd) 우선, 실패 시 python zstandard 폴백."""
+    """.tar.zst 추출 — 시스템 tar(zstd) 우선, 실패 시 순수 파이썬 zstandard.
+
+    Railway 등 zstd 미탑재 서버를 위해 zstandard(파이썬 패키지)로 .tar 복원 후 추출한다.
+    """
+    global _last_err
     os.makedirs(outdir, exist_ok=True)
     for cmd in (["tar", "--zstd", "-xf", path, "-C", outdir],
                 ["tar", "-I", "zstd", "-xf", path, "-C", outdir],
@@ -180,16 +184,17 @@ def _extract_tar_zst(path: str, outdir: str) -> bool:
                 return True
         except Exception:  # noqa: BLE001
             pass
-    try:  # 순수 파이썬 폴백(zstandard 있으면)
-        import io
+    try:  # 순수 파이썬 폴백 — .tar로 복원 후 tarfile 추출(가장 견고)
         import tarfile
         import zstandard
-        with open(path, "rb") as f:
-            reader = zstandard.ZstdDecompressor().stream_reader(f)
-            with tarfile.open(fileobj=io.BufferedReader(reader), mode="r|") as t:
-                t.extractall(outdir)
+        tar_path = path[:-4] if path.endswith(".zst") else path + ".tar"
+        with open(path, "rb") as ifh, open(tar_path, "wb") as ofh:
+            zstandard.ZstdDecompressor().copy_stream(ifh, ofh)
+        with tarfile.open(tar_path) as t:
+            t.extractall(outdir)
         return bool(_find_ollama_binary(outdir))
-    except Exception:  # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
+        _last_err = f"zst 추출 실패: {e}"
         return False
 
 
