@@ -203,6 +203,8 @@
   });
   // 입력 저장
   $("#ollamaUrl").oninput=e=>persist({ollamaUrl:e.target.value.trim()});
+  // 빈 칸을 탭(포커스)하면 기본 주소를 바로 채워줌
+  $("#ollamaUrl").addEventListener("focus", e=>{ if(!e.target.value){ e.target.value="http://localhost:11434"; persist({ollamaUrl:e.target.value}); } });
   $("#claudeKey").oninput=e=>persist({claudeKey:e.target.value.trim()});
   $("#openrouterKey").oninput=e=>persist({openrouterKey:e.target.value.trim()});
   $("#ollamaModel").onchange=e=>persist({ollamaModel:e.target.value});
