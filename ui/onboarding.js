@@ -10,7 +10,7 @@
   var BLUE = "#1E5BFF";
 
   var STEPS = [
-    { center: true, icon: "🛡️", title: "AgentGuard에 오신 걸 환영해요",
+    { center: true, logo: true, title: "AgentGuard에 오신 걸 환영해요",
       body: "파일·링크·AI 프롬프트 속 <b>숨은 위험</b>을 찾아 누구나 아는 말로 알려드려요.<br>30초만 함께 둘러볼까요?" },
     { sel: ".tabs", title: "① 무엇이든 검사해요",
       body: "파일을 끌어다 놓거나, 텍스트·링크를 붙여넣으면 바로 검사해요." },
@@ -68,7 +68,7 @@
       '<li>아래 <b>확장 다운로드</b>를 눌러 zip을 받아요</li>' +
       '<li>받은 zip의 <b>압축을 풀어요</b></li>' +
       '<li>주소창에 <b>chrome://extensions</b> 열고 우측 위 <b>개발자 모드</b> 켜기</li>' +
-      '<li><b>‘압축해제된 확장 프로그램을 로드’</b> → 압축 푼 폴더 선택</li>' +
+      '<li><b>‘압축해제된 확장 프로그램 폴더를 로드’</b> → 압축 푼 폴더 선택</li>' +
       '</ol></div><a class="dl" href="/extension.zip" download>⬇️ 확장 다운로드</a>';
   }
 
@@ -116,8 +116,13 @@
 
   function render() {
     var s = STEPS[idx];
-    $(".ic").textContent = s.icon || "";
-    $(".ic").style.display = s.icon ? "block" : "none";
+    if (s.logo) {
+      $(".ic").innerHTML = '<img src="/logo.svg" alt="AgentGuard" style="width:132px;height:132px;object-fit:contain">';
+      $(".ic").style.display = "block";
+    } else {
+      $(".ic").textContent = s.icon || "";
+      $(".ic").style.display = s.icon ? "block" : "none";
+    }
     $(".bub h4").textContent = s.title;
     $(".bub p").innerHTML = s.body;
     $(".extra").innerHTML = s.ext ? extHTML() : (s.ondevice ? ondeviceHTML() : "");

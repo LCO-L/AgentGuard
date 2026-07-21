@@ -29,7 +29,7 @@ Grammarly가 문법 오류에 밑줄을 긋듯, AgentGuard는 **보이지 않는
    cd agentguard && uv run python app.py   # http://localhost:8000
    ```
 2. 크롬 → `chrome://extensions` → 우상단 **개발자 모드** 켜기
-3. **압축해제된 확장 프로그램을 로드** → 이 `extension/` 폴더 선택
+3. **압축해제된 확장 프로그램 폴더를 로드** → 이 `extension/` 폴더 선택
 4. 툴바의 🛡️ 아이콘 클릭 → 판단 엔진(온디바이스/Claude/OpenRouter)과 서버 주소 설정
 
 ## 온디바이스 원칙

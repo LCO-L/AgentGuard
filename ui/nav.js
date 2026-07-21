@@ -1,4 +1,5 @@
-/* AgentGuard 통합 상단 네비게이션 — 모든 페이지 공용(한 줄 <script src="/nav.js"> 로 주입).
+/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). Unauthorized copying/use prohibited.
+ * AgentGuard 통합 상단 네비게이션 — 모든 페이지 공용(한 줄 <script src="/nav.js"> 로 주입).
  *
  * 순수 HTML 산출물들(검사·에디터·비교·시나리오·설정 + 확장 설치)을 하나로 잇는다.
  * fixed 상단 바 + body padding 자동 확보 → 각 페이지의 기존 레이아웃을 건드리지 않는다.
@@ -60,7 +61,7 @@
   agMeta('meta[name="apple-mobile-web-app-capable"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; return m; });
   agMeta('meta[name="apple-mobile-web-app-status-bar-style"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-status-bar-style"; m.content = "default"; return m; });
   agMeta('meta[name="apple-mobile-web-app-title"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "AgentGuard"; return m; });
-  agMeta('link[rel="apple-touch-icon"]', function () { var l = document.createElement("link"); l.rel = "apple-touch-icon"; l.href = "/icon.svg"; return l; });
+  agMeta('link[rel="apple-touch-icon"]', function () { var l = document.createElement("link"); l.rel = "apple-touch-icon"; l.href = "/logo.svg"; return l; });
 
   var items = LINKS.map(function (l) {
     var on = (l[0] === "/" ? path === "/" : path.indexOf(l[0]) === 0);
@@ -71,7 +72,7 @@
   var nav = document.createElement("nav");
   nav.id = "ag-topnav";
   nav.innerHTML =
-    '<a class="agb" href="/">🛡️ <span class="t">AgentGuard <span class="u">ULTRA</span></span></a>' +
+    '<a class="agb" href="/"><img src="/icon.svg" alt="" style="width:19px;height:19px;vertical-align:-4px"> <span class="t">AgentGuard <span class="u">ULTRA</span></span></a>' +
     '<div class="agl">' + items + "</div>" +
     '<a class="agx" href="/extension.zip" download title="크롬 확장 프로그램(zip) 다운로드 → 압축해제 후 로드">🧩 확장 설치</a>';
   document.body.insertBefore(nav, document.body.firstChild);
@@ -92,6 +93,18 @@
       }
     };
     document.body.appendChild(fab);
+  }
+
+  // 워터마크(소유권 표시) — © DONGHUN LEE (모든 페이지)
+  if (!document.querySelector('meta[name="author"]')) {
+    var _am = document.createElement("meta"); _am.name = "author"; _am.content = "DONGHUN LEE"; document.head.appendChild(_am);
+  }
+  if (!document.getElementById("ag-wm")) {
+    var wm = document.createElement("div");
+    wm.id = "ag-wm";
+    wm.textContent = "© DONGHUN LEE";
+    wm.style.cssText = "position:fixed;left:12px;bottom:10px;z-index:2147483000;font:600 10.5px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:rgba(14,17,22,.32);letter-spacing:.04em;pointer-events:none;user-select:none;-webkit-user-select:none";
+    document.body.appendChild(wm);
   }
 
   // 기존 레이아웃을 밀어내지 않도록 상단 여백만 확보
