@@ -32,6 +32,10 @@
     "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
     "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(37,99,235,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
+    "#ag-topnav .agh{flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1px solid #E8E8EA;" +
+    "background:#fff;color:#2563EB;font-weight:900;font-size:14px;line-height:1;cursor:pointer;" +
+    "font-family:inherit;transition:.12s}" +
+    "#ag-topnav .agh:hover{background:#EFF6FF;border-color:#2563EB}" +
     "@media(max-width:640px){#ag-topnav .agb .t{display:none}#ag-topnav a.agi span.tx{display:none}#ag-topnav a.agi{padding:7px 9px}}";
   var st = document.createElement("style");
   st.textContent = css;
@@ -57,8 +61,19 @@
   nav.innerHTML =
     '<a class="agb" href="/">🛡️ <span class="t">AgentGuard <span class="u">ULTRA</span></span></a>' +
     '<div class="agl">' + items + "</div>" +
-    '<a class="agx" href="/extension.zip" download title="크롬 확장 프로그램(zip) 다운로드 → 압축해제 후 로드">🧩 확장 설치</a>';
+    '<a class="agx" href="/extension.zip" download title="크롬 확장 프로그램(zip) 다운로드 → 압축해제 후 로드">🧩 확장 설치</a>' +
+    '<button class="agh" title="사용법 다시 보기" aria-label="사용법 다시 보기">?</button>';
   document.body.insertBefore(nav, document.body.firstChild);
+
+  // '?' 도움말 → 온보딩 투어 다시 보기(대시보드에 있으면 즉시, 아니면 홈으로 이동해 시작)
+  var help = nav.querySelector(".agh");
+  if (help) help.onclick = function () {
+    if (window.AGOnboard && typeof window.AGOnboard.start === "function") {
+      window.AGOnboard.start();
+    } else {
+      location.href = "/?tour=1";
+    }
+  };
 
   // 기존 레이아웃을 밀어내지 않도록 상단 여백만 확보
   var cur = parseInt(getComputedStyle(document.body).paddingTop) || 0;

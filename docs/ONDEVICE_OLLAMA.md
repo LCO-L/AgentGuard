@@ -13,11 +13,21 @@ curl -fsSL https://ollama.com/install.sh | sh
 # 2) 서버 실행(보통 설치 시 자동 시작. 아니면)
 ollama serve      # http://localhost:11434
 
-# 3) 모델 내려받기(최초 1회, 수 GB)
-ollama pull qwen3:8b
+# 3) 모델 내려받기(최초 1회, 4bit 소형 ~1.8GB)
+ollama pull qwen2.5:3b
 ```
 
-또는 원클릭: 프로젝트 루트에서 `./install.sh` → Ollama 확인 → 모델 pull → 백엔드 실행까지 자동.
+### 🟢 가장 쉬운 길 — 버튼 하나 (수동 설치 불필요)
+
+`/settings`의 **[온디바이스 실행]** 버튼을 누르면 **클릭 즉시** 아래가 전부 자동 진행됩니다(진행률 표시):
+
+1. **Ollama 설치** — `brew`가 있으면 brew로, 없으면 **공식 배포본을 직접 내려받아**(`~/.agentguard/`) 실행 파일 확보 → *Homebrew가 없어도 됩니다*
+2. **`ollama serve` 자동 기동**
+3. **`qwen2.5:3b`(4bit ~1.8GB) 자동 pull** — 이미 받은 채팅 모델이 있으면 그걸로 즉시 시작(추가 다운로드 없음)
+4. **준비 완료** → 온디바이스로 검사
+
+> 설치형(내 컴퓨터에서 실행)에서 100% 자동. 클라우드 배포는 GPU·권한 한계로 성공이 환경에 따라 다릅니다.
+> 터미널에서 `./install.sh` 로 띄우면 이 버튼이 로컬 권한으로 완결됩니다.
 
 ## 2. AgentGuard에서 켜기
 
@@ -45,7 +55,7 @@ ollama pull qwen3:8b
 ```bash
 AG_AI_PROVIDER=ollama                 # 기본 판단 엔진(요청 헤더가 우선)
 AG_OLLAMA_URL=http://localhost:11434  # Ollama 주소
-AG_OLLAMA_MODEL=qwen3:8b              # 기본 모델
+AG_OLLAMA_MODEL=qwen2.5:3b           # 기본 모델(4bit 소형 ~1.8GB)
 AG_OLLAMA_NUM_CTX=8192               # 컨텍스트 길이(긴 문서면 늘리기)
 AG_AI_TIMEOUT=20                     # 초. 대형 모델 첫 응답이 느리면 늘리기
 ```
@@ -65,8 +75,8 @@ AG_AI_TIMEOUT=20                     # 초. 대형 모델 첫 응답이 느리�
 
 | 용도 | 모델 | 비고 |
 |---|---|---|
-| 기본(균형) | `qwen3:8b` | 한국어·JSON 양호 |
-| 저사양/빠름 | `qwen3:4b`, `llama3.2:3b` | 속도 우선 |
-| 고품질 | `qwen3:14b` 이상 | 메모리 여유 시 |
+| 기본(온디바이스) | `qwen2.5:3b` | 4bit ~1.8GB · 한국어·JSON 양호 · 저메모리 |
+| 더 빠름/가벼움 | `llama3.2:3b`, `qwen2.5:1.5b` | 속도·메모리 우선 |
+| 고품질 | `qwen2.5:7b`, `qwen3:8b` 이상 | 메모리 여유 시 |
 
 > 어떤 모델이든 설치돼 있으면 AgentGuard가 자동 인식합니다. 클라우드(Claude·OpenRouter)와 언제든 전환 가능하고, 셋 다 없어도 오프라인 규칙으로 동작합니다.

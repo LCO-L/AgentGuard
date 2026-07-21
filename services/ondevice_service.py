@@ -15,6 +15,8 @@ import urllib.request
 
 DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL", "qwen2.5:3b")  # 4bit(Q4_K_M)·소형
 OLLAMA_URL = os.environ.get("AG_OLLAMA_URL", "http://localhost:11434")
+_HOME = os.path.expanduser(os.environ.get("AG_HOME", "~/.agentguard"))
+_OLLAMA_BIN: str | None = None  # 패키지매니저 대신 직접 설치한 경우의 실행 파일 경로
 
 _state: dict = {
     "state": "idle",      # idle|checking|starting|pulling|ready|error|no_ollama
@@ -42,6 +44,18 @@ def _ollama_alive() -> bool:
             return r.status == 200
     except Exception:
         return False
+
+
+def _bin() -> str:
+    """실행할 ollama 경로 — PATH 우선, 없으면 직접 설치한 위치."""
+    if _OLLAMA_BIN and os.path.exists(_OLLAMA_BIN):
+        return _OLLAMA_BIN
+    return shutil.which("ollama") or "ollama"
+
+
+def _ollama_present() -> bool:
+    """PATH에 있거나, 직접 설치한 실행 파일이 존재하면 True."""
+    return bool(shutil.which("ollama")) or bool(_OLLAMA_BIN and os.path.exists(_OLLAMA_BIN))
 
 
 def _installed_models() -> list[str]:
@@ -80,20 +94,111 @@ def start(model: str | None = None) -> dict:
     return status()
 
 
-def _install_ollama() -> bool:
-    """Ollama 자동 설치(로컬 전용). macOS=Homebrew, Linux=공식 설치 스크립트."""
+def _download(url: str, dest: str) -> None:
+    """urllib 스트리밍 다운로드(+진행률). 외부 의존성 없이 순수 표준 라이브러리."""
+    req = urllib.request.Request(url, headers={"User-Agent": "AgentGuard-Installer"})
+    with urllib.request.urlopen(req, timeout=60) as r:  # noqa: S310
+        total = int(r.headers.get("Content-Length") or 0)
+        done = 0
+        with open(dest, "wb") as f:
+            while True:
+                chunk = r.read(1 << 16)
+                if not chunk:
+                    break
+                f.write(chunk)
+                done += len(chunk)
+                if total:
+                    pct = int(done * 100 / total)
+                    _set(progress=min(4, 1 + pct // 34),
+                         message=f"Ollama 내려받는 중… {pct}%")
+
+
+def _mark_exec(path: str) -> None:
+    import stat as _stat
+    os.chmod(path, os.stat(path).st_mode | _stat.S_IXUSR | _stat.S_IXGRP | _stat.S_IXOTH)
+
+
+def _find_ollama_binary(root: str) -> str | None:
+    """추출 폴더에서 CLI 실행 파일(소문자 'ollama')을 찾는다(대문자 GUI 앱 제외)."""
+    for base, _dirs, files in os.walk(root):
+        for fn in files:
+            if fn == "ollama":
+                return os.path.join(base, fn)
+    return None
+
+
+def _install_macos_direct() -> bool:
+    """Homebrew 없이 공식 macOS zip을 직접 받아 CLI 바이너리 확보."""
+    global _OLLAMA_BIN
+    import zipfile
+    os.makedirs(_HOME, exist_ok=True)
+    zpath = os.path.join(_HOME, "Ollama-darwin.zip")
+    _download("https://ollama.com/download/Ollama-darwin.zip", zpath)
+    appdir = os.path.join(_HOME, "app")
+    shutil.rmtree(appdir, ignore_errors=True)
+    with zipfile.ZipFile(zpath) as z:
+        z.extractall(appdir)
+    binp = _find_ollama_binary(appdir)
+    if binp:
+        _mark_exec(binp)
+        _OLLAMA_BIN = binp
+        return True
+    return False
+
+
+def _install_linux_direct() -> bool:
+    """설치 스크립트가 막힌 환경에서 공식 tgz를 직접 받아 확보."""
+    global _OLLAMA_BIN
     import platform
+    import tarfile
+    arch = platform.machine().lower()
+    a = "arm64" if arch in ("arm64", "aarch64") else "amd64"
+    os.makedirs(_HOME, exist_ok=True)
+    tpath = os.path.join(_HOME, "ollama.tgz")
+    _download(f"https://ollama.com/download/ollama-linux-{a}.tgz", tpath)
+    outdir = os.path.join(_HOME, "linux")
+    shutil.rmtree(outdir, ignore_errors=True)
+    with tarfile.open(tpath) as t:
+        t.extractall(outdir)
+    binp = os.path.join(outdir, "bin", "ollama")
+    if not os.path.exists(binp):
+        binp = _find_ollama_binary(outdir) or ""
+    if binp and os.path.exists(binp):
+        _mark_exec(binp)
+        _OLLAMA_BIN = binp
+        return True
+    return False
+
+
+def _install_ollama() -> bool:
+    """Ollama 자동 설치. 패키지매니저 우선, 실패 시 공식 배포본 직접 다운로드로 폴백.
+
+    - macOS: brew 있으면 brew, 없으면 공식 zip 직접 다운로드(설치 불필요·바로 실행).
+    - Linux: 공식 install.sh, 권한/네트워크로 막히면 공식 tgz 직접 다운로드.
+    """
+    import platform
+    system = platform.system()
     try:
-        if platform.system() == "Darwin":
-            if not shutil.which("brew"):
-                return False  # Homebrew 없음 → GUI 앱 수동 설치 안내
-            subprocess.run(["brew", "install", "ollama"],
-                           check=True, capture_output=True, timeout=900)
-        else:  # Linux 등
+        if system == "Darwin":
+            if shutil.which("brew"):
+                try:
+                    subprocess.run(["brew", "install", "ollama"],
+                                   check=True, capture_output=True, timeout=900)
+                    if shutil.which("ollama"):
+                        return True
+                except Exception:  # noqa: BLE001
+                    pass  # brew 실패 → 직접 다운로드로 폴백
+            return _install_macos_direct()
+        # Linux 등
+        try:
             subprocess.run("curl -fsSL https://ollama.com/install.sh | sh",
                            shell=True, check=True, capture_output=True, timeout=900)
-        return shutil.which("ollama") is not None
-    except Exception:
+            if shutil.which("ollama"):
+                return True
+        except Exception:  # noqa: BLE001
+            pass  # 스크립트 실패(권한/네트워크) → 직접 다운로드로 폴백
+        return _install_linux_direct()
+    except Exception:  # noqa: BLE001
         return False
 
 
@@ -101,10 +206,10 @@ def _run(model: str) -> None:
     global _proc
     try:
         # ① 설치 확인 → 없으면 자동 설치
-        if not shutil.which("ollama"):
+        if not _ollama_present():
             _set(state="starting", progress=2,
                  message="Ollama 자동 설치 중… (최초 1회, 수 분 걸릴 수 있어요)")
-            if not _install_ollama() or not shutil.which("ollama"):
+            if not _install_ollama() or not _ollama_present():
                 _set(state="no_ollama", progress=0,
                      message="자동 설치를 완료하지 못했어요. https://ollama.com 에서 "
                              "설치 후 다시 눌러주세요. (설치 없이도 오프라인 규칙으로 동작해요)")
@@ -115,7 +220,7 @@ def _run(model: str) -> None:
         if not _ollama_alive():
             _set(state="starting", progress=5, message="Ollama 실행 중…")
             _proc = subprocess.Popen(
-                ["ollama", "serve"],
+                [_bin(), "serve"],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             import time
             for i in range(30):
@@ -143,7 +248,7 @@ def _run(model: str) -> None:
         _set(state="pulling", progress=10,
              message=f"{model} 다운로드 중… (최초 1회)")
         proc = subprocess.Popen(
-            ["ollama", "pull", model],
+            [_bin(), "pull", model],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         assert proc.stdout is not None
         buf = ""
