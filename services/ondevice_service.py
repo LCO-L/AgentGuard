@@ -55,10 +55,17 @@ def _ollama_alive() -> bool:
 
 
 def _bin() -> str:
-    """실행할 ollama 경로 — PATH 우선, 없으면 직접 설치한 위치."""
+    """실행할 ollama 경로 — 정식 설치(PATH)를 우선, 없으면 직접 받은 실행 파일.
+
+    PATH의 정식 설치본은 런너/라이브러리가 제대로 세팅돼 있어 llama-server
+    segfault 위험이 적다. 직접 추출한 standalone 바이너리는 최후 수단.
+    """
+    p = shutil.which("ollama")
+    if p:
+        return p
     if _OLLAMA_BIN and os.path.exists(_OLLAMA_BIN):
         return _OLLAMA_BIN
-    return shutil.which("ollama") or "ollama"
+    return "ollama"
 
 
 def _ollama_present() -> bool:

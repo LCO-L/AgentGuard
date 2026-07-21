@@ -136,15 +136,12 @@
   function start() { idx = 0; host.classList.add("on"); render(); }
   window.AGOnboard = { start: start, reset: function () { try { localStorage.removeItem(KEY); } catch (e) {} } };
 
-  // 시작 조건: ?tour=1(상단 ? 버튼) 이면 항상 / 아니면 첫 방문(대시보드)에서만
-  var first = false;
-  try { first = !localStorage.getItem(KEY); } catch (e) { first = true; }
+  // 시작 조건: 진입할 때마다 항상 온보딩(공유 시트 자동검사 때만 제외). ?tour=1도 항상.
   var p = location.pathname.replace(/\/+$/, "") || "/";
   if ((location.search || "").indexOf("tour=1") >= 0) {
     try { history.replaceState(null, "", location.pathname); } catch (e) {}
     setTimeout(start, 500);
-  } else if (first && p === "/" && !/[?&](url|text|title)=/.test(location.search || "")) {
-    // 공유 시트로 들어와 자동 검사 중이면 투어를 띄우지 않음
+  } else if (p === "/" && !/[?&](url|text|title)=/.test(location.search || "")) {
     setTimeout(start, 700);
   }
 })();
