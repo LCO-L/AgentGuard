@@ -9,8 +9,9 @@ import type {
   Verdict,
 } from "./types";
 
-// 웹: /api 프록시(rewrites) / APK(정적 export): 백엔드 절대 주소 직접 호출(CORS)
-const BASE = process.env.NEXT_PUBLIC_API_ABSOLUTE || "/api";
+// 웹: /api 프록시(rewrites) / 정적 export: NEXT_PUBLIC_API_ABSOLUTE 사용.
+// 빈 문자열("")이면 같은 오리진(FastAPI가 정적 서빙할 때) — /v1 직접 호출.
+const BASE = process.env.NEXT_PUBLIC_API_ABSOLUTE ?? "/api";
 
 async function postJSON<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

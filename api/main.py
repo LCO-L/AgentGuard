@@ -71,6 +71,11 @@ def create_app() -> FastAPI:
         """온디바이스 경량 스캐너(익스텐션·위젯 공용)."""
         return _serve("agscan.js", "application/javascript; charset=utf-8")
 
+    @app.get("/nav.js", tags=["meta"])
+    def nav_js() -> Response:
+        """통합 상단 네비게이션(모든 순수 HTML 페이지 공용)."""
+        return _serve("nav.js", "application/javascript; charset=utf-8")
+
     # ── PWA (아이폰 공유 시트 = Web Share Target) ──
     @app.get("/manifest.webmanifest", tags=["meta"])
     def manifest() -> Response:
@@ -95,6 +100,12 @@ def create_app() -> FastAPI:
         """Grammarly식 보안 에디터 — AI 전송 전 실시간 검사."""
         html = _UI_DIR / "editor.html"
         return html.read_text(encoding="utf-8") if html.exists() else "<h1>no editor</h1>"
+
+    @app.get("/scenarios", response_class=HTMLResponse, tags=["meta"])
+    def scenarios_page() -> str:
+        """탐지 시나리오 카탈로그 — 데이터 한 줄로 확장되는 룰팩 가시화."""
+        html = _UI_DIR / "scenarios.html"
+        return html.read_text(encoding="utf-8") if html.exists() else "<h1>no scenarios</h1>"
 
     @app.get("/compare", response_class=HTMLResponse, tags=["meta"])
     def compare_page() -> str:
@@ -158,9 +169,13 @@ def create_app() -> FastAPI:
         return {
             "service": "AgentGuard ULTRA",
             "docs": "/docs",
+            "pages": ["/", "/editor", "/compare", "/scenarios", "/settings", "/embed-demo"],
+            "downloads": ["/extension.zip", "/extension.crx"],
             "endpoints": [
                 "POST /v1/scan", "POST /v1/scan/batch", "POST /v1/scan/url",
-                "POST /v1/scan/text", "GET /v1/ai/status",
+                "POST /v1/scan/text", "POST /v1/inspect", "POST /v1/redact",
+                "POST /v1/chat", "GET /v1/scenarios",
+                "GET /v1/ai/status", "GET /v1/ai/models", "POST /v1/ai/test",
                 "GET /v1/scans", "GET /v1/scans/{id}",
                 "GET /v1/rules", "GET /v1/health",
             ],
