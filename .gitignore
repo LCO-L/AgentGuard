@@ -1,9 +1,32 @@
+# ── Python ──
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── 런타임 캐시/이력 (원본 비저장 원칙 — 커밋 금지) ──
 .cache/
+*.jsonl
+
+# ── 환경/비밀 ──
 .env
-.DS_Store
+.env.*
+!.env.example
+
+# ── 데모 샘플 산출물 (make_samples.py 로 생성 — 소스만 커밋) ──
 samples/evil.*
 samples/clean.*
 !samples/make_samples.py
+
+# ── OS/에디터 ──
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# ── 초기 쓰기 테스트 잔여물 ──
+.write_test
