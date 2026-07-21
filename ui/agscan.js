@@ -1,3 +1,4 @@
+/* © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary). */
 /* AGScan — 온디바이스 경량 위험 스캐너(브라우저·Node 공용, 백엔드 불필요).
  *
  * 파이썬 core/textnorm.py 의 JS 이식본. 페이지·텍스트에서 숨은 명령을 즉시 찾는다:

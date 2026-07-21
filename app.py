@@ -1,4 +1,5 @@
-"""실행 엔트리 — `uv run python app.py` 또는 `uv run uvicorn api.main:app`.
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+"""실행 엔트리 —`uv run python app.py` 또는 `uv run uvicorn api.main:app`.
 
 Railway는 Procfile/startCommand로 이 모듈을 사용.
 PORT 환경변수는 Railway가 자동 주입.

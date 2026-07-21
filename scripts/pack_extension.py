@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """크롬 익스텐션 CRX3 패키저 — 순수 stdlib + openssl CLI.
 
 CRX3 구조:

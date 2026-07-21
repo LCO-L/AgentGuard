@@ -1,3 +1,4 @@
+// © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 // AgentGuard — 네이티브 macOS 앱(Cocoa + WebKit).
 //
 // 하는 일:
