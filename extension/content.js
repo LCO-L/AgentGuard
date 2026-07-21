@@ -66,7 +66,7 @@
 
   var _lastVerdict = null;
   function showBusy(kind) { openPanel(); panel.innerHTML = '<div class="bar"><span>🛡️ AgentGuard</span><button class="x">×</button></div><div class="msg"><b>검사 중…</b> 기기 안에서 살펴보는 중이에요</div>'; bindClose(); }
-  function showError(e) { openPanel(); panel.innerHTML = '<div class="bar"><span>🛡️ AgentGuard</span><button class="x">×</button></div><div class="msg"><b>검사 서버에 연결하지 못했어요.</b><br>확장 아이콘을 눌러 <b>백엔드 주소</b>를 확인하세요 — 기본값은 <code>agentguard.maeum.io</code>, 로컬 실행 시 <code>localhost:8000</code>으로 바꾸면 돼요.<br><br><span style="opacity:.55;font-size:11px">' + esc(e) + '</span></div>'; bindClose(); }
+  function showError(e) { openPanel(); panel.innerHTML = '<div class="bar"><span>🛡️ AgentGuard</span><button class="x">×</button></div><div class="msg"><b>검사 서버에 연결하지 못했어요.</b><br>확장 아이콘을 눌러 <b>백엔드 주소</b>를 확인하세요 — 기본값은 <code>agentguard.maeum.ai</code>, 로컬 실행 시 <code>localhost:8000</code>으로 바꾸면 돼요.<br><br><span style="opacity:.55;font-size:11px">' + esc(e) + '</span></div>'; bindClose(); }
   function showSummary() {
     openPanel();
     var msg = _pageHits ? ("이 페이지에서 숨은 위험 신호 <b>" + _pageHits + "곳</b>을 찾아 빨간 밑줄로 표시했어요. 밑줄에 마우스를 올려 보세요.") : "이 페이지에서는 특별한 숨은 위험이 보이지 않아요. 링크나 파일을 우클릭해 검사할 수도 있어요.";

@@ -8,7 +8,7 @@
  * 설정은 chrome.storage.local 에 저장(온디바이스 원칙: 키는 로컬만).
  */
 const DEFAULTS = {
-  apiBase: "https://agentguard.maeum.io",  // 기본 = 배포 백엔드(설치 없이 바로 동작). 로컬 실행 시 팝업에서 http://localhost:8000 로 변경
+  apiBase: "https://agentguard.maeum.ai",  // 기본 = 배포 백엔드(설치 없이 바로 동작). 로컬 실행 시 팝업에서 http://localhost:8000 로 변경
   provider: "ollama",     // 기본 = 온디바이스
 
   ollamaUrl: "", ollamaModel: "",

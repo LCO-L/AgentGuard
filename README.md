@@ -4,7 +4,7 @@
 
 ### AI 시대의 보안 통역사 — 위험을 "사람의 말"로 바꿔주는 온디바이스 보안 도우미
 
-**🔗 라이브 데모: [agentguard.maeum.io](https://agentguard.maeum.io)**
+**🔗 라이브 데모: [agentguard.maeum.ai](https://agentguard.maeum.ai)**
 
 *파일·링크·문서·AI 프롬프트에 숨은 위험을, 인터넷 없이 내 기기 안에서 검사하고
 "열자마자 자동 실행되는 명령이 있어요, 열지 마세요"처럼 누구나 알아듣는 말로 알려줍니다.*
@@ -67,7 +67,7 @@
 
 ## 🚀 직접 써보기
 
-**가장 빠른 길:** [agentguard.maeum.io](https://agentguard.maeum.io) 접속 → 텍스트 탭 → 데모 버튼 클릭
+**가장 빠른 길:** [agentguard.maeum.ai](https://agentguard.maeum.ai) 접속 → 텍스트 탭 → 데모 버튼 클릭
 
 | 이거 눌러보세요 | 무슨 일이? |
 |---|---|

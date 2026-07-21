@@ -13,7 +13,7 @@
 cd agentguard
 uv sync
 uv run python samples/make_samples.py     # 데모 파일 생성
-uv run python app.py                        # http://localhost:8000  (배포면 https://agentguard.maeum.io)
+uv run python app.py                        # http://localhost:8000  (배포면 https://agentguard.maeum.ai)
 # (온디바이스 AI 보이려면) ollama serve && ollama pull qwen3:8b → 설정에서 온디바이스 선택
 ```
 
