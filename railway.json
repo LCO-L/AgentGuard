@@ -5,7 +5,7 @@
     "buildCommand": "python scripts/pack_extension.py || echo 'CRX 패키징 건늘뛰기(openssl 없음) — zip으로 배포'"
   },
   "deploy": {
-    "startCommand": "python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}",
+    "startCommand": "python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}",
     "healthcheckPath": "/v1/health",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",

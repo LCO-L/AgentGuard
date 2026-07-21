@@ -252,3 +252,33 @@ AG_AI_PROVIDER=off python -m unittest tests.test_ultra                      # 35
 - 배포: **백엔드 = Railway(Nixpacks pip)**, **웹 = Vercel 등 별도** 권장(또는 web 정적 export 를 백엔드가 서빙).
 - 데모 샘플은 **실제 페이로드 없음**(탐지 신호만). PII/시크릿 데모 값도 가짜.
 - 마스킹 매핑·원문은 서버에 저장하지 않음(비저장 원칙).
+
+---
+
+## 8. UI 통합·라우팅 점검 (2026-07-21 추가)
+
+여러 트랙(비교 시연·확장 배포·설치형·VS Code)이 각각 완성됐지만 **순수 HTML UI에서 서로 링크로
+연결되지 않아** 사용자가 발견·이동할 수 없던 문제를 통합했다. (기능은 모두 이미 작동)
+
+### 한 것
+- **`ui/nav.js` 통합 상단 네비게이션** 신설 — 모든 순수 HTML 페이지에 `<script src="/nav.js">` 한 줄로
+  주입(fixed 바 + body 여백 자동). 검사·에디터·비교·시나리오·설정 + **확장 설치 다운로드** 버튼.
+- **`ui/scenarios.html`** 신설(순수 HTML 시나리오 카탈로그) + `GET /scenarios` 라우트.
+- `main.py`: `/nav.js`·`/scenarios` 라우트 추가, `/api` 인덱스에 신규 엔드포인트·페이지·다운로드 반영.
+- `dashboard/settings/compare/scenarios` 에 nav.js 연결, `editor` 는 자체 상단바에 링크(풀스크린 레이아웃 보존).
+- Next.js `TopNav` 버그 수정(검사 링크 `/scan`→`/`) + 비교(`/api/compare`)·확장 다운로드(`/api/extension.zip`) 링크.
+
+### 검증 (in-process ASGI)
+- 페이지·에셋 **12개 전부 200**: `/ /editor /compare /scenarios /settings /embed-demo /nav.js
+  /agconfig.js /widget.js /extension.zip /extension.crx /manifest.webmanifest`
+- 모든 순수 HTML 페이지에 nav.js 주입 확인 · 에디터 자체 네비 확인.
+- **v1 엔드포인트 17개** · **unittest 35 통과** · `scripts/pack_extension.py` 문법 OK · `vscode-extension/out/extension.js` 빌드 확인.
+
+### Railway (배포) 주의
+- `railway.json`: builder=NIXPACKS, buildCommand 가 `python scripts/pack_extension.py`(실패 시 `|| echo` 로 배포 계속),
+  startCommand `python -m uvicorn api.main:app`, healthcheck `/v1/health`.
+- `dist/` 는 `.gitignore` 대상 → **빌드 시 buildCommand 가 재생성**. openssl 없으면 CRX 생략, `/extension.zip` 은
+  `main.py` 가 항상 즉석 생성하므로 확장 배포는 무중단.
+- Railway **Variables** 권장: `AG_AI_PROVIDER`(기본 auto), 선택 `ANTHROPIC_API_KEY`/`OPENROUTER_API_KEY`, `AG_API_KEY`.
+- 순수 HTML UI 전부를 FastAPI 가 서빙하므로 백엔드 1개 배포로 대시보드·에디터·비교·시나리오·설정·확장다운로드가 모두 동작.
+  (Next.js `web/` 는 로컬/Vercel 별도)

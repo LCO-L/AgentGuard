@@ -29,9 +29,9 @@ uv run python app.py                      # 서버 기동 (http://localhost:8000
 #   ollama pull qwen3:8b && ollama serve
 ```
 
-- 대시보드: `http://localhost:8000/` · **보안 에디터: `/editor`** · 설정: `/settings` · 위젯 데모: `/embed-demo`
-- 크롬 익스텐션: `extension/` 폴더를 `chrome://extensions`에서 로드 (`extension/README.md`)
-- 아이폰 공유시트: `docs/IOS_SHORTCUT.md`
+- 페이지(상단 네비로 이동): 대시보드 `/` · 보안 에디터 `/editor` · 비교 `/compare` · 시나리오 `/scenarios` · 설정 `/settings` · 위젯 데모 `/embed-demo`
+- 크롬 익스텐션: **`/extension.zip` 다운로드** → 압축해제 후 `chrome://extensions`에서 로드 (또는 `extension/` 폴더, `extension/README.md`)
+- 원클릭 설치형(온디바이스): `./install.sh` · 아이폰 공유시트: `docs/IOS_SHORTCUT.md`
 
 ## API (v1)
 
