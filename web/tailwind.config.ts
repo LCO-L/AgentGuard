@@ -20,7 +20,7 @@ const config: Config = {
         line: "#E8E8EA",
         canvas: "#EEF0F3",
         card: "#FFFFFF",
-        brand: { DEFAULT: "#2563EB", soft: "#F0F0FD", ink: "#4A4AC4" },
+        brand: { DEFAULT: "#2563EB", soft: "#EFF6FF", ink: "#1D4ED8" },
         risk: {
           critical: "#C4283C",
           red: "#E5484D",
@@ -37,7 +37,7 @@ const config: Config = {
       boxShadow: {
         card: "0 10px 34px rgba(20,24,29,.10)",
         pop: "0 18px 60px rgba(20,24,29,.28)",
-        glow: "0 8px 26px rgba(91,91,214,.42)",
+        glow: "0 8px 26px rgba(37,99,235,.42)",
       },
       keyframes: {
         rise: { "0%": { opacity: "0", transform: "translateY(8px)" }, "100%": { opacity: "1", transform: "none" } },

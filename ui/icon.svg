@@ -1,13 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="AgentGuard">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#5B5BD6"/>
-      <stop offset="1" stop-color="#7C6BF0"/>
+    <linearGradient id="agShield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#3B82F6"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <path d="M256 96 L392 148 V256 C392 344 328 400 256 424 C184 400 120 344 120 256 V148 Z"
-        fill="#fff" fill-opacity="0.16" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
-  <path d="M212 258 L244 292 L312 214" fill="none" stroke="#fff" stroke-width="22"
-        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 방패 배경 -->
+  <path d="M256 40 L440 106 C440 120 440 262 434 302 C421 392 346 454 256 478
+           C166 454 91 392 78 302 C72 262 72 120 72 106 Z"
+        fill="url(#agShield)"/>
+
+  <!-- 스파르탄 투구 실루엣 (흰색). T자 개구부는 evenodd 로 방패 파랑이 비치게 -->
+  <g fill="#fff">
+    <!-- 볏(crest) -->
+    <path d="M256 120 C206 128 176 168 184 216 L212 210 C207 176 228 150 256 145
+             C284 150 305 176 300 210 L328 216 C336 168 306 128 256 120 Z"/>
+    <!-- 헬멧 돔 + 볼가드, 가운데 T슬릿(눈·코) 뚫림 -->
+    <path fill-rule="evenodd" d="
+      M196 206 C196 196 214 190 256 190 C298 190 316 196 316 206
+      L316 268 C316 312 292 346 256 362 C220 346 196 312 196 268 Z
+      M242 232 L270 232 L265 264 L259 320 L256 332 L253 320 L247 264 Z"/>
+  </g>
+
+  <!-- 눈(청록) — 마스코트 색 -->
+  <circle cx="230" cy="250" r="8.5" fill="#22D3EE"/>
+  <circle cx="282" cy="250" r="8.5" fill="#22D3EE"/>
 </svg>

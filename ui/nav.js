@@ -30,12 +30,21 @@
     "#ag-topnav a.agi:hover{color:#16181D}" +
     "#ag-topnav a.agi.on{background:#16181D;color:#fff}" +
     "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
-    "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(91,91,214,.35)}" +
+    "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(37,99,235,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
     "@media(max-width:640px){#ag-topnav .agb .t{display:none}#ag-topnav a.agi span.tx{display:none}#ag-topnav a.agi{padding:7px 9px}}";
   var st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
+
+  // 파비콘(모든 페이지 공통) — 새 브랜드 로고(방패+투구)
+  if (!document.querySelector('link[rel="icon"]')) {
+    var fav = document.createElement("link");
+    fav.rel = "icon";
+    fav.type = "image/svg+xml";
+    fav.href = "/icon.svg";
+    document.head.appendChild(fav);
+  }
 
   var items = LINKS.map(function (l) {
     var on = (l[0] === "/" ? path === "/" : path.indexOf(l[0]) === 0);
