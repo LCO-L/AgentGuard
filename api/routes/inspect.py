@@ -37,6 +37,12 @@ def redact(req: RedactRequest) -> dict:
     return inspect_service.redact_text(req.text)
 
 
+@router.post("/sanitize")
+def sanitize(req: RedactRequest) -> dict:
+    """AI 전송 전 정화 — 민감정보는 마스킹, 프롬프트 인젝션·은닉은 제거."""
+    return inspect_service.sanitize_text(req.text)
+
+
 @router.get("/scenarios")
 def scenarios() -> dict:
     """시나리오 카탈로그 — 어떤 보안 시나리오를 잡는지(가시성·관리 화면)."""

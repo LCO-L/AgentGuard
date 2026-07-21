@@ -84,6 +84,18 @@
     return { threats: threats, pii: pii, level: level, count: threats.length + pii.length };
   }
 
+  // 정화: 프롬프트 인젝션·은닉은 '민감정보'가 아니라 공격이므로 제거(제외),
+  //        시크릿·PII는 복원 가능 마스킹. (밑줄 교정카드와 같은 원칙)
+  function sanitize(text) {
+    var spans = injectSpans(text).filter(function (s) { return s.kind === "inject"; });
+    var removed = spans.length;
+    spans.sort(function (a, b) { return b.s - a.s; });   // 뒤에서부터 제거(offset 보존)
+    var out = text;
+    spans.forEach(function (sp) { out = out.slice(0, sp.s) + out.slice(sp.e); });
+    var r = AGScan.redact(out);                          // 남은 텍스트의 민감정보만 마스킹
+    return { text: r.masked, masked: r.count, removed: removed };
+  }
+
   function scan() {
     if (!active || !allowed()) { badge.style.display = "none"; clearUnderline(); return; }
     var t = getText(active) || "";
@@ -109,10 +121,25 @@
     a.threats.forEach(function (t) { rows.push('<div class="it"><span class="d ' + (t.severity === "red" ? "red" : "yellow") + '"></span><div><b>' + esc(t.label) + '</b> — ' + esc(t.msg) + (t.decoded ? " (숨은 내용: " + esc(t.decoded) + ")" : "") + '</div></div>'); });
     mb.innerHTML = rows.join("") || '<div class="it">위험 요소가 정리됐어요.</div>';
     ov.classList.add("show");
-    root.querySelector(".b-mask").onclick = function () {
-      var r = AGScan.redact(getText(field));
-      if (r.count) { setText(field, r.masked); toast(r.count + "건 마스킹 완료 — 이제 안전하게 보낼 수 있어요"); }
-      else toast("마스킹할 비밀·개인정보는 없어요. 남은 위험을 확인하세요.");
+    var hasPII = a.pii.length > 0, hasInject = a.threats.length > 0;
+    var primary = root.querySelector(".b-mask");
+    // 인젝션(역할 조작 등)은 민감정보가 아니라 공격 → '마스킹'이 아니라 '제거'
+    primary.textContent = (hasPII && hasInject) ? "정리 후 전송"
+      : hasInject ? "위험 지시 제거 후 전송" : "마스킹 후 전송";
+    primary.onclick = function () {
+      var t = getText(field);
+      if (hasInject) {
+        var s = sanitize(t);                    // 인젝션 제거(+민감정보 있으면 마스킹)
+        setText(field, s.text);
+        var parts = [];
+        if (s.masked) parts.push("민감정보 " + s.masked + "건 마스킹");
+        if (s.removed) parts.push("위험 지시 " + s.removed + "건 제거");
+        toast(parts.length ? parts.join(" · ") + " 완료" : "정리할 항목이 없어요");
+      } else {
+        var r = AGScan.redact(t);
+        if (r.count) { setText(field, r.masked); toast(r.count + "건 마스킹 완료 — 안전하게 보낼 수 있어요"); }
+        else toast("마스킹할 비밀·개인정보는 없어요.");
+      }
       ov.classList.remove("show"); scan();
     };
     root.querySelector(".b-send").onclick = function () {

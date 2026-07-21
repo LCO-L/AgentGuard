@@ -164,11 +164,13 @@
       (s.high?`<span class="c-high">${s.high} High</span>`:"")+
       (s.medium?`<span class="c-med">${s.medium} Medium</span>`:"");
     const sb=$("#sendBtn"); sb.classList.toggle("warn", (s.critical+s.high)>0);
-    sb.textContent=(s.critical+s.high)>0? (d.has_secrets?"마스킹 후 전송":"위험 확인 후 전송") : "안전하게 전송";
+    const hasSan=issues.some(i=>["secret","pii","inject","stego"].includes(i.category));
+    sb.textContent=(s.critical+s.high)>0? (hasSan?"정리 후 전송":"위험 확인 후 전송") : "안전하게 전송";
 
     if(!issues.length){ coachBody.innerHTML='<div class="empty">✅ 지금은 위험 신호가 없어요.</div>'; return; }
     coachBody.innerHTML=issues.map((i,idx)=>{
       const canMask=(i.category==="secret"||i.category==="pii");
+      const canRemove=(i.category==="inject"||i.category==="stego");
       return `<div class="icard ${i.severity}">
         <div class="sev ${i.severity}">${i.severity} · ${cat(i.category)}</div>
         <div class="t">${esc(i.title)}</div>
@@ -178,34 +180,39 @@
         ${i.suggestion?`<div class="sug">${esc(i.suggestion)}</div>`:""}
         <div class="acts">
           ${canMask?`<button class="b-primary" data-mask="${idx}">마스킹</button>`:""}
+          ${canRemove?`<button class="b-primary" data-remove="${idx}">제거</button>`:""}
           <button class="b-ghost" data-goto="${i.start}">위치로</button>
           <button class="b-ghost" data-allow="${i.rule_id}:${i.start}">이번만 허용</button>
         </div></div>`;
     }).join("");
     coachBody.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>{ed.focus();ed.setSelectionRange(+b.dataset.goto,+b.dataset.goto);ed.blur();ed.focus();});
     coachBody.querySelectorAll("[data-allow]").forEach(b=>b.onclick=()=>{allow.add(b.dataset.allow);paintBackdrop(ed.value,LAST.issues);renderCoach(LAST);});
-    coachBody.querySelectorAll("[data-mask]").forEach(b=>b.onclick=()=>maskAll());
+    coachBody.querySelectorAll("[data-mask]").forEach(b=>b.onclick=()=>sanitizeAll());
+    coachBody.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>sanitizeAll());
   }
   function cat(c){return{secret:"비밀값",pii:"개인정보",vuln:"취약코드",agency:"과잉권한",inject:"인젝션",stego:"은닉"}[c]||c;}
 
-  // 마스킹 적용(전체 secret/pii)
-  async function maskAll(){
+  // 정화: 민감정보는 마스킹(복원 가능), 프롬프트 인젝션·은닉은 제거(제외)
+  async function sanitizeAll(){
     try{
-      const r=await fetch("/v1/redact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:ed.value})});
+      const r=await fetch("/v1/sanitize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:ed.value})});
       const d=await r.json();
-      if(!d.count){ toast("마스킹할 비밀·개인정보가 없어요"); return; }
-      ed.value=d.masked; toast(`${d.count}건 마스킹 완료 — 이제 전송해도 안전해요`); run();
-    }catch(e){ toast("마스킹 실패"); }
+      const total=(d.masked||0)+(d.removed||0);
+      if(!total){ toast("정리할 민감정보·위험 지시가 없어요"); return false; }
+      ed.value=d.sanitized;
+      const parts=[]; if(d.masked)parts.push(`민감정보 ${d.masked}건 마스킹`); if(d.removed)parts.push(`위험 지시 ${d.removed}건 제거`);
+      toast(parts.join(" · ")+" 완료"); run(); return true;
+    }catch(e){ toast("정리 실패"); return false; }
   }
 
   // 안전하게 전송
   $("#sendBtn").onclick=async()=>{
     if(!LAST){ toast("검사할 내용이 없어요"); return; }
     const s=LAST.summary;
-    if(LAST.has_secrets){ await maskAll(); }
-    const crit=s.critical||0, high=s.high||0;
+    await sanitizeAll();   // 민감정보 마스킹 + 프롬프트 인젝션·은닉 제거
+    const crit=s.critical||0;
     if(crit>0){ if(!confirm(`Critical 위험 ${crit}건이 남아 있어요. 그래도 전송(클립보드 복사)할까요?`)) return; }
-    try{ await navigator.clipboard.writeText(ed.value); toast("검사·마스킹된 내용을 클립보드에 복사했어요"); }
+    try{ await navigator.clipboard.writeText(ed.value); toast("검사·정화된 내용을 클립보드에 복사했어요"); }
     catch(e){ toast("클립보드 복사는 브라우저 권한이 필요해요"); }
   };
 
