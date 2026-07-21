@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """시나리오 레지스트리 기반 — 확장성의 심장.
 
 ★ 새 보안 시나리오를 추가하는 법(둘 중 하나):

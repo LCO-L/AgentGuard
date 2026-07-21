@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """파일 스캔 라우트 — 단건/배치."""
 from __future__ import annotations
 

@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """URL 스캔 라우트 — 크롬 익스텐션·링크 검사용."""
 from __future__ import annotations
 

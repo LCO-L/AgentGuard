@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """은닉/닮은꼴 팩 — textnorm 기반 offset span(제로위드·태그·homoglyph·BiDi)."""
 from __future__ import annotations
 

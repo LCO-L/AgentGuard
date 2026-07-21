@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """판정 산출물 — Finding / InterpretedCard / Verdict.
 
 rule_id는 포맷이 아니라 위험 종류(EXEC-*/NET-*/HID-*…) 기준.

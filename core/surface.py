@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """★ RiskSurface — 모든 어댑터의 공통 산출물(통합 계약).
 
 포맷의 다양성은 여기서 흡수된다. 이 아래로는 세상에 포맷이 하나뿐인 것처럼 동작.

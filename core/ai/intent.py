@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """2층 의도 분석 — hidden_instruction 을 먹는 포맷 무관 판정기.
 
 우선순위: LLM(ollama/claude/openrouter) → 실패 시 오프라인 결합엔진(local_intent).

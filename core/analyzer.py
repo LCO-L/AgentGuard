@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """1층 — 포맷 무관 결정적 룰 엔진(공용).
 
 RiskSurface의 Capability들을 받아 signatures.RULES와 매칭해 Finding 산출.

@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """파일 스캔 오케스트레이션 — ①정규화 → ②1층 → ③2층(AI) → ④3층(러그풀) → ⑤통역.
 
 원본은 로컬 임시파일에만 머물고 처리 후 즉시 삭제(비저장 원칙).

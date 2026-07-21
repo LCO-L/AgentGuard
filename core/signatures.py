@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """1층 룰 카탈로그 — 데이터로 분리(코드 안 늘림).
 
 룰은 포맷이 아니라 Capability.kind에 붙는다.

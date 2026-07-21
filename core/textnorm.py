@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """텍스트 은닉·난독 실탐지 — ULTRA 1층의 눈.
 
 "규칙은 표현 바꾸면 뚫린다"의 대표 우회가 **보이지 않는 문자**다.

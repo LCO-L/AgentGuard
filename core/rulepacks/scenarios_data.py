@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """★ 시나리오 카탈로그(데이터) — 여기에 한 줄 추가하면 즉시 전 계층에 반영된다.
 
 정규식으로 표현되는 보안 시나리오(프롬프트 인젝션 · 취약 코드 · 과잉권한)를

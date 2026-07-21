@@ -1,3 +1,4 @@
+# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
 """통합 LLM 백엔드 — 의존성 0(urllib)로 3개 provider 를 한 입구로.
 
 지원:
