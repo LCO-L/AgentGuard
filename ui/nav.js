@@ -13,6 +13,7 @@
     ["/editor", "✍️", "에디터"],
     ["/compare", "⚖️", "비교"],
     ["/scenarios", "🧩", "시나리오"],
+    ["/audit", "📋", "감사"],
     ["/settings", "⚙️", "설정"],
   ];
 
@@ -91,6 +92,17 @@
       }
     };
     document.body.appendChild(fab);
+
+    // 확장(AgentGuard 배지, #agentguard-ext-host)이 같은 우하단에 뜨면
+    // '?'를 그 위로 올려 두 버튼이 겹치지 않고 모두 보이게 한다.
+    var positionFab = function () {
+      var ext = document.getElementById("agentguard-ext-host");
+      fab.style.bottom = ext ? "86px" : "20px";
+      fab.style.right = ext ? "24px" : "20px";
+    };
+    positionFab();
+    try { new MutationObserver(positionFab).observe(document.documentElement, { childList: true }); } catch (e) {}
+    setTimeout(positionFab, 1500);   // 확장 주입 지연 대비
   }
 
   // 기존 레이아웃을 밀어내지 않도록 상단 여백만 확보

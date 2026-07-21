@@ -97,6 +97,48 @@ def _best_installed(model: str) -> str | None:
     return big[0] if big else installed[0]
 
 
+def _verify_inference(model: str) -> tuple[bool, str]:
+    """모델이 '실제로' 추론되는지 1토큰 생성으로 확인 — llama-server segfault 등 조기 감지.
+
+    serve·pull이 됐어도 런너가 추론 중 죽으면 '준비 완료'는 거짓이 된다.
+    """
+    try:
+        payload = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": "hi"}],
+            "stream": False,
+            "options": {"num_predict": 1},
+        }).encode()
+        req = urllib.request.Request(
+            OLLAMA_URL + "/api/chat", data=payload,
+            headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=90) as r:
+            data = json.loads(r.read())
+        return (data.get("message") is not None or bool(data.get("done"))), ""
+    except Exception as e:  # noqa: BLE001
+        code = getattr(e, "code", None)
+        body = ""
+        try:
+            body = e.read().decode("utf-8", "ignore")[:200]
+        except Exception:  # noqa: BLE001
+            body = str(e)
+        return False, (f"HTTP {code}: {body}" if code else str(e))
+
+
+def _mark_ready(model: str, note: str = "") -> None:
+    """추론 검증 후 ready 표시 — 실패(segfault 등)면 정직하게 error+안내."""
+    ok, err = _verify_inference(model)
+    if ok:
+        _set(state="ready", progress=100, model=model,
+             message=f"준비 완료! {model} 온디바이스로 동작해요 🖥️" + note)
+        return
+    seg = ("segmentation" in err.lower() or "terminated" in err.lower())
+    tip = ("공식 Ollama로 다시 설치(brew install ollama 또는 ollama.com)하거나 "
+           "더 가벼운 모델(llama3.2:1b)을 써보세요. " if seg else "")
+    _set(state="error", progress=0, model=model,
+         message=f"모델 실행 중 충돌했어요({err[:90]}). {tip}설정에서 API로도 검사할 수 있어요.")
+
+
 def start(model: str | None = None) -> dict:
     """비동기로 온디바이스 준비 시작. 현재 상태를 즉시 반환."""
     model = model or DEFAULT_MODEL
@@ -350,16 +392,13 @@ def _run(model: str) -> None:
                                             "터미널에서 `ollama serve`를 확인하세요.")
                 return
 
-        # ③ 모델 준비 — 설치됨 → 즉시 / 비슷한 채팅 모델 있음 → 그걸로 즉시 / 없음 → pull
+        # ③ 모델 준비 — 설치됨 → 추론검증 후 ready / 비슷한 모델 있음 → 그걸로 / 없음 → pull
         if _model_installed(model):
-            _set(state="ready", progress=100, model=model,
-                 message=f"준비 완료! {model} 온디바이스로 동작해요 🖥️")
+            _mark_ready(model)
             return
         alt = _best_installed(model)
         if alt:
-            _set(state="ready", progress=100, model=alt,
-                 message=f"준비 완료! 설치된 {alt} 모델로 바로 시작해요 🖥️ "
-                         f"(추가 다운로드 없음)")
+            _mark_ready(alt, " (설치된 모델로 바로 시작)")
             return
 
         _set(state="pulling", progress=10,
@@ -383,8 +422,7 @@ def _run(model: str) -> None:
                 buf = ""
         rc = proc.wait()
         if rc == 0 and _model_installed(model):
-            _set(state="ready", progress=100,
-                 message=f"준비 완료! {model} 온디바이스로 동작해요 🖥️")
+            _mark_ready(model)
         else:
             _set(state="error", message="모델 다운로드에 실패했어요. 네트워크를 확인하세요.")
     except Exception as e:  # noqa: BLE001

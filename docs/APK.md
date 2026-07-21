@@ -6,7 +6,7 @@
 
 ```bash
 cd web
-CAPACITOR_BUILD=1 NEXT_PUBLIC_API_ABSOLUTE=https://<배포된-백엔드> npm run build
+CAPACITOR_BUILD=1 NEXT_PUBLIC_API_ABSOLUTE=https://agentguard.maeum.ai npm run build
 # → out/ 생성. rewrites 대신 클라이언트가 백엔드 절대 주소로 직접 호출(CORS)
 ```
 
@@ -53,7 +53,7 @@ cd android && ./gradlew assembleDebug
 
 ```bash
 npm i -g @bubblewrap/cli
-bubblewrap init --manifest https://<배포-도메인>/manifest.webmanifest
+bubblewrap init --manifest https://agentguard.maeum.ai/manifest.webmanifest
 bubblewrap build   # → app-release-signed.apk
 ```
 

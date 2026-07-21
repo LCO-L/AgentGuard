@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentGuard — 감사 로그</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#3346D3">
+<style>
+  :root{
+    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
+    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
+    --bg:#F5F6F8; --card:#FFFFFF;
+    --accent:#3346D3; --accent-weak:rgba(51,70,211,.09);
+    --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64;
+    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
+    --r:16px; --r-sm:11px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); word-break:keep-all; line-height:1.62;
+    min-height:100vh; padding:30px 20px 80px; display:flex; flex-direction:column; align-items:center; gap:20px;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; letter-spacing:-.011em;
+    background-image:radial-gradient(120% 62% at 50% -12%, rgba(51,70,211,.06), transparent 60%); background-attachment:fixed;}
+  .wrap{width:100%; max-width:820px;}
+  .hero{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding:6px 2px 2px;}
+  .hero .eyebrow{font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);}
+  .hero h1{font-size:26px; line-height:1.14; font-weight:800; letter-spacing:-.036em; margin-top:9px; word-break:keep-all;}
+  .hero p{font-size:13.5px; color:var(--sub); margin-top:7px;}
+  .refresh{flex:0 0 auto; border:1px solid var(--line); background:rgba(255,255,255,.72); border-radius:999px;
+    padding:8px 14px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-2); box-shadow:var(--shadow);
+    font-family:inherit; transition:transform .16s, box-shadow .16s;}
+  .refresh:hover{transform:translateY(-1px);}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 16px 14px; box-shadow:var(--shadow);}
+  .stat .k{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  .stat .k i{width:8px; height:8px; border-radius:50%; display:inline-block;}
+  .stat .v{font-size:30px; font-weight:800; letter-spacing:-.03em; margin-top:8px; font-variant-numeric:tabular-nums;}
+  .stat.red .v{color:var(--red);} .stat.yellow .v{color:var(--yellow-ink);} .stat.green .v{color:var(--green);}
+  .i-red{background:var(--red);} .i-yellow{background:var(--yellow);} .i-green{background:var(--green);} .i-ink{background:var(--ink);}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); margin-top:16px; overflow:hidden;}
+  .panel .ph{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line-2); font-size:13px; font-weight:800;}
+  .panel .ph .c{font-size:11.5px; font-weight:700; color:var(--muted); background:rgba(14,17,22,.04); border-radius:99px; padding:3px 9px; font-variant-numeric:tabular-nums;}
+  table{width:100%; border-collapse:collapse;}
+  th{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); text-align:left; padding:10px 18px; border-bottom:1px solid var(--line-2);}
+  td{font-size:13px; padding:12px 18px; border-bottom:1px solid var(--line-2); color:var(--ink-2); vertical-align:middle;}
+  tr:last-child td{border-bottom:0;}
+  .lv{display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:12px;}
+  .lv i{width:8px; height:8px; border-radius:50%;}
+  .lv.red{color:var(--red);} .lv.yellow{color:var(--yellow-ink);} .lv.green{color:var(--green);}
+  .kind{font-size:11.5px; font-weight:700; color:var(--ink-2); background:rgba(14,17,22,.04); border-radius:7px; padding:3px 8px;}
+  .num{font-variant-numeric:tabular-nums; font-weight:700;}
+  .what{color:var(--sub); max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ts{color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .empty{padding:44px 18px; text-align:center; color:var(--muted); font-size:13.5px;}
+  .note{max-width:820px; font-size:11.5px; color:var(--muted); text-align:center; line-height:1.75; margin-top:6px;}
+  @media(max-width:640px){ .stats{grid-template-columns:repeat(2,1fr);} .hide-sm{display:none;} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">AUDIT LOG</div>
+        <h1>감사 로그</h1>
+        <p>조직의 검사 이력을 한눈에 — 언제·무엇을·어떤 위험으로 판정했는지. <b>원문은 저장하지 않습니다.</b></p>
+      </div>
+      <button class="refresh" id="refresh">↻ 새로고침</button>
+    </header>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="k"><i class="i-ink"></i>총 검사</div><div class="v" id="s-total">–</div></div>
+      <div class="stat red"><div class="k"><i class="i-red"></i>위험</div><div class="v" id="s-red">–</div></div>
+      <div class="stat yellow"><div class="k"><i class="i-yellow"></i>주의</div><div class="v" id="s-yellow">–</div></div>
+      <div class="stat green"><div class="k"><i class="i-green"></i>안전</div><div class="v" id="s-green">–</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><span>최근 검사 타임라인</span><span class="c" id="count">0건</span></div>
+      <div id="tableWrap"><div class="empty" id="empty">불러오는 중…</div></div>
+    </div>
+
+    <div class="note">🔒 이 대시보드는 검사 <b>메타데이터</b>(시각·유형·등급·발견 수)만 보여줍니다. 원문·비밀값은 서버에 남지 않습니다.</div>
+  </div>
+
+  <script src="/nav.js"></script>
+  <script>
+  const $=s=>document.querySelector(s);
+  const LV={red:"위험",yellow:"주의",green:"안전"};
+  const KIND={text:"텍스트",url:"링크",file:"파일",hwp:"HWP",pdf:"PDF",docx:"DOCX",mcp:"MCP",skill:"SKILL",svg:"SVG",zip:"ZIP"};
+  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));}
+  function when(iso){
+    try{ const d=new Date(iso), now=new Date(), diff=(now-d)/1000;
+      if(diff<60) return "방금";
+      if(diff<3600) return Math.floor(diff/60)+"분 전";
+      if(diff<86400) return Math.floor(diff/3600)+"시간 전";
+      return d.toLocaleDateString("ko-KR",{month:"2-digit",day:"2-digit"})+" "+d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+    }catch(e){ return iso||""; }
+  }
+
+  async function load(){
+    let data;
+    try{ const r=await fetch("/v1/scans?limit=200"); data=await r.json(); }
+    catch(e){ $("#empty").textContent="서버에 연결할 수 없어요."; return; }
+    const items=data.items||[];
+    const c={red:0,yellow:0,green:0};
+    items.forEach(it=>{ c[it.overall]=(c[it.overall]||0)+1; });
+    $("#s-total").textContent=items.length;
+    $("#s-red").textContent=c.red||0; $("#s-yellow").textContent=c.yellow||0; $("#s-green").textContent=c.green||0;
+    $("#count").textContent=items.length+"건";
+
+    if(!items.length){ $("#tableWrap").innerHTML='<div class="empty">아직 검사 기록이 없어요. 검사를 실행하면 여기에 쌓입니다.</div>'; return; }
+    const rows=items.map(it=>{
+      const o=it.overall||"green", n=(it.findings||[]).length;
+      const top=(it.findings&&it.findings[0])? (it.findings[0].what||it.findings[0].rule_id||"") : (o==="green"?"위험 신호 없음":"");
+      const kind=KIND[it.surface_kind]||esc(it.surface_kind||"—");
+      return `<tr>
+        <td class="ts">${esc(when(it.ts))}</td>
+        <td><span class="kind">${kind}</span></td>
+        <td><span class="lv ${o}"><i style="background:var(--${o==="yellow"?"yellow":o})"></i>${LV[o]||o}</span></td>
+        <td class="num">${n}</td>
+        <td class="what hide-sm">${esc(top)}</td></tr>`;
+    }).join("");
+    $("#tableWrap").innerHTML=
+      '<table><thead><tr><th>시각</th><th>유형</th><th>등급</th><th>발견</th><th class="hide-sm">주요 항목</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+  $("#refresh").onclick=load;
+  load();
+  </script>
+</body>
+</html>
