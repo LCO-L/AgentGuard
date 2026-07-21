@@ -1,3 +1,4 @@
+/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
 /* AgentGuard 보안 도우미 위젯 — 채널톡/Intercom Fin 스타일.
  * 아무 사이트에 <script src=".../widget.js"></script> 한 줄로 임베드.
  * Shadow DOM 으로 호스트 페이지 CSS 와 격리. 온디바이스 우선(헤더로 provider/키 주입).

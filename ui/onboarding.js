@@ -1,3 +1,4 @@
+/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
 /* AgentGuard 온보딩 투어 — 처음 온 사용자를 말풍선으로 자연스럽게 이끈다.
  *
  * 스포트라이트(대상만 밝게 + 펄스) + 말풍선(설명·다음) 으로 단계 안내.

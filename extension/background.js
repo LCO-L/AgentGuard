@@ -1,3 +1,4 @@
+/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
 /* AgentGuard 익스텐션 — 백그라운드 서비스 워커.
  *
  * 역할:

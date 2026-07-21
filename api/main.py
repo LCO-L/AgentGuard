@@ -1,3 +1,4 @@
+# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
 """FastAPI 앱 조립 — CORS·라우팅·버저닝.
 
 모든 비즈니스 로직은 services/core에 있고, 여기는 껍데기뿐.
@@ -12,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, Response
 
 from api.routes import ai, chat, health, history, inspect, rules, scan, text, url
+from core._authorship import AUTHOR, COPYRIGHT, info, signature
 
 _UI_DIR = Path(__file__).resolve().parent.parent / "ui"
 _ROOT = Path(__file__).resolve().parent.parent
@@ -29,7 +31,8 @@ def create_app() -> FastAPI:
         title="AgentGuard",
         version="0.1.0",
         description=("포맷 무관 통합 보안 엔진 — 파일·AI도구·링크의 위험을 "
-                     "온디바이스에서 검사하고 쉬운 말로 통역하는 API"),
+                     "온디바이스에서 검사하고 쉬운 말로 통역하는 API\n\n" + COPYRIGHT),
+        contact={"name": AUTHOR},
     )
 
     # CORS — 환경변수로 제한 가능. 기본 * (해커톤/확장 개발 편의)
@@ -42,10 +45,22 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # 숨은 소유권 워터마크 — 모든 HTTP 응답에 저작자 헤더(화면엔 안 보임). © DONGHUN LEE
+    @app.middleware("http")
+    async def _authorship_hdr(request, call_next):  # noqa: ANN001,ANN202
+        response = await call_next(request)
+        response.headers["X-Authored-By"] = signature()
+        return response
+
     # v1 네임스페이스 — 향후 v2 추가 시 클라이언트 무중단
     for r in (scan.router, url.router, text.router, inspect.router, chat.router,
               ai.router, history.router, rules.router, health.router):
         app.include_router(r, prefix="/v1")
+
+    @app.get("/authorship", tags=["meta"])
+    def authorship() -> dict:
+        """저작권/저작자 정보 — 단독 저작자 DONGHUN LEE (© 2026)."""
+        return info()
 
     @app.get("/", response_class=HTMLResponse, tags=["meta"])
     def dashboard() -> str:

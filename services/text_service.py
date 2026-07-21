@@ -1,3 +1,4 @@
+# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
 """텍스트 스캔 — 붙여넣기/페이지 본문/메시지의 프롬프트 인젝션·은닉 검사.
 
 파일이 아닌 '순수 텍스트'를 같은 엔진에 태운다. 크롬 익스텐션이 현재 페이지의

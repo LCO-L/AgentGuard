@@ -1,3 +1,4 @@
+/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
 /* AgentGuard 익스텐션 — 입력창 가드(Grammarly for Security, Outbound/Inbound).
  *
  * 사람이 AI에게 보내는 '바로 그 순간'을 지킨다:

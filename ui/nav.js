@@ -95,17 +95,19 @@
     document.body.appendChild(fab);
   }
 
-  // 워터마크(소유권 표시) — © DONGHUN LEE (모든 페이지)
-  if (!document.querySelector('meta[name="author"]')) {
-    var _am = document.createElement("meta"); _am.name = "author"; _am.content = "DONGHUN LEE"; document.head.appendChild(_am);
-  }
-  if (!document.getElementById("ag-wm")) {
-    var wm = document.createElement("div");
-    wm.id = "ag-wm";
-    wm.textContent = "© DONGHUN LEE";
-    wm.style.cssText = "position:fixed;left:12px;bottom:10px;z-index:2147483000;font:600 10.5px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:rgba(14,17,22,.32);letter-spacing:.04em;pointer-events:none;user-select:none;-webkit-user-select:none";
-    document.body.appendChild(wm);
-  }
+  // 숨은 소유권 워터마크(이스터에그) — 화면엔 안 보이지만 여러 곳에 남는다. © DONGHUN LEE
+  try {
+    if (!document.querySelector('meta[name="author"]')) {
+      var _am = document.createElement("meta"); _am.name = "author"; _am.content = "DONGHUN LEE";
+      document.head.appendChild(_am);
+    }
+    document.documentElement.setAttribute("data-author", "DONGHUN LEE");
+    window.__AGENTGUARD_AUTHOR__ = "© 2026 DONGHUN LEE · All Rights Reserved";
+    // devtools 콘솔 이스터에그(일반 화면엔 안 보임)
+    console.log("%c AgentGuard %c © 2026 DONGHUN LEE · built solo. ",
+      "background:#1E5BFF;color:#fff;font-weight:800;border-radius:4px 0 0 4px;padding:2px 6px",
+      "background:#0E1116;color:#9AD0FF;border-radius:0 4px 4px 0;padding:2px 6px");
+  } catch (e) {}
 
   // 기존 레이아웃을 밀어내지 않도록 상단 여백만 확보
   var cur = parseInt(getComputedStyle(document.body).paddingTop) || 0;

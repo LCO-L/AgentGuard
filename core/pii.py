@@ -1,3 +1,4 @@
+# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
 """PII·시크릿 탐지 + 복원 가능 마스킹 — Outbound 유출 방지(SecureType Outbound).
 
 AI에게 보내기 직전, 텍스트 속 비밀값·개인정보를 **문자 offset span**으로 잡아

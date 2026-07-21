@@ -1,3 +1,4 @@
+# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
 """AI provider 상태 — 대시보드·익스텐션 설정 패널용.
 
 어떤 백엔드가 준비됐는지(온디바이스 Ollama 접속성, 클라우드 키 유무)를 알려준다.

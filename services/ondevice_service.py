@@ -1,3 +1,4 @@
+# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
 """온디바이스 원클릭 실행 — Ollama 자동 기동 + 모델 자동 pull.
 
 버튼 하나로: ① ollama 설치·설치확인 → ② serve 기동 → ③ 소형 4bit 모델 pull(진행률 추적) → ④ 사용 준비.
