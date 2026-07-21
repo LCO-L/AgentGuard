@@ -1,0 +1,62 @@
+{
+  "name": "agentguard",
+  "displayName": "AgentGuard — AI 보안 가드",
+  "description": "편집 중인 문서·프롬프트·코드의 인젝션·시크릿·취약 패턴을 IDE 안에서 실시간 경고 (AI 시대의 Grammarly)",
+  "version": "0.1.0",
+  "publisher": "agentguard",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Linters", "Security", "Other"],
+  "activationEvents": [
+    "onLanguage:plaintext",
+    "onLanguage:markdown",
+    "onLanguage:json",
+    "onLanguage:python",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:yaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "agentguard.scanNow", "title": "AgentGuard: 지금 문서 검사" },
+      { "command": "agentguard.maskSecrets", "title": "AgentGuard: 시크릿·PII 마스킹" }
+    ],
+    "configuration": {
+      "title": "AgentGuard",
+      "properties": {
+        "agentguard.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "AgentGuard 백엔드 주소 (로컬 또는 Railway 배포 URL)"
+        },
+        "agentguard.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API 키 (백엔드에 AG_API_KEY 설정 시 필요)"
+        },
+        "agentguard.realtime": {
+          "type": "boolean",
+          "default": true,
+          "description": "편집 중 실시간 검사 (800ms 디바운스)"
+        },
+        "agentguard.minSeverity": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "low",
+          "description": "표시할 최소 심각도"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.12",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.5.4"
+  }
+}

@@ -9,7 +9,8 @@ import type {
   Verdict,
 } from "./types";
 
-const BASE = "/api"; // rewrites → NEXT_PUBLIC_API_BASE
+// 웹: /api 프록시(rewrites) / APK(정적 export): 백엔드 절대 주소 직접 호출(CORS)
+const BASE = process.env.NEXT_PUBLIC_API_ABSOLUTE || "/api";
 
 async function postJSON<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

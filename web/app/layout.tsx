@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { TopNav } from "@/components/TopNav";
+import { PwaRegister } from "@/components/PwaRegister";
 
 export const metadata: Metadata = {
   title: "AgentGuard — 온디바이스 통합 보안",
@@ -21,6 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-canvas text-ink antialiased">
         <TopNav />
         <main className="mx-auto w-full max-w-5xl px-5 pb-24 pt-6">{children}</main>
+        <PwaRegister />
+        {/* 상시 보안 도우미 위젯 — 백엔드가 서빙(/api 프록시 경유). 전 페이지 공통 */}
+        <Script src="/api/widget.js" strategy="afterInteractive" />
       </body>
     </html>
   );

@@ -16,11 +16,13 @@
 | API 15 엔드포인트 | ✅ 완료 |
 | 순수 HTML UI(대시보드·에디터·설정·위젯·PWA) | ✅ 완료 |
 | 크롬 익스텐션(우클릭·인라인·입력가드) | ✅ 완료 |
-| Next.js 웹(설치형/APK 공통 프론트) | 🟡 코드 완료, **로컬 npm 빌드 검증 필요** |
+| Next.js 웹(설치형/APK 공통 프론트) | ✅ **로컬 빌드·구동 검증 완료** (next 14.2.35 보안 패치, 4페이지 200, /api 프록시·위젯·PWA 확인) |
 | CLI(CI 게이트) | ✅ 완료 |
 | 테스트 35개 | ✅ 전부 통과 |
 | 배포(Railway Nixpacks) | ✅ 빌드 오류 수정 |
-| APK / VS Code 확장 / Tauri 설치형 | ⬜ 미착수(설계 확정) |
+| VS Code 확장 | ✅ 완료 (`vscode-extension/` — Diagnostics+마스킹, tsc 컴파일 통과) |
+| APK (Capacitor) | 🟡 **프로젝트 생성·sync 완료** (`web/android/`, Share Intent 추가, 가이드 `docs/APK.md`) — APK 바이너리 빌드는 Android Studio 필요 |
+| 설치형 패키징 | ✅ 원클릭 `install.sh` (Ollama 확인→모델 pull→실행→브라우저 오픈) / Tauri는 컷라인 보류 |
 
 **검증 수치:** unittest 35 통과 · v1 엔드포인트 15 · 순수 JS 문법 9/9 · Ollama 없이도 오프라인 규칙으로 전 기능 동작.
 
@@ -192,6 +194,16 @@ cd web && npm install && npm run dev                                        # :3
 # 크롬 익스텐션
 chrome://extensions → 개발자 모드 → extension/ 로드
 
+# 원클릭 설치형
+./install.sh                    # Ollama 확인 → 모델 pull → 백엔드 → 브라우저 오픈
+
+# VS Code 익스텐션
+cd vscode-extension && npm install && npm run compile   # → F5로 Extension Host 디버그
+
+# APK (Capacitor) — 자세히 docs/APK.md
+cd web && CAPACITOR_BUILD=1 NEXT_PUBLIC_API_ABSOLUTE=https://<백엔드> npm run build
+npx cap sync android && npx cap open android            # Android Studio에서 빌드
+
 # CLI
 python cli.py samples/*.pdf --fail-on yellow
 
@@ -219,10 +231,10 @@ AG_AI_PROVIDER=off python -m unittest tests.test_ultra                      # 35
 | 12 | Grammarly식 웹 보안 에디터 | ✅ |
 | 13 | 익스텐션 AI 입력창 인터셉트 | ✅ |
 | 14 | 시나리오 레지스트리(데이터 한 줄 확장) | ✅ |
-| 15 | Next.js 프론트엔드(노먼 원칙) | 🟡 코드 완료·로컬 검증 필요 |
-| 16 | APK(Capacitor) | ⬜ |
-| 17 | VS Code 익스텐션 | ⬜ |
-| 18 | 설치형 패키징(Tauri/스크립트) | ⬜ |
+| 15 | Next.js 프론트엔드(노먼 원칙) | ✅ 로컬 검증 완료(보안 패치·위젯·PWA 마운트) |
+| 16 | APK(Capacitor) | 🟡 프로젝트·sync·Share Intent 완료, 바이너리 빌드는 로컬(가이드 `docs/APK.md`) |
+| 17 | VS Code 익스텐션 | ✅ 완료(컴파일 통과) |
+| 18 | 설치형 패키징(스크립트) | ✅ `install.sh` 완료(Tauri는 보류) |
 
 ---
 
