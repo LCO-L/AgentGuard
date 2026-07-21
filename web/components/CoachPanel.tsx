@@ -6,6 +6,17 @@ import { Button } from "@/components/ui";
 import { categoryLabel, sevTone } from "@/lib/cn";
 import type { Issue, InspectResult } from "@/lib/types";
 
+// Grammarly 4색 카테고리 도트 — 밑줄 물결과 같은 색(매핑 일관)
+const CAT_DOT: Record<string, string> = {
+  inject: "#E5484D",
+  secret: "#F5A623",
+  pii: "#F5A623",
+  vuln: "#3B82F6",
+  agency: "#3B82F6",
+  stego: "#8B5CF6",
+  obfuscation: "#8B5CF6",
+};
+
 export function CoachPanel({
   result,
   allow,
@@ -48,8 +59,14 @@ export function CoachPanel({
             transition={{ duration: 0.18 }}
             className={`rounded-xl border border-l-4 border-line bg-card p-3 ${tone.ring}`}
           >
-            <div className={`text-[10.5px] font-extrabold uppercase tracking-wide ${tone.text}`}>
-              {i.severity} · {categoryLabel[i.category] ?? i.category}
+            <div className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: CAT_DOT[i.category] ?? "#6B7280" }}
+              />
+              <span className={`text-[10.5px] font-extrabold uppercase tracking-wide ${tone.text}`}>
+                {categoryLabel[i.category] ?? i.category} · {i.severity}
+              </span>
             </div>
             <div className="mt-0.5 text-sm font-extrabold">{i.title}</div>
             <div className="text-[12.5px] text-[#3A3D46]">{i.why}</div>
@@ -66,15 +83,18 @@ export function CoachPanel({
             )}
             <div className="mt-2.5 flex gap-1.5">
               {canMask && (
-                <Button variant="soft" onClick={onMask} className="px-2.5 py-1.5 text-xs">
-                  마스킹
-                </Button>
+                <button
+                  onClick={onMask}
+                  className="rounded-lg bg-[#30A46C] px-3 py-1.5 text-xs font-extrabold text-white transition-transform hover:scale-[1.03] active:scale-95"
+                >
+                  ✓ 마스킹 적용
+                </button>
               )}
               <Button variant="ghost" onClick={() => onGoto(i.start)} className="px-2.5 py-1.5 text-xs">
                 위치로
               </Button>
-              <Button variant="ghost" onClick={() => onAllow(i.rule_id + ":" + i.start)} className="px-2.5 py-1.5 text-xs">
-                이번만 허용
+              <Button variant="ghost" onClick={() => onAllow(i.rule_id + ":" + i.start)} className="px-2.5 py-1.5 text-xs text-sub">
+                무시
               </Button>
             </div>
           </motion.div>

@@ -26,8 +26,8 @@
   root.innerHTML =
     '<style>' +
     ':host{all:initial}*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif}' +
-    '.badge{position:fixed;z-index:2147483400;height:26px;padding:0 9px;border-radius:99px;background:#5B5BD6;color:#fff;font-size:12px;font-weight:800;display:none;align-items:center;gap:5px;cursor:pointer;box-shadow:0 4px 14px rgba(91,91,214,.4)}' +
-    '.badge.red{background:#E5484D}.badge.yellow{background:#F5A623}' +
+    '.badge{position:fixed;z-index:2147483400;width:36px;height:36px;border-radius:50%;background:#5B5BD6;color:#fff;font-size:13px;font-weight:800;display:none;align-items:center;justify-content:center;gap:0;cursor:pointer;box-shadow:0 6px 18px rgba(20,24,29,.35);border:2.5px solid #fff}' +
+    '.badge.red{background:#E5484D}.badge.yellow{background:#F5A623}.badge.green{background:#30A46C}' +
     '.ov{position:fixed;inset:0;background:rgba(16,18,29,.5);z-index:2147483500;display:none;align-items:center;justify-content:center}' +
     '.ov.show{display:flex}' +
     '.modal{background:#fff;border-radius:18px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}' +
@@ -94,9 +94,11 @@
     var r = active.getBoundingClientRect();
     badge.className = "badge " + a.level;
     badge.style.display = "flex";
-    badge.style.left = Math.max(8, r.right - 84) + "px";
-    badge.style.top = Math.max(8, r.top - 14) + "px";
-    bn.textContent = a.count + " 위험";
+    // Grammarly G 버튼 패리티: 필드 우하단 원형 배지
+    badge.style.left = Math.max(8, r.right - 46) + "px";
+    badge.style.top = Math.max(8, r.bottom - 46) + "px";
+    bn.textContent = a.count;
+    badge.title = "🛡️ 위험 " + a.count + "건 — 클릭해서 확인";
     badge.onclick = function () { openModal(active, a); };
   }
 
@@ -169,9 +171,10 @@
             badge.className = "badge " + (res.overall === "red" ? "red" : "yellow");
             badge.style.display = "flex";
             var r = field.getBoundingClientRect();
-            badge.style.left = Math.max(8, r.right - 84) + "px";
-            badge.style.top = Math.max(8, r.top - 14) + "px";
-            bn.textContent = deepCount + " 위험(심층)";
+            badge.style.left = Math.max(8, r.right - 46) + "px";
+            badge.style.top = Math.max(8, r.bottom - 46) + "px";
+            bn.textContent = deepCount;
+            badge.title = "🛡️ 심층 분석 " + deepCount + "건 — 클릭해서 확인";
             badge.onclick = function () { openModal(field, localA); };
           }
           if (ov.classList.contains("show")) renderDeepRows();
@@ -282,8 +285,13 @@
 
   function openCoach(u, sp) {
     var red = sp.kind === "inject";
+    // Grammarly 제안 카드 패리티: 상단 카테고리 칩(컬러 도트) → 설명 → 액션
     coach.innerHTML =
-      '<div style="font-weight:800;margin-bottom:4px">' + (red ? "🔴" : "🟡") + " 🛡️ " + esc(sp.label) + "</div>" +
+      '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">' +
+        '<span style="width:8px;height:8px;border-radius:50%;background:' + (red ? "#E5484D" : "#F5A623") + '"></span>' +
+        '<span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;color:' + (red ? "#E5484D" : "#B45309") + '">' +
+          (red ? "숨은 명령" : "개인정보") + "</span></div>" +
+      '<div style="font-weight:800;margin-bottom:4px">🛡️ ' + esc(sp.label) + "</div>" +
       '<div style="color:#6B7280;font-size:12px;margin-bottom:10px">' +
         (red ? "AI를 향한 숨은 명령이에요." : "개인정보가 포함되어 있어요.") + "</div>" +
       '<div style="display:flex;gap:6px">' +

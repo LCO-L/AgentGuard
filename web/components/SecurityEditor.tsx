@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, Tabs } from "@/components/ui";
 import { CoachPanel } from "@/components/CoachPanel";
+import { GuardianFab } from "@/components/GuardianFab";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import type { InspectResult } from "@/lib/types";
@@ -32,7 +33,8 @@ function buildSegments(text: string, issues: InspectResult["issues"], allow: Set
   for (const i of shown) {
     if (i.start < lastEnd) continue;
     if (i.start > pos) segs.push({ t: text.slice(pos, i.start) });
-    segs.push({ t: text.slice(i.start, i.end), cls: `ul-${i.severity}` });
+    // Grammarly 패리티: 카테고리=색상 물결 (없으면 심각도 색 폴 백)
+    segs.push({ t: text.slice(i.start, i.end), cls: `ul-${i.category}` });
     pos = i.end;
     lastEnd = i.end;
   }
@@ -177,9 +179,21 @@ export function SecurityEditor() {
         </Card>
 
         {/* 코치 패널 */}
+        <div id="coach-panel">
         <Card className="min-h-[420px] overflow-hidden">
-          <div className="flex items-center justify-between border-b border-line px-4 py-3 text-[13px] font-extrabold text-sub">
-            🛡️ Security Coach
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <span className="text-[13px] font-extrabold text-sub">🛡️ Security Coach</span>
+            {result && (
+              <span className="flex items-center gap-2 text-[12px] font-black">
+                <span className="text-sub">{result.score}/100</span>
+                <span
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] text-white"
+                  style={{ backgroundColor: result.overall === "green" ? "#30A46C" : result.overall === "red" ? "#E5484D" : "#F5A623" }}
+                >
+                  {result.score >= 90 ? "A" : result.score >= 70 ? "B" : result.score >= 50 ? "C" : "D"}
+                </span>
+              </span>
+            )}
           </div>
           <div className="max-h-[520px] overflow-auto">
             <CoachPanel
@@ -191,6 +205,7 @@ export function SecurityEditor() {
             />
           </div>
         </Card>
+        </div>
       </div>
 
       {/* 상태바 — 가시성(카운트) + 제약(위험 시 경고색 전송) */}
@@ -222,6 +237,12 @@ export function SecurityEditor() {
           {toast}
         </div>
       )}
+
+      {/* Grammarly 'G' 원형 플로팅 — 점수 링 + 건수 배지, 클릭 시 코치로 */}
+      <GuardianFab
+        result={result}
+        onClick={() => document.getElementById("coach-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+      />
     </div>
   );
 }

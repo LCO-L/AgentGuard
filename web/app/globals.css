@@ -66,3 +66,37 @@ a {
   border-bottom: 2px dotted theme("colors.sub");
   cursor: help;
 }
+
+/* ── Grammarly 4색 물결 체계 — 카테고리=색상 (이중 부호화로 색맹 안전) ──
+   빨강=숨은 명령 · 노랑=개인정보/시크릿 · 파랑=취약 코드 · 본라=은닉/난독화 */
+.ul-inject {
+  text-decoration: underline wavy #e5484d 2px;
+  text-underline-offset: 3px;
+  background: rgba(229, 72, 77, 0.07);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.ul-secret,
+.ul-pii {
+  text-decoration: underline wavy #f5a623 2px;
+  text-underline-offset: 3px;
+  background: rgba(245, 166, 35, 0.09);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.ul-vuln,
+.ul-agency {
+  text-decoration: underline wavy #3b82f6 2px;
+  text-underline-offset: 3px;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.ul-stego,
+.ul-obfuscation {
+  text-decoration: underline wavy #8b5cf6 2px;
+  text-underline-offset: 3px;
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: 2px;
+  cursor: pointer;
+}
