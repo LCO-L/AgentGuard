@@ -22,14 +22,14 @@
     "-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E8E8EA;" +
     "font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',system-ui,sans-serif}" +
     "#ag-topnav .agb{display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px;color:#16181D;text-decoration:none;white-space:nowrap}" +
-    "#ag-topnav .agb .u{color:#5B5BD6}" +
+    "#ag-topnav .agb .u{color:#2563EB}" +
     "#ag-topnav .agl{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}" +
     "#ag-topnav .agl::-webkit-scrollbar{display:none}" +
     "#ag-topnav a.agi{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:8px;" +
     "font-size:13px;font-weight:700;color:#6B7280;text-decoration:none;white-space:nowrap;transition:.12s}" +
     "#ag-topnav a.agi:hover{color:#16181D}" +
     "#ag-topnav a.agi.on{background:#16181D;color:#fff}" +
-    "#ag-topnav .agx{background:#5B5BD6;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
+    "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
     "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(91,91,214,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
     "@media(max-width:640px){#ag-topnav .agb .t{display:none}#ag-topnav a.agi span.tx{display:none}#ag-topnav a.agi{padding:7px 9px}}";

@@ -20,7 +20,7 @@ const config: Config = {
         line: "#E8E8EA",
         canvas: "#EEF0F3",
         card: "#FFFFFF",
-        brand: { DEFAULT: "#5B5BD6", soft: "#F0F0FD", ink: "#4A4AC4" },
+        brand: { DEFAULT: "#2563EB", soft: "#F0F0FD", ink: "#4A4AC4" },
         risk: {
           critical: "#C4283C",
           red: "#E5484D",

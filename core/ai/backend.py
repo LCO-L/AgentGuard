@@ -187,7 +187,9 @@ def _call_ollama(system: str, user: str, cfg: AIConfig, max_tokens: int) -> str 
             "stream": False,
             # qwen3 등 'thinking' 모델: 추론에 토큰을 다 쓰고 content가 비는 것 방지
             "think": False,
-            "options": {"temperature": 0, "num_predict": max_tokens},
+            # num_ctx: 기본 2048은 findings·문서 텍스트에 부족 → 긴 입력 잘림 방지
+            "options": {"temperature": 0, "num_predict": max_tokens,
+                        "num_ctx": int(os.environ.get("AG_OLLAMA_NUM_CTX", "8192"))},
         }
         data = _post_json(f"{cfg.ollama_url}/api/chat", payload, {}, cfg.timeout)
         if not data:
