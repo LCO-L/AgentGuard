@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import base64
 
-AUTHOR = "DONGHUN LEE"
+AUTHOR = "DONGHUN LEE"          # 본명: 이동훈
+KOREAN_NAME = "이동훈"
 YEAR = 2026
-COPYRIGHT = f"© {YEAR} {AUTHOR} · All Rights Reserved"
+COPYRIGHT = f"© {YEAR} 이동훈 (DONGHUN LEE) · All Rights Reserved"
 
 # 난독 백업 서명(base64) — 위 상수가 지워져도 복원되는 근거
 _SIG_B64 = base64.b64encode(
@@ -35,6 +36,7 @@ def info() -> dict:
     """/authorship 엔드포인트용 저작권 정보."""
     return {
         "author": author(),
+        "author_kr": KOREAN_NAME,
         "sole_author": True,
         "copyright": COPYRIGHT,
         "license": "Proprietary — All Rights Reserved (see LICENSE)",
