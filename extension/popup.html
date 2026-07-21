@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root{--ink:#16181D;--sub:#6B7280;--line:#E8E8EA;--accent:#5B5BD6;--green:#30A46C;--red:#E5484D;}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif;}
+  body{width:340px;padding:14px;color:var(--ink);background:#fff;}
+  .hd{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .hd b{font-size:15px;font-weight:800;} .hd .u{color:var(--accent);}
+  .hint{font-size:11.5px;color:var(--sub);margin-bottom:10px;line-height:1.5;}
+  .row{margin-bottom:10px;}
+  label{display:block;font-size:11px;color:var(--sub);font-weight:700;margin-bottom:3px;}
+  input,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;}
+  .prov{display:flex;gap:5px;flex-wrap:wrap;}
+  .prov button{flex:1;min-width:60px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 4px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .prov button.on{border-color:var(--accent);background:#F0F0FD;color:var(--accent);}
+  .keybox{display:none;} .keybox.show{display:block;}
+  .status{display:flex;gap:6px;flex-wrap:wrap;font-size:10.5px;margin:8px 0;}
+  .pill{padding:2px 8px;border-radius:99px;font-weight:700;border:1px solid var(--line);color:var(--sub);}
+  .pill.ok{background:rgba(48,164,108,.1);color:var(--green);border-color:#BFE9D3;}
+  .btns{display:flex;gap:6px;margin-top:6px;}
+  .btn{flex:1;border:0;border-radius:9px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn.primary{background:var(--ink);color:#fff;} .btn.ghost{background:#F3F4F6;color:var(--ink);}
+  .test{font-size:11.5px;font-weight:700;margin-top:6px;min-height:16px;}
+  .test.ok{color:var(--green);} .test.bad{color:var(--red);}
+  .save{font-size:10.5px;color:var(--green);text-align:center;margin-top:6px;opacity:0;transition:.2s;}
+  .save.show{opacity:1;}
+</style>
+</head>
+<body>
+  <div class="hd"><span>🛡️</span><b>AgentGuard <span class="u">보안 도우미</span></b></div>
+  <div class="hint">링크·파일·페이지를 <b>우클릭</b>하면 즉시 검사해요. 아래에서 판단 엔진을 고르세요.</div>
+
+  <div class="row">
+    <label>판단 엔진</label>
+    <div class="prov" id="prov">
+      <button data-p="auto">✨ 자동</button>
+      <button data-p="ollama">🖥️ 온디바이스</button>
+      <button data-p="claude">☁️ Claude</button>
+      <button data-p="openrouter">☁️ OpenRouter</button>
+      <button data-p="off">끄기</button>
+    </div>
+  </div>
+
+  <div class="row keybox" id="box-ollama">
+    <label>Ollama 주소</label>
+    <input id="ollamaUrl" placeholder="http://localhost:11434">
+  </div>
+  <div class="row keybox" id="box-claude">
+    <label>Claude API 키 (로컬 저장)</label>
+    <input id="claudeKey" type="password" placeholder="sk-ant-...">
+  </div>
+  <div class="row keybox" id="box-openrouter">
+    <label>OpenRouter API 키 (로컬 저장)</label>
+    <input id="openrouterKey" type="password" placeholder="sk-or-...">
+  </div>
+
+  <div class="row">
+    <label>백엔드 서버 주소</label>
+    <input id="apiBase" placeholder="http://localhost:8000">
+  </div>
+
+  <div class="status" id="status"><span class="pill">상태 확인 중…</span></div>
+  <div class="test" id="test"></div>
+
+  <div class="btns">
+    <button class="btn ghost" id="testBtn">연결 테스트</button>
+    <button class="btn primary" id="scanBtn">이 페이지 검사</button>
+  </div>
+  <div class="save" id="save">저장됐어요 ✓</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

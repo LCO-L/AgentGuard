@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "AgentGuard — 온디바이스 보안 도우미",
+  "version": "1.0.0",
+  "description": "링크·파일·페이지에 숨은 명령과 프롬프트 인젝션을 우클릭으로 즉시 검사. 원본은 기기 안에서만 봅니다.",
+  "permissions": ["contextMenus", "downloads", "storage", "notifications", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "AgentGuard 보안 도우미" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["agscan.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    { "resources": ["agscan.js"], "matches": ["<all_urls>"] }
+  ]
+}

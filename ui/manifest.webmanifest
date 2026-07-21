@@ -1,0 +1,19 @@
+{
+  "name": "AgentGuard 보안 도우미",
+  "short_name": "AgentGuard",
+  "description": "링크·문서·문구의 숨은 명령을 기기 안에서 검사하고 쉬운 말로 설명해요.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#EEF0F3",
+  "theme_color": "#5B5BD6",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}

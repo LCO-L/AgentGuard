@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+python-multipart
+olefile
+# anthropic  # 선택: Claude 통역. 없으면 i18n_key 폴 백으로 자동 동작

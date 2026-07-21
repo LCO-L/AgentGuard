@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentGuard — AI 엔진 설정</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  :root{ --ink:#16181D; --sub:#6B7280; --line:#E8E8EA; --bg:#EEF0F3; --card:#fff;
+    --accent:#5B5BD6; --green:#30A46C; --red:#E5484D; --yellow:#FFB224; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Pretendard',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+    word-break:keep-all;line-height:1.6;padding:32px 20px 80px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .wrap{width:100%;max-width:560px;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .top b{font-size:20px;font-weight:800;} .top b .u{color:var(--accent);}
+  .top a{font-size:13px;color:var(--sub);text-decoration:none;border:1px solid var(--line);
+    background:#fff;border-radius:9px;padding:7px 12px;font-weight:700;}
+  .lead{font-size:13.5px;color:var(--sub);margin-bottom:8px;}
+
+  .reco{background:linear-gradient(135deg,#5B5BD6,#7C6BF0);color:#fff;border-radius:14px;
+    padding:14px 16px;font-size:13.5px;font-weight:600;display:flex;gap:10px;align-items:center;}
+  .reco b{font-weight:800;} .reco button{margin-left:auto;background:rgba(255,255,255,.22);border:0;
+    color:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
+  .card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;transition:.15s;}
+  .card.sel{border-color:var(--accent);box-shadow:0 6px 22px rgba(91,91,214,.14);}
+  .chead{display:flex;align-items:center;gap:11px;}
+  .chead .ico{width:40px;height:40px;border-radius:11px;background:#F0F0FD;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto;}
+  .chead .tt{flex:1;} .chead .tt b{font-size:15.5px;font-weight:800;display:block;}
+  .chead .tt span{font-size:12px;color:var(--sub);}
+  .st{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:99px;white-space:nowrap;}
+  .st.ok{background:rgba(48,164,108,.12);color:var(--green);}
+  .st.no{background:#F3F4F6;color:var(--sub);}
+  .st.chk{background:rgba(255,178,36,.16);color:#B45309;}
+  .sel-btn{margin-left:8px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;
+    font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .card.sel .sel-btn{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .body{margin-top:13px;display:flex;flex-direction:column;gap:10px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:11.5px;color:var(--sub);font-weight:700;}
+  .field input,.field select{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;background:#fff;}
+  .modelrow{display:flex;gap:6px;} .modelrow select{flex:1;}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:9px;padding:0 11px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);}
+  .test{display:flex;gap:8px;align-items:center;}
+  .test button{border:0;background:var(--ink);color:#fff;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .test .res{font-size:12.5px;font-weight:700;}
+  .test .res.ok{color:var(--green);} .test .res.bad{color:var(--red);}
+
+  .altrow{display:flex;gap:8px;}
+  .alt{flex:1;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:11px;text-align:center;
+    cursor:pointer;font-size:13px;font-weight:700;} .alt.sel{border-color:var(--accent);color:var(--accent);}
+  .saved{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:10px 18px;border-radius:99px;font-size:13px;font-weight:700;opacity:0;transition:.2s;pointer-events:none;}
+  .saved.show{opacity:1;}
+  .note{font-size:11.5px;color:var(--sub);text-align:center;line-height:1.7;}
+  .cards{display:flex;flex-direction:column;gap:12px;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top"><b>AgentGuard <span class="u">설정</span></b><a href="/">← 대시보드</a></div>
+    <div class="lead">보안 판단·통역에 쓸 AI 엔진을 고르세요. <b>온디바이스</b>는 인터넷 없이 내 컴퓨터에서,
+      <b>Claude·OpenRouter</b>는 API 키로 클라우드에서 돕습니다. 셋 다 없어도 오프라인 규칙으로 항상 작동해요.</div>
+  </div>
+
+  <div class="wrap"><div class="reco" id="reco" style="display:none"></div></div>
+
+  <div class="wrap cards">
+    <!-- 온디바이스 -->
+    <div class="card" data-p="ollama" id="card-ollama">
+      <div class="chead">
+        <div class="ico">🖥️</div>
+        <div class="tt"><b>온디바이스 (Ollama)</b><span>내 컴퓨터에서 실행 · 파일이 밖으로 안 나감</span></div>
+        <span class="st no" id="st-ollama">확인 중…</span>
+        <button class="sel-btn" data-p="ollama">선택</button>
+      </div>
+      <div class="body">
+        <div class="field"><label>Ollama 주소</label>
+          <input id="ollamaUrl" type="text" placeholder="http://localhost:11434"></div>
+        <div class="field"><label>모델</label>
+          <div class="modelrow"><select id="ollamaModel"><option value="">기본(qwen3:8b)</option></select>
+            <button class="mini" data-load="ollama">↻ 설치된 모델</button></div></div>
+        <div class="test"><button data-test="ollama">연결 테스트</button><span class="res" id="res-ollama"></span></div>
+      </div>
+    </div>
+
+    <!-- Claude -->
+    <div class="card" data-p="claude" id="card-claude">
+      <div class="chead">
+        <div class="ico">☁️</div>
+        <div class="tt"><b>Claude</b><span>Anthropic API · 가장 정교한 통역</span></div>
+        <span class="st no" id="st-claude">키 필요</span>
+        <button class="sel-btn" data-p="claude">선택</button>
+      </div>
+      <div class="body">
+        <div class="field"><label>API 키 (브라우저에만 저장)</label>
+          <input id="claudeKey" type="password" placeholder="sk-ant-..."></div>
+        <div class="field"><label>모델</label>
+          <div class="modelrow"><select id="claudeModel"></select>
+            <button class="mini" data-load="claude">↻</button></div></div>
+        <div class="test"><button data-test="claude">연결 테스트</button><span class="res" id="res-claude"></span></div>
+      </div>
+    </div>
+
+    <!-- OpenRouter -->
+    <div class="card" data-p="openrouter" id="card-openrouter">
+      <div class="chead">
+        <div class="ico">☁️</div>
+        <div class="tt"><b>OpenRouter</b><span>수백 개 모델을 한 키로 · qwen/gpt/llama 등</span></div>
+        <span class="st no" id="st-openrouter">키 필요</span>
+        <button class="sel-btn" data-p="openrouter">선택</button>
+      </div>
+      <div class="body">
+        <div class="field"><label>API 키 (브라우저에만 저장)</label>
+          <input id="openrouterKey" type="password" placeholder="sk-or-..."></div>
+        <div class="field"><label>모델</label>
+          <div class="modelrow"><select id="openrouterModel"><option value="">기본(qwen/qwen3-8b)</option></select>
+            <button class="mini" data-load="openrouter">↻ 목록</button></div></div>
+        <div class="test"><button data-test="openrouter">연결 테스트</button><span class="res" id="res-openrouter"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="lead" style="margin:8px 0 6px">또는</div>
+    <div class="altrow">
+      <div class="alt" data-p="auto" id="alt-auto">✨ 자동 (지능적 선택)</div>
+      <div class="alt" data-p="off" id="alt-off">⚙️ 끄기 (오프라인 규칙만)</div>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="note">
+    설정은 이 브라우저에만 저장됩니다. 대시보드와 보안 위젯이 이 설정을 함께 사용해요.<br>
+    '자동'은 온디바이스를 우선 시도하고, 안 되면 오프라인 규칙으로 답합니다.
+  </div></div>
+
+  <div class="saved" id="saved">저장됐어요 ✓</div>
+
+  <script src="/agconfig.js"></script>
+  <script>
+  const $=s=>document.querySelector(s);
+  let CFG=AGConfig.load();
+
+  function reflect(){
+    $("#ollamaUrl").value=CFG.ollamaUrl; $("#claudeKey").value=CFG.claudeKey; $("#openrouterKey").value=CFG.openrouterKey;
+    document.querySelectorAll(".card").forEach(c=>c.classList.toggle("sel",c.dataset.p===CFG.provider));
+    document.querySelectorAll(".alt").forEach(a=>a.classList.toggle("sel",a.dataset.p===CFG.provider));
+  }
+  function toast(){ const s=$("#saved"); s.classList.add("show"); setTimeout(()=>s.classList.remove("show"),1400); }
+  function persist(patch){ CFG=AGConfig.set(patch); toast(); }
+  function hdrs(provider){ // 특정 provider 로 상태/모델/테스트할 때의 헤더
+    const c=Object.assign({},CFG,{provider});
+    return AGConfig.headers(c);
+  }
+
+  // provider 선택
+  document.querySelectorAll("[data-p]").forEach(el=>{
+    if(el.classList.contains("card"))return;
+    el.addEventListener("click",()=>{ persist({provider:el.dataset.p}); reflect(); });
+  });
+  // 입력 저장
+  $("#ollamaUrl").oninput=e=>persist({ollamaUrl:e.target.value.trim()});
+  $("#claudeKey").oninput=e=>persist({claudeKey:e.target.value.trim()});
+  $("#openrouterKey").oninput=e=>persist({openrouterKey:e.target.value.trim()});
+  $("#ollamaModel").onchange=e=>persist({ollamaModel:e.target.value});
+  $("#claudeModel").onchange=e=>persist({claudeModel:e.target.value});
+  $("#openrouterModel").onchange=e=>persist({openrouterModel:e.target.value});
+
+  // 상태 점검(지능적): 각 provider 가용성 + 자동 추천
+  async function refreshStatus(){
+    try{
+      const r=await fetch("/v1/ai/status",{headers:AGConfig.headers(CFG)});
+      const d=await r.json(); const p=d.providers||{};
+      setSt("ollama",p.ollama, p.ollama?"연결됨":"오프라인");
+      setSt("claude",p.claude, p.claude?"키 확인됨":"키 필요");
+      setSt("openrouter",p.openrouter, p.openrouter?"키 확인됨":"키 필요");
+      recommend(p);
+    }catch(e){ ["ollama","claude","openrouter"].forEach(k=>setSt(k,false,"서버 없음")); }
+  }
+  function setSt(k,ok,txt){ const el=$("#st-"+k); el.className="st "+(ok?"ok":"no"); el.textContent=(ok?"● ":"○ ")+txt; }
+  function recommend(p){
+    const r=$("#reco");
+    if(p.ollama && CFG.provider!=="ollama"){
+      r.style.display="flex";
+      r.innerHTML=`✨ <b>온디바이스(Ollama)</b>가 감지됐어요. 인터넷 없이 가장 안전해요. <button id="useReco">이걸로 설정</button>`;
+      $("#useReco").onclick=()=>{ persist({provider:"ollama"}); reflect(); r.style.display="none"; loadModels("ollama"); };
+    } else { r.style.display="none"; }
+  }
+
+  // 모델 자동 로드
+  async function loadModels(provider){
+    const sel=$("#"+provider+"Model"); if(!sel)return;
+    const keep=sel.querySelector('option[value=""]');
+    try{
+      const r=await fetch("/v1/ai/models?provider="+provider,{headers:hdrs(provider)});
+      const d=await r.json(); const models=d.models||[];
+      sel.innerHTML=""; if(keep)sel.appendChild(keep);
+      models.forEach(m=>{ const o=document.createElement("option"); o.value=m; o.textContent=m; sel.appendChild(o); });
+      const cur=CFG[provider+"Model"]; if(cur){ sel.value=cur; }
+      if(!models.length && !keep){ sel.innerHTML='<option value="">모델을 불러오지 못했어요</option>'; }
+    }catch(e){}
+  }
+  document.querySelectorAll("[data-load]").forEach(b=>b.onclick=()=>loadModels(b.dataset.load));
+
+  // 연결 테스트(실측)
+  document.querySelectorAll("[data-test]").forEach(b=>b.onclick=async()=>{
+    const provider=b.dataset.test, res=$("#res-"+provider);
+    res.className="res"; res.textContent="테스트 중…";
+    try{
+      const r=await fetch("/v1/ai/test",{method:"POST",headers:{...hdrs(provider),"Content-Type":"application/json"},body:"{}"});
+      const d=await r.json();
+      if(d.ok){ res.className="res ok"; res.textContent=`✓ 연결됨 · ${d.latency_ms}ms · ${d.model||d.engine}`; }
+      else { res.className="res bad"; res.textContent="✗ 연결 실패 (키·주소·모델 확인)"; }
+    }catch(e){ res.className="res bad"; res.textContent="✗ 서버에 연결할 수 없어요"; }
+  });
+
+  // 초기 모델 세팅
+  $("#claudeModel").innerHTML="";
+  ["claude-sonnet-4-5","claude-opus-4-1","claude-3-5-haiku-latest"].forEach(m=>{
+    const o=document.createElement("option"); o.value=m; o.textContent=m; $("#claudeModel").appendChild(o);});
+  if(CFG.claudeModel)$("#claudeModel").value=CFG.claudeModel;
+
+  reflect(); refreshStatus();
+  if(CFG.provider==="ollama")loadModels("ollama");
+  if(CFG.openrouterKey)loadModels("openrouter");
+  </script>
+</body>
+</html>
