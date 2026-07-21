@@ -9,7 +9,8 @@
  */
 const DEFAULTS = {
   apiBase: "http://localhost:8000",
-  provider: "auto",
+  provider: "ollama",     // 기본 = 온디바이스
+
   ollamaUrl: "", ollamaModel: "",
   claudeKey: "", claudeModel: "",
   openrouterKey: "", openrouterModel: "",

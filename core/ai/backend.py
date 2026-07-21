@@ -30,7 +30,7 @@ _PROVIDERS = ("ollama", "claude", "openrouter")
 
 @dataclass
 class AIConfig:
-    provider: str = "auto"        # auto|ollama|claude|openrouter|off
+    provider: str = "ollama"      # ollama(기본·온디바이스)|claude|openrouter|auto|off
     api_key: str = ""
     model: str = ""
     ollama_url: str = DEFAULT_OLLAMA_URL
@@ -49,7 +49,7 @@ class AIConfig:
 def resolve_config(overrides: dict | None = None) -> AIConfig:
     """요청 오버라이드(dict) > 환경변수 > 기본값 순으로 AIConfig 조립."""
     o = overrides or {}
-    provider = (o.get("provider") or os.environ.get("AG_AI_PROVIDER") or "auto").strip().lower()
+    provider = (o.get("provider") or os.environ.get("AG_AI_PROVIDER") or "ollama").strip().lower()
     api_key = (o.get("api_key") or "").strip()
     if not api_key:
         # provider 별 환경변수 키 폴백
@@ -61,7 +61,7 @@ def resolve_config(overrides: dict | None = None) -> AIConfig:
             api_key = (os.environ.get("ANTHROPIC_API_KEY")
                        or os.environ.get("OPENROUTER_API_KEY") or "")
     return AIConfig(
-        provider=provider if provider in ("auto", "off", *_PROVIDERS) else "auto",
+        provider=provider if provider in ("auto", "off", *_PROVIDERS) else "ollama",
         api_key=api_key,
         model=(o.get("model") or "").strip(),
         ollama_url=(o.get("ollama_url") or os.environ.get("AG_OLLAMA_URL")

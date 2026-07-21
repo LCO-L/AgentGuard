@@ -11,7 +11,7 @@
   "use strict";
   var KEY = "ag_cfg";
   var DEF = {
-    provider: "auto",
+    provider: "ollama",   // 기본 = 온디바이스(내 컴퓨터). 없으면 자동으로 오프라인 규칙 폴백
     ollamaUrl: "", ollamaModel: "",
     claudeKey: "", claudeModel: "",
     openrouterKey: "", openrouterModel: ""

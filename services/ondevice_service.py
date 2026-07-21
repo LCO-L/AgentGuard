@@ -17,6 +17,7 @@ DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL", "qwen2.5:3b")  # 4bit(Q4_K_M)�
 OLLAMA_URL = os.environ.get("AG_OLLAMA_URL", "http://localhost:11434")
 _HOME = os.path.expanduser(os.environ.get("AG_HOME", "~/.agentguard"))
 _OLLAMA_BIN: str | None = None  # 패키지매니저 대신 직접 설치한 경우의 실행 파일 경로
+_last_err: str = ""             # 마지막 설치 오류(사용자에게 원인 안내용)
 
 _state: dict = {
     "state": "idle",      # idle|checking|starting|pulling|ready|error|no_ollama
@@ -95,9 +96,30 @@ def start(model: str | None = None) -> dict:
 
 
 def _download(url: str, dest: str) -> None:
-    """urllib 스트리밍 다운로드(+진행률). 외부 의존성 없이 순수 표준 라이브러리."""
+    """다운로드 — 시스템 curl 우선, 실패 시 SSL 관대 urllib 폴백.
+
+    macOS 파이썬은 CA 인증서 미설정으로 urllib HTTPS가 자주 실패한다(가장 흔한 설치 실패 원인).
+    curl은 시스템 인증서와 307/302 리다이렉트를 그대로 처리하므로 훨씬 매끄럽다.
+    """
+    os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
+    _set(message="Ollama 내려받는 중…")
+    if shutil.which("curl"):
+        r = subprocess.run(
+            ["curl", "-fSL", "--retry", "3", "--connect-timeout", "20", "-o", dest, url],
+            capture_output=True, timeout=1800)
+        if r.returncode == 0 and os.path.exists(dest) and os.path.getsize(dest) > 1000:
+            return
+    # urllib 폴백 — 기본 컨텍스트 → (인증서 실패 시) 관대 컨텍스트 순
+    import ssl
     req = urllib.request.Request(url, headers={"User-Agent": "AgentGuard-Installer"})
-    with urllib.request.urlopen(req, timeout=60) as r:  # noqa: S310
+    try:
+        _stream(req, dest, ssl.create_default_context())
+    except Exception:  # noqa: BLE001
+        _stream(req, dest, ssl._create_unverified_context())  # noqa: S323
+
+
+def _stream(req: "urllib.request.Request", dest: str, ctx) -> None:
+    with urllib.request.urlopen(req, timeout=120, context=ctx) as r:  # noqa: S310
         total = int(r.headers.get("Content-Length") or 0)
         done = 0
         with open(dest, "wb") as f:
@@ -119,10 +141,10 @@ def _mark_exec(path: str) -> None:
 
 
 def _find_ollama_binary(root: str) -> str | None:
-    """추출 폴더에서 CLI 실행 파일(소문자 'ollama')을 찾는다(대문자 GUI 앱 제외)."""
+    """추출 폴더에서 CLI 실행 파일(ollama / ollama.exe)을 찾는다(대문자 GUI 앱 제외)."""
     for base, _dirs, files in os.walk(root):
         for fn in files:
-            if fn == "ollama":
+            if fn in ("ollama", "ollama.exe"):
                 return os.path.join(base, fn)
     return None
 
@@ -170,12 +192,40 @@ def _install_linux_direct() -> bool:
     return False
 
 
-def _install_ollama() -> bool:
-    """Ollama 자동 설치. 패키지매니저 우선, 실패 시 공식 배포본 직접 다운로드로 폴백.
+def _install_windows_direct() -> bool:
+    """관리자 권한 없이 공식 Windows 스탠드얼론 zip을 받아 ollama.exe 확보."""
+    global _OLLAMA_BIN
+    import zipfile
+    os.makedirs(_HOME, exist_ok=True)
+    zpath = os.path.join(_HOME, "ollama-windows-amd64.zip")
+    _download("https://ollama.com/download/ollama-windows-amd64.zip", zpath)
+    outdir = os.path.join(_HOME, "win")
+    shutil.rmtree(outdir, ignore_errors=True)
+    with zipfile.ZipFile(zpath) as z:
+        z.extractall(outdir)
+    binp = _find_ollama_binary(outdir)
+    if binp:
+        _OLLAMA_BIN = binp
+        return True
+    return False
 
-    - macOS: brew 있으면 brew, 없으면 공식 zip 직접 다운로드(설치 불필요·바로 실행).
-    - Linux: 공식 install.sh, 권한/네트워크로 막히면 공식 tgz 직접 다운로드.
+
+def _manual_hint() -> str:
+    """자동 설치 실패 시 OS별 '가장 확실한 한 줄' 안내."""
+    import platform
+    if platform.system() == "Windows":
+        return "https://ollama.com/download/windows 에서 OllamaSetup.exe 실행이 가장 확실해요(관리자 불필요)."
+    return "터미널에서 `curl -fsSL https://ollama.com/install.sh | sh` 한 줄이면 확실해요."
+
+
+def _install_ollama() -> bool:
+    """Ollama 자동 설치 — OS별 라우팅. 관리자 권한 없이 되는 경로를 우선한다.
+
+    - macOS(Darwin): brew → 공식 zip 직접 다운로드(~/.agentguard, sudo 불필요·바로 실행)
+    - Windows: 공식 스탠드얼론 zip 직접 다운로드(관리자 불필요) → winget 무인 설치 폴백
+    - Linux: 공식 install.sh(root면 성공) → 공식 tgz 직접 다운로드
     """
+    global _last_err
     import platform
     system = platform.system()
     try:
@@ -183,22 +233,43 @@ def _install_ollama() -> bool:
             if shutil.which("brew"):
                 try:
                     subprocess.run(["brew", "install", "ollama"],
-                                   check=True, capture_output=True, timeout=900)
+                                   check=True, capture_output=True, timeout=1800)
                     if shutil.which("ollama"):
                         return True
-                except Exception:  # noqa: BLE001
-                    pass  # brew 실패 → 직접 다운로드로 폴백
+                except Exception as e:  # noqa: BLE001
+                    _last_err = f"brew 실패: {e}"  # → 직접 다운로드로 폴백
             return _install_macos_direct()
+
+        if system == "Windows":
+            try:
+                if _install_windows_direct():
+                    return True
+            except Exception as e:  # noqa: BLE001
+                _last_err = f"zip 설치 실패: {e}"
+            if shutil.which("winget"):  # 폴백: winget 무인 설치
+                try:
+                    subprocess.run(
+                        ["winget", "install", "-e", "--id", "Ollama.Ollama",
+                         "--silent", "--accept-package-agreements",
+                         "--accept-source-agreements"],
+                        check=True, capture_output=True, timeout=1800)
+                    if shutil.which("ollama"):
+                        return True
+                except Exception as e:  # noqa: BLE001
+                    _last_err = f"winget 실패: {e}"
+            return _ollama_present()
+
         # Linux 등
         try:
             subprocess.run("curl -fsSL https://ollama.com/install.sh | sh",
-                           shell=True, check=True, capture_output=True, timeout=900)
+                           shell=True, check=True, capture_output=True, timeout=1800)
             if shutil.which("ollama"):
                 return True
-        except Exception:  # noqa: BLE001
-            pass  # 스크립트 실패(권한/네트워크) → 직접 다운로드로 폴백
+        except Exception as e:  # noqa: BLE001
+            _last_err = f"install.sh 실패: {e}"  # 권한/네트워크 → 직접 다운로드
         return _install_linux_direct()
-    except Exception:  # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
+        _last_err = str(e)
         return False
 
 
@@ -210,9 +281,10 @@ def _run(model: str) -> None:
             _set(state="starting", progress=2,
                  message="Ollama 자동 설치 중… (최초 1회, 수 분 걸릴 수 있어요)")
             if not _install_ollama() or not _ollama_present():
+                cause = (" (원인: " + _last_err[:140] + ")") if _last_err else ""
                 _set(state="no_ollama", progress=0,
-                     message="자동 설치를 완료하지 못했어요. https://ollama.com 에서 "
-                             "설치 후 다시 눌러주세요. (설치 없이도 오프라인 규칙으로 동작해요)")
+                     message="자동 설치를 완료하지 못했어요. " + _manual_hint() + cause +
+                             " 설치 없이도 오프라인 규칙으로 동작해요.")
                 return
             _set(progress=4, message="Ollama 설치 완료 ✓ 실행 준비 중…")
 

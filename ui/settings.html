@@ -54,13 +54,18 @@
   .saved.show{opacity:1;}
   .note{font-size:11.5px;color:var(--sub);text-align:center;line-height:1.7;}
   .cards{display:flex;flex-direction:column;gap:12px;}
+  .seg{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px;}
+  .segb{flex:1;border:0;background:transparent;border-radius:10px;padding:11px;cursor:pointer;font-family:inherit;color:var(--ink);display:flex;flex-direction:column;gap:2px;align-items:center;transition:.12s;}
+  .segb b{font-size:14.5px;font-weight:800;} .segb span{font-size:11px;color:var(--sub);}
+  .segb.on{background:var(--accent);color:#fff;} .segb.on span{color:rgba(255,255,255,.9);}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top"><b>AgentGuard <span class="u">설정</span></b><a href="/">← 대시보드</a></div>
-    <div class="lead">보안 판단·통역에 쓸 AI 엔진을 고르세요. <b>온디바이스</b>는 인터넷 없이 내 컴퓨터에서,
-      <b>Claude·OpenRouter</b>는 API 키로 클라우드에서 돕습니다. 셋 다 없어도 오프라인 규칙으로 항상 작동해요.</div>
+    <div class="lead">판단 엔진은 <b>온디바이스</b>(기본)와 <b>API</b> 둘 중 하나예요.
+      <b>온디바이스</b>는 인터넷 없이 내 컴퓨터에서, <b>API</b>는 Claude·OpenRouter 키로 클라우드에서 돕습니다.
+      Ollama가 없어도 자동으로 오프라인 규칙으로 항상 작동해요.</div>
   </div>
 
   <div class="wrap"><div class="reco" id="reco" style="display:none"></div></div>
@@ -86,6 +91,12 @@
       </div>
     </div>
   </div>
+
+  <!-- 엔진 모드: 온디바이스 / API (온디바이스가 기본) -->
+  <div class="wrap"><div class="seg" id="seg">
+    <button class="segb" data-mode="ondevice"><b>🖥️ 온디바이스</b><span>내 컴퓨터 · 기본</span></button>
+    <button class="segb" data-mode="api"><b>☁️ API</b><span>Claude · OpenRouter</span></button>
+  </div></div>
 
   <div class="wrap cards">
     <!-- 온디바이스 -->
@@ -143,17 +154,9 @@
     </div>
   </div>
 
-  <div class="wrap">
-    <div class="lead" style="margin:8px 0 6px">또는</div>
-    <div class="altrow">
-      <div class="alt" data-p="auto" id="alt-auto">✨ 자동 (지능적 선택)</div>
-      <div class="alt" data-p="off" id="alt-off">⚙️ 끄기 (오프라인 규칙만)</div>
-    </div>
-  </div>
-
   <div class="wrap"><div class="note">
     설정은 이 브라우저에만 저장됩니다. 대시보드와 보안 위젯이 이 설정을 함께 사용해요.<br>
-    '자동'은 온디바이스를 우선 시도하고, 안 되면 오프라인 규칙으로 답합니다.
+    기본은 <b>온디바이스</b>예요. Ollama가 준비돼 있지 않으면 자동으로 오프라인 규칙으로 답합니다.
   </div></div>
 
   <div class="saved" id="saved">저장됐어요 ✓</div>
@@ -167,8 +170,23 @@
   function reflect(){
     $("#ollamaUrl").value=CFG.ollamaUrl; $("#claudeKey").value=CFG.claudeKey; $("#openrouterKey").value=CFG.openrouterKey;
     document.querySelectorAll(".card").forEach(c=>c.classList.toggle("sel",c.dataset.p===CFG.provider));
-    document.querySelectorAll(".alt").forEach(a=>a.classList.toggle("sel",a.dataset.p===CFG.provider));
   }
+
+  // 엔진 모드: 온디바이스 / API (온디바이스 기본)
+  function curMode(){ return (CFG.provider==="claude"||CFG.provider==="openrouter")?"api":"ondevice"; }
+  function applyMode(mode){
+    document.querySelectorAll(".segb").forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
+    $("#card-ollama").style.display   = mode==="ondevice"?"":"none";
+    $("#card-claude").style.display   = mode==="api"?"":"none";
+    $("#card-openrouter").style.display= mode==="api"?"":"none";
+  }
+  function setMode(mode){
+    if(mode==="ondevice") persist({provider:"ollama"});
+    else if(!(CFG.provider==="claude"||CFG.provider==="openrouter")) persist({provider:"claude"});
+    applyMode(mode); reflect();
+    if(mode==="ondevice") loadModels("ollama");
+  }
+  document.querySelectorAll(".segb").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
   function toast(){ const s=$("#saved"); s.classList.add("show"); setTimeout(()=>s.classList.remove("show"),1400); }
   function persist(patch){ CFG=AGConfig.set(patch); toast(); }
   function hdrs(provider){ // 특정 provider 로 상태/모델/테스트할 때의 헤더
@@ -206,7 +224,7 @@
     if(p.ollama && CFG.provider!=="ollama"){
       r.style.display="flex";
       r.innerHTML=`✨ <b>온디바이스(Ollama)</b>가 감지됐어요. 인터넷 없이 가장 안전해요. <button id="useReco">이걸로 설정</button>`;
-      $("#useReco").onclick=()=>{ persist({provider:"ollama"}); reflect(); r.style.display="none"; loadModels("ollama"); };
+      $("#useReco").onclick=()=>{ persist({provider:"ollama"}); applyMode("ondevice"); reflect(); r.style.display="none"; loadModels("ollama"); };
     } else { r.style.display="none"; }
   }
 
@@ -243,7 +261,7 @@
     const o=document.createElement("option"); o.value=m; o.textContent=m; $("#claudeModel").appendChild(o);});
   if(CFG.claudeModel)$("#claudeModel").value=CFG.claudeModel;
 
-  reflect(); refreshStatus();
+  reflect(); applyMode(curMode()); refreshStatus();
   if(CFG.provider==="ollama")loadModels("ollama");
   if(CFG.openrouterKey)loadModels("openrouter");
 
