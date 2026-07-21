@@ -168,24 +168,50 @@ def _install_macos_direct() -> bool:
     return False
 
 
+def _extract_tar_zst(path: str, outdir: str) -> bool:
+    """.tar.zst 추출 — 시스템 tar(zstd) 우선, 실패 시 python zstandard 폴백."""
+    os.makedirs(outdir, exist_ok=True)
+    for cmd in (["tar", "--zstd", "-xf", path, "-C", outdir],
+                ["tar", "-I", "zstd", "-xf", path, "-C", outdir],
+                ["tar", "-xf", path, "-C", outdir]):  # 일부 tar은 자동 감지
+        try:
+            r = subprocess.run(cmd, capture_output=True, timeout=600)
+            if r.returncode == 0 and _find_ollama_binary(outdir):
+                return True
+        except Exception:  # noqa: BLE001
+            pass
+    try:  # 순수 파이썬 폴백(zstandard 있으면)
+        import io
+        import tarfile
+        import zstandard
+        with open(path, "rb") as f:
+            reader = zstandard.ZstdDecompressor().stream_reader(f)
+            with tarfile.open(fileobj=io.BufferedReader(reader), mode="r|") as t:
+                t.extractall(outdir)
+        return bool(_find_ollama_binary(outdir))
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def _install_linux_direct() -> bool:
-    """설치 스크립트가 막힌 환경에서 공식 tgz를 직접 받아 확보."""
-    global _OLLAMA_BIN
+    """공식 Linux tar.zst를 직접 받아 ollama 실행 파일 확보(설치 스크립트 폴백).
+
+    최신 릴리스 자산은 .tgz가 아니라 .tar.zst 다(과거 .tgz URL은 404).
+    """
+    global _OLLAMA_BIN, _last_err
     import platform
-    import tarfile
     arch = platform.machine().lower()
     a = "arm64" if arch in ("arm64", "aarch64") else "amd64"
     os.makedirs(_HOME, exist_ok=True)
-    tpath = os.path.join(_HOME, "ollama.tgz")
-    _download(f"https://ollama.com/download/ollama-linux-{a}.tgz", tpath)
+    tpath = os.path.join(_HOME, f"ollama-linux-{a}.tar.zst")
+    _download(f"https://ollama.com/download/ollama-linux-{a}.tar.zst", tpath)
     outdir = os.path.join(_HOME, "linux")
     shutil.rmtree(outdir, ignore_errors=True)
-    with tarfile.open(tpath) as t:
-        t.extractall(outdir)
-    binp = os.path.join(outdir, "bin", "ollama")
-    if not os.path.exists(binp):
-        binp = _find_ollama_binary(outdir) or ""
-    if binp and os.path.exists(binp):
+    if not _extract_tar_zst(tpath, outdir):
+        _last_err = "tar.zst 추출 실패 — 서버에 zstd/tar이 없을 수 있어요"
+        return False
+    binp = _find_ollama_binary(outdir)
+    if binp:
         _mark_exec(binp)
         _OLLAMA_BIN = binp
         return True
