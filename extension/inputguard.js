@@ -26,7 +26,7 @@
   root.innerHTML =
     '<style>' +
     ':host{all:initial}*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif}' +
-    '.badge{position:fixed;z-index:2147483400;width:36px;height:36px;border-radius:50%;background:#2563EB;color:#fff;font-size:13px;font-weight:800;display:none;align-items:center;justify-content:center;gap:0;cursor:pointer;box-shadow:0 6px 18px rgba(20,24,29,.35);border:2.5px solid #fff}' +
+    '.badge{position:fixed;z-index:2147483400;width:36px;height:36px;border-radius:50%;background:#1E5BFF;color:#fff;font-size:13px;font-weight:800;display:none;align-items:center;justify-content:center;gap:0;cursor:pointer;box-shadow:0 6px 18px rgba(20,24,29,.35);border:2.5px solid #fff}' +
     '.badge.red{background:#E5484D}.badge.yellow{background:#F5A623}.badge.green{background:#30A46C}' +
     '.ov{position:fixed;inset:0;background:rgba(16,18,29,.5);z-index:2147483500;display:none;align-items:center;justify-content:center}' +
     '.ov.show{display:flex}' +
@@ -218,7 +218,7 @@
         (i.suggestion ? ' — ' + esc(i.suggestion) : "") + '</div></div>';
     }).join("");
     if (extra)
-      mb.innerHTML += '<div class="it" style="border-top:2px solid #EEF0F3;font-weight:800;color:#2563EB">🔬 심층 분석(LLM)</div>' + extra;
+      mb.innerHTML += '<div class="it" style="border-top:2px solid #EEF0F3;font-weight:800;color:#1E5BFF">🔬 심층 분석(LLM)</div>' + extra;
   }
 
   // ── 인라인 물결 밑줄 — 타깃 AI 사이트(contenteditable) 정밀 지원 ──

@@ -23,15 +23,15 @@
     "-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E8E8EA;" +
     "font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',system-ui,sans-serif}" +
     "#ag-topnav .agb{display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px;color:#16181D;text-decoration:none;white-space:nowrap}" +
-    "#ag-topnav .agb .u{color:#2563EB}" +
+    "#ag-topnav .agb .u{color:#1E5BFF}" +
     "#ag-topnav .agl{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}" +
     "#ag-topnav .agl::-webkit-scrollbar{display:none}" +
     "#ag-topnav a.agi{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:8px;" +
     "font-size:13px;font-weight:700;color:#6B7280;text-decoration:none;white-space:nowrap;transition:.12s}" +
     "#ag-topnav a.agi:hover{color:#16181D}" +
     "#ag-topnav a.agi.on{background:#16181D;color:#fff}" +
-    "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
-    "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(37,99,235,.35)}" +
+    "#ag-topnav .agx{background:#1E5BFF;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
+    "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(30,91,255,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
     "#ag-help-fab{position:fixed;right:22px;bottom:96px;z-index:2147483647;width:46px;height:46px;" +
     "border-radius:50%;border:0;background:#16181D;color:#fff;font-size:20px;font-weight:800;cursor:pointer;" +
@@ -56,7 +56,7 @@
   // PWA/모바일 메타 — 모든 페이지에서 '홈 화면에 설치' + 앱처럼 표시(중복 가드)
   function agMeta(sel, make) { if (!document.querySelector(sel)) document.head.appendChild(make()); }
   agMeta('link[rel="manifest"]', function () { var l = document.createElement("link"); l.rel = "manifest"; l.href = "/manifest.webmanifest"; return l; });
-  agMeta('meta[name="theme-color"]', function () { var m = document.createElement("meta"); m.name = "theme-color"; m.content = "#2563EB"; return m; });
+  agMeta('meta[name="theme-color"]', function () { var m = document.createElement("meta"); m.name = "theme-color"; m.content = "#1E5BFF"; return m; });
   agMeta('meta[name="apple-mobile-web-app-capable"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; return m; });
   agMeta('meta[name="apple-mobile-web-app-status-bar-style"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-status-bar-style"; m.content = "default"; return m; });
   agMeta('meta[name="apple-mobile-web-app-title"]', function () { var m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "AgentGuard"; return m; });

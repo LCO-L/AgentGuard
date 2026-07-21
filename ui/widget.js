@@ -36,8 +36,8 @@
   :host{ all: initial; }
   *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",system-ui,sans-serif; }
   .launcher{ position:fixed; right:22px; bottom:22px; width:60px; height:60px; border-radius:50%;
-    background:linear-gradient(135deg,#2563EB,#3B82F6); color:#fff; border:0; cursor:pointer;
-    box-shadow:0 8px 26px rgba(37,99,235,.42); font-size:26px; z-index:2147483000;
+    background:linear-gradient(135deg,#1E5BFF,#3D7BFF); color:#fff; border:0; cursor:pointer;
+    box-shadow:0 8px 26px rgba(30,91,255,.42); font-size:26px; z-index:2147483000;
     display:flex; align-items:center; justify-content:center; transition:transform .15s; }
   .launcher:hover{ transform:scale(1.06); }
   .launcher .badge{ position:absolute; top:-3px; right:-3px; min-width:20px; height:20px; padding:0 5px;
@@ -48,7 +48,7 @@
     box-shadow:0 18px 60px rgba(20,24,29,.28); z-index:2147483000; overflow:hidden;
     display:none; flex-direction:column; opacity:0; transform:translateY(12px); transition:.22s; }
   .panel.show{ display:flex; opacity:1; transform:none; }
-  .hd{ background:linear-gradient(135deg,#2563EB,#3B82F6); color:#fff; padding:16px 18px;
+  .hd{ background:linear-gradient(135deg,#1E5BFF,#3D7BFF); color:#fff; padding:16px 18px;
     display:flex; align-items:center; gap:10px; }
   .hd .av{ width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.22);
     display:flex; align-items:center; justify-content:center; font-size:18px; }
@@ -59,7 +59,7 @@
   .msgs{ flex:1; overflow-y:auto; padding:16px; background:#F4F5F8; display:flex; flex-direction:column; gap:10px; }
   .m{ max-width:86%; font-size:14px; line-height:1.55; padding:10px 13px; border-radius:14px; white-space:pre-wrap; word-break:keep-all; }
   .m.bot{ background:#fff; color:#16181D; align-self:flex-start; border-bottom-left-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
-  .m.user{ background:#2563EB; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+  .m.user{ background:#1E5BFF; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
   .m.typing{ color:#6B7280; font-style:italic; }
   /* 카드 */
   .card{ align-self:stretch; max-width:100%; background:#fff; border:1px solid #E8E8EA; border-radius:16px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06); }
@@ -79,7 +79,7 @@
   .r .v{ font-size:13.5px; margin-top:1px; }
   .act{ margin:6px 15px 12px; border-radius:12px; padding:11px; font-size:14px; font-weight:800; }
   .act.red{ background:#FCECEC; color:#E5484D; } .act.yellow{ background:#FFF7E8; color:#B45309; } .act.green{ background:#EEF9F2; color:#30A46C; }
-  .eng{ font-size:11px; color:#2563EB; padding:0 15px 10px; font-weight:700; }
+  .eng{ font-size:11px; color:#1E5BFF; padding:0 15px 10px; font-weight:700; }
   /* 빠른 액션 */
   .quick{ display:flex; gap:6px; flex-wrap:wrap; padding:0 16px 8px; background:#F4F5F8; }
   .quick button{ border:1px solid #E1E3EA; background:#fff; border-radius:99px; padding:6px 11px; font-size:12px; font-weight:700; cursor:pointer; color:#16181D; }
@@ -87,7 +87,7 @@
   .inbar{ display:flex; align-items:center; gap:8px; padding:11px 12px; border-top:1px solid #E8E8EA; background:#fff; }
   .inbar .att{ background:#F4F5F8; border:0; width:38px; height:38px; border-radius:10px; cursor:pointer; font-size:17px; flex:0 0 auto; }
   .inbar input{ flex:1; border:1px solid #E1E3EA; border-radius:11px; padding:10px 12px; font-size:14px; outline:none; }
-  .inbar .send{ background:#2563EB; border:0; color:#fff; width:40px; height:40px; border-radius:11px; cursor:pointer; font-size:16px; flex:0 0 auto; }
+  .inbar .send{ background:#1E5BFF; border:0; color:#fff; width:40px; height:40px; border-radius:11px; cursor:pointer; font-size:16px; flex:0 0 auto; }
   .foot{ text-align:center; font-size:10.5px; color:#9AA0AA; padding:0 0 8px; background:#fff; }
   /* Grammarly식 호버 툴팁 */
   .ag-tip{ position:fixed; z-index:2147483600; max-width:280px; background:#16181D; color:#fff;

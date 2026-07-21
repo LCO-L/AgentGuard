@@ -7,7 +7,7 @@
 (function () {
   "use strict";
   var KEY = "ag_onboarded_v1";
-  var BLUE = "#2563EB";
+  var BLUE = "#1E5BFF";
 
   var STEPS = [
     { center: true, icon: "🛡️", title: "AgentGuard에 오신 걸 환영해요",
@@ -37,7 +37,7 @@
     '#ag-onboard .veil.blur{background:rgba(12,16,30,.42);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}' +
     '#ag-onboard .spot{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(12,16,30,.62);transition:all .3s cubic-bezier(.2,.7,.2,1);pointer-events:none;border:2.5px solid ' + BLUE + '}' +
     '#ag-onboard .spot.pulse{animation:agpulse 1.6s ease-out infinite}' +
-    '@keyframes agpulse{0%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(37,99,235,.5)}70%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 14px rgba(37,99,235,0)}100%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(37,99,235,0)}}' +
+    '@keyframes agpulse{0%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(30,91,255,.5)}70%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 14px rgba(30,91,255,0)}100%{box-shadow:0 0 0 9999px rgba(12,16,30,.62),0 0 0 0 rgba(30,91,255,0)}}' +
     '#ag-onboard .bub{position:fixed;max-width:320px;background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.32);padding:16px 17px;opacity:0;transform:translateY(6px);transition:.22s}' +
     '#ag-onboard .bub.show{opacity:1;transform:none}' +
     '#ag-onboard .bub .ic{font-size:26px;line-height:1}' +

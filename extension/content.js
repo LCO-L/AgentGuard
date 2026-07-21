@@ -19,7 +19,7 @@
     '<style>' +
     ':host{all:initial}' +
     '*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Malgun Gothic",system-ui,sans-serif}' +
-    '.badge{position:fixed;right:20px;bottom:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border:0;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.42);font-size:24px;display:flex;align-items:center;justify-content:center;z-index:2147483000}' +
+    '.badge{position:fixed;right:20px;bottom:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1E5BFF,#3D7BFF);color:#fff;border:0;cursor:pointer;box-shadow:0 8px 24px rgba(30,91,255,.42);font-size:24px;display:flex;align-items:center;justify-content:center;z-index:2147483000}' +
     '.badge .n{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;background:#E5484D;color:#fff;border-radius:99px;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #fff}' +
     '.panel{position:fixed;right:20px;bottom:86px;width:360px;max-width:calc(100vw - 32px);max-height:calc(100vh - 130px);overflow:auto;background:#fff;border-radius:18px;box-shadow:0 18px 60px rgba(20,24,29,.30);z-index:2147483000;display:none}' +
     '.panel.show{display:block}' +
@@ -36,7 +36,7 @@
     '.rows{padding:6px 16px 4px}.r{padding:9px 0;border-top:1px solid #EEF0F3}.r .k{font-size:11px;color:#6B7280;font-weight:700}.r .v{font-size:13.5px;color:#16181D;margin-top:1px}' +
     '.act{margin:6px 16px 10px;border-radius:12px;padding:11px;font-size:14px;font-weight:800}' +
     '.act.red{background:#FCECEC;color:#E5484D}.act.yellow{background:#FFF7E8;color:#B45309}.act.green{background:#EEF9F2;color:#30A46C}' +
-    '.eng{font-size:11px;color:#2563EB;padding:0 16px 12px;font-weight:700}' +
+    '.eng{font-size:11px;color:#1E5BFF;padding:0 16px 12px;font-weight:700}' +
     '.msg{padding:16px;font-size:13.5px;color:#16181D;line-height:1.6}' +
     '.tip{position:fixed;z-index:2147483600;max-width:280px;background:#16181D;color:#fff;border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.32);display:none}' +
     '.tip.show{display:block}.tip .tt{font-weight:800;margin-bottom:3px;color:#FF8A8D}.tip .dec{margin-top:6px;background:#23262F;border-radius:7px;padding:6px 8px;font-family:monospace;color:#9EE6C0;word-break:break-all}' +

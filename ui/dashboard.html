@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentGuard ULTRA — 온디바이스 통합 보안 검사</title>
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#2563EB">
+<meta name="theme-color" content="#1E5BFF">
 <link rel="apple-touch-icon" href="/icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AgentGuard">
@@ -14,7 +14,7 @@
     --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
     --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
     --bg:#F5F6F8; --card:#FFFFFF;
-    --accent:#3346D3; --accent-weak:rgba(51,70,211,.09);
+    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
     --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64;
     --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
     --shadow-lg:0 2px 6px rgba(14,17,22,.05), 0 30px 70px -24px rgba(14,17,22,.24);
@@ -127,6 +127,15 @@
   .foot .eng{color:var(--accent); font-weight:700;}
   .note{max-width:560px; font-size:11.5px; color:var(--muted); text-align:center; line-height:1.75;}
   .note a{color:var(--accent) !important;}
+  /* 모바일: 히어로 세로 배치 + 입력 확대(줌) 방지 */
+  @media(max-width:600px){
+    body{padding:20px 14px 84px;}
+    .hero{flex-direction:column;align-items:flex-start;gap:12px;}
+    .hero h1{font-size:23px;}
+    .engbtn{align-self:flex-start;}
+    textarea,.urlrow input{font-size:16px;}
+    .tabs button{font-size:12.5px;padding:9px 6px;}
+  }
 </style>
 </head>
 <body>
