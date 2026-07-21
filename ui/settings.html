@@ -88,6 +88,8 @@
         <div id="odMsg" style="margin-top:6px;font-size:12px;font-weight:700;color:var(--accent)"></div>
         <a id="odLink" href="https://ollama.com/download" target="_blank" rel="noreferrer"
            style="display:none;margin-top:4px;font-size:12px;font-weight:800;color:var(--accent)">Ollama 설치하기 →</a>
+        <div id="odOffer" style="display:none;margin-top:9px;font-size:12.5px;color:var(--sub)">온디바이스가 어려운 환경 같아요. <b style="color:var(--ink)">클라우드 API</b>로 대신 검사할까요?</div>
+        <button id="odApi" style="display:none;margin-top:7px;background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit">API로 전환하기 →</button>
       </div>
     </div>
   </div>
@@ -251,7 +253,7 @@
       const r=await fetch("/v1/ai/test",{method:"POST",headers:{...hdrs(provider),"Content-Type":"application/json"},body:"{}"});
       const d=await r.json();
       if(d.ok){ res.className="res ok"; res.textContent=`✓ 연결됨 · ${d.latency_ms}ms · ${d.model||d.engine}`; }
-      else { res.className="res bad"; res.textContent="✗ 연결 실패 (키·주소·모델 확인)"; }
+      else { res.className="res bad"; res.textContent="✗ "+(d.error||"연결 실패 (키·주소·모델 확인)"); }
     }catch(e){ res.className="res bad"; res.textContent="✗ 서버에 연결할 수 없어요"; }
   });
 
@@ -267,7 +269,8 @@
 
   // ── 온디바이스 원클릭 실행 ──
   (function(){
-    const btn=$("#odBtn"), body=$("#odBody"), bar=$("#odBar"), msg=$("#odMsg"), link=$("#odLink");
+    const btn=$("#odBtn"), body=$("#odBody"), bar=$("#odBar"), msg=$("#odMsg"), link=$("#odLink"), offer=$("#odOffer"), apiBtn=$("#odApi");
+    apiBtn.onclick=()=>{ setMode("api"); const c=document.querySelector("#card-claude"); if(c)c.scrollIntoView({behavior:"smooth",block:"center"}); };
     let poll=null;
     function paint(d){
       body.style.display="block";
@@ -275,6 +278,9 @@
       msg.textContent=d.message||"";
       msg.style.color=d.state==="ready"?"#30A46C":(d.state==="error"||d.state==="no_ollama"||d.state==="blocked")?"#E5484D":"var(--accent)";
       link.style.display=d.state==="no_ollama"?"inline-block":"none";
+      const failed=(d.state==="no_ollama"||d.state==="error"||d.state==="blocked");
+      offer.style.display=failed?"block":"none";
+      apiBtn.style.display=failed?"inline-block":"none";
       btn.disabled=["checking","starting","pulling"].includes(d.state);
       btn.textContent=btn.disabled?"준비 중…":(d.state==="ready"?"다시 실행":"실행");
       if(d.state==="ready"&&d.model){ persist({provider:"ollama",ollamaModel:d.model}); }

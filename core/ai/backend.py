@@ -179,36 +179,40 @@ def _ollama_pick(cfg: AIConfig) -> str:
 
 
 def _call_ollama(system: str, user: str, cfg: AIConfig, max_tokens: int) -> str | None:
-    def _try(model: str) -> str | None:
+    def _try(model: str, use_think: bool = True) -> str | None:
         payload = {
             "model": model,
             "messages": [{"role": "system", "content": system},
                          {"role": "user", "content": user}],
             "stream": False,
-            # qwen3 등 'thinking' 모델: 추론에 토큰을 다 쓰고 content가 비는 것 방지
-            "think": False,
             # num_ctx: 기본 2048은 findings·문서 텍스트에 부족 → 긴 입력 잘림 방지
             "options": {"temperature": 0, "num_predict": max_tokens,
                         "num_ctx": int(os.environ.get("AG_OLLAMA_NUM_CTX", "8192"))},
         }
+        # qwen3 등 'thinking' 모델은 추론에 토큰을 다 써 content가 비는 것을 막고자 끈다.
+        # 단 qwen2.5 등 thinking 미지원 모델은 이 필드에서 에러 → use_think=False로 재시도.
+        if use_think:
+            payload["think"] = False
         data = _post_json(f"{cfg.ollama_url}/api/chat", payload, {}, cfg.timeout)
         if not data:
             return None
         m = data.get("message") or {}
         msg = (m.get("content") or "").strip()
         if not msg:
-            # 구형 Ollama(think 미지원): thinking 이라도 있으면 그걸로
             msg = str(m.get("thinking") or "").strip()
         return msg or None
 
     model = _ollama_pick(cfg)
     out = _try(model)
     if out is None:
+        # 'think' 미지원 모델(qwen2.5 등)일 수 있어 해당 필드 없이 1회 재시도
+        out = _try(model, use_think=False)
+    if out is None:
         # 404 model-not-found 등: 설치된 다른 채팅 모델로 1회 재시도
         alt = [n for n in _ollama_installed(cfg)
                if n != model and "embed" not in n.lower()]
         if alt:
-            out = _try(alt[0])
+            out = _try(alt[0], use_think=False)
     return out
 
 
@@ -342,7 +346,7 @@ def probe(cfg: AIConfig | None = None) -> dict:
     # ollama 로컬 접속 확인
     try:
         req = urllib.request.Request(f"{cfg.ollama_url}/api/tags")
-        with urllib.request.urlopen(req, timeout=1.5) as resp:
+        with urllib.request.urlopen(req, timeout=3.0) as resp:
             status["ollama"] = resp.status == 200
     except Exception:
         status["ollama"] = False

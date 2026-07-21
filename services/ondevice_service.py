@@ -31,7 +31,14 @@ _proc: subprocess.Popen | None = None
 
 def status() -> dict:
     with _lock:
-        return dict(_state)
+        st = dict(_state)
+    # 'ready'로 남아 있지만 서버가 실제로 꺼졌으면 정직하게 반영(버튼↔상태 불일치 방지)
+    if st.get("state") == "ready" and not _ollama_alive():
+        _set(state="idle", progress=0,
+             message="온디바이스가 꺼져 있어요. '실행'을 눌러 다시 켜주세요.")
+        with _lock:
+            return dict(_state)
+    return st
 
 
 def _set(**kw) -> None:
