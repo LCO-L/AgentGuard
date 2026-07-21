@@ -21,6 +21,13 @@ __pycache__/
 samples/evil.*
 samples/clean.*
 !samples/make_samples.py
+dist/
+web/node_modules/
+web/.next/
+web/out/
+web/android/
+vscode-extension/node_modules/
+vscode-extension/out/
 
 # ── OS/에디터 ──
 .DS_Store

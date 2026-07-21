@@ -191,16 +191,23 @@ export default function Landing() {
             </p>
           </motion.div>
 
-          <motion.div {...rise(0.08)} className="mt-7">
+          <motion.div {...rise(0.08)} className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a href="/api/extension.zip" download
               className="inline-flex items-center gap-2 rounded-2xl bg-white px-7 py-3.5 text-[15px] font-extrabold text-ink shadow-xl transition-transform hover:scale-[1.03] active:scale-95">
               <Download size={17} /> 지금 설치하기 (ZIP)
             </a>
+            <a href="/api/extension.crx" download
+              className="inline-flex items-center gap-2 rounded-2xl border-2 border-white/40 px-6 py-3 text-[14px] font-extrabold text-white/90 transition-colors hover:border-white hover:text-white">
+              서명된 패키지 (.crx)
+            </a>
             {isChromium && (
-              <p className="mt-2 text-[12px] font-bold text-emerald-300">
+              <p className="w-full text-[12px] font-bold text-emerald-300">
                 ✓ Chrome 계열 브라우저를 사용 중이시네요 — 10초면 끝나요
               </p>
             )}
+            <p className="w-full text-[11.5px] text-white/50">
+              일반 설치는 ZIP 권장 · .crx는 엔터프라이즈 정책 배포용 서명 패키지
+            </p>
           </motion.div>
 
           <motion.ol {...rise(0.14)}

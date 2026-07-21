@@ -127,6 +127,26 @@ def create_app() -> FastAPI:
                      "attachment; filename=agentguard-extension.zip"},
         )
 
+    @app.get("/extension.crx", tags=["meta"])
+    def extension_crx() -> Response:
+        """서명된 CRX3 패키지 — scripts/pack_extension.py 로 미리 빌드한 산출물 서빙.
+
+        ⚠️ 최신 Chrome은 웹스토어 외 CRX 직접 설치를 제한(엔터프라이즈 정책용).
+        일반 사용자는 /extension.zip + '압축해제된 확장 프로그램 로드' 권장.
+        """
+        crx = _ROOT / "dist" / "agentguard-extension.crx"
+        if not crx.exists():
+            return Response(
+                "CRX가 아직 빌드되지 않았습니다. "
+                "uv run python scripts/pack_extension.py 를 먼저 실행하세요.",
+                status_code=404)
+        return Response(
+            content=crx.read_bytes(),
+            media_type="application/x-chrome-extension",
+            headers={"Content-Disposition":
+                     "attachment; filename=agentguard-extension.crx"},
+        )
+
     @app.get("/api", tags=["meta"])
     def api_index() -> dict:
         return {
