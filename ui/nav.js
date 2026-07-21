@@ -33,7 +33,7 @@
     "#ag-topnav .agx{background:#2563EB;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;" +
     "font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(37,99,235,.35)}" +
     "#ag-topnav .agx:hover{filter:brightness(1.05)}" +
-    "#ag-help-fab{position:fixed;right:20px;bottom:20px;z-index:2147483000;width:46px;height:46px;" +
+    "#ag-help-fab{position:fixed;right:22px;bottom:88px;z-index:2147483000;width:46px;height:46px;" +
     "border-radius:50%;border:0;background:#16181D;color:#fff;font-size:20px;font-weight:800;cursor:pointer;" +
     "font-family:inherit;display:flex;align-items:center;justify-content:center;" +
     "box-shadow:0 8px 24px rgba(14,17,22,.28);transition:transform .16s cubic-bezier(.2,.7,.2,1),box-shadow .16s}" +
@@ -92,17 +92,6 @@
       }
     };
     document.body.appendChild(fab);
-
-    // 확장(AgentGuard 배지, #agentguard-ext-host)이 같은 우하단에 뜨면
-    // '?'를 그 위로 올려 두 버튼이 겹치지 않고 모두 보이게 한다.
-    var positionFab = function () {
-      var ext = document.getElementById("agentguard-ext-host");
-      fab.style.bottom = ext ? "86px" : "20px";
-      fab.style.right = ext ? "24px" : "20px";
-    };
-    positionFab();
-    try { new MutationObserver(positionFab).observe(document.documentElement, { childList: true }); } catch (e) {}
-    setTimeout(positionFab, 1500);   // 확장 주입 지연 대비
   }
 
   // 기존 레이아웃을 밀어내지 않도록 상단 여백만 확보
