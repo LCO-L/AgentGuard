@@ -1,6 +1,6 @@
 """온디바이스 원클릭 실행 — Ollama 자동 기동 + 모델 자동 pull.
 
-버튼 하나로: ① ollama 설치 확인 → ② serve 기동 → ③ 8B 모델 pull(진행률 추적) → ④ 사용 준비.
+버튼 하나로: ① ollama 설치·설치확인 → ② serve 기동 → ③ 소형 4bit 모델 pull(진행률 추적) → ④ 사용 준비.
 상태는 프로세스 내 싱글턴으로, 프론트가 1초 폴 백으로 진행률을 표시.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ import subprocess
 import threading
 import urllib.request
 
-DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL", "qwen3:8b")
+DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL", "qwen2.5:3b")  # 4bit(Q4_K_M)·소형
 OLLAMA_URL = os.environ.get("AG_OLLAMA_URL", "http://localhost:11434")
 
 _state: dict = {

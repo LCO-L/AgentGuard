@@ -21,7 +21,7 @@ import urllib.request
 from dataclasses import dataclass
 
 DEFAULT_OLLAMA_URL = "http://localhost:11434"
-DEFAULT_OLLAMA_MODEL = "qwen3:8b"
+DEFAULT_OLLAMA_MODEL = "qwen2.5:3b"  # Ollama 기본 Q4_K_M(4bit)·~1.8GB — 온디바이스 소형
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5"
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3-8b"
 

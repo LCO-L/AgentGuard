@@ -143,7 +143,7 @@ function OndeviceCard({ onReady }: { onReady: (model: string) => void }) {
         <div className="flex-1">
           <div className="text-[15px] font-extrabold">온디바이스 실행</div>
           <div className="text-[12px] text-sub">
-            버튼 하나면 Ollama가 켜지고 8B 모델이 자동으로 준비돼요
+            버튼 하나면 Ollama가 켜지고 4bit 양자화 소형 모델(qwen2.5:3b)이 자동 준비돼요
           </div>
         </div>
         <Button onClick={start} disabled={!!busy} className="px-4 py-2.5 text-[13px]">
