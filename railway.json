@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "python scripts/pack_extension.py || echo 'CRX 패키징 건늘뛰기(openssl 없음) — zip으로 배포'"
+    "buildCommand": "pip install -r requirements.txt && (python scripts/pack_extension.py || echo 'CRX 패키징 건너뜀 — /extension.zip 즉석 배포로 대체')"
   },
   "deploy": {
     "startCommand": "python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}",
