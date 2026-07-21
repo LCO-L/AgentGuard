@@ -14,6 +14,7 @@ from fastapi.responses import HTMLResponse, Response
 from api.routes import ai, chat, health, history, inspect, rules, scan, text, url
 
 _UI_DIR = Path(__file__).resolve().parent.parent / "ui"
+_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _serve(name: str, media: str) -> Response:
@@ -100,6 +101,31 @@ def create_app() -> FastAPI:
         """위젯이 붙은 '가상 회사 사이트' 데모."""
         html = _UI_DIR / "embed-demo.html"
         return html.read_text(encoding="utf-8") if html.exists() else "<h1>no demo</h1>"
+
+    @app.get("/extension.zip", tags=["meta"])
+    def extension_zip() -> Response:
+        """크롬 익스텐션 즉시 설치 패키지 — extension/ 디렉터리를 즉석 ZIP으로.
+
+        랜딩의 '확장 프로그램 설치' 버튼이 다운로드. 사용자는 압축 해제 후
+        chrome://extensions → '압축해제된 확장 프로그램 로드'로 10초 설치.
+        """
+        import io
+        import zipfile
+
+        ext_dir = _ROOT / "extension"
+        if not ext_dir.exists():
+            return Response("extension 디렉터리가 없습니다", status_code=404)
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for f in sorted(ext_dir.rglob("*")):
+                if f.is_file() and "__pycache__" not in str(f):
+                    z.write(f, arcname=f"agentguard-extension/{f.relative_to(ext_dir)}")
+        return Response(
+            content=buf.getvalue(),
+            media_type="application/zip",
+            headers={"Content-Disposition":
+                     "attachment; filename=agentguard-extension.zip"},
+        )
 
     @app.get("/api", tags=["meta"])
     def api_index() -> dict:

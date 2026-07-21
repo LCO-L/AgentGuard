@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { EngineIndicator } from "./EngineIndicator";
 
 const NAV = [
-  { href: "/", label: "검사" },
+  { href: "/scan", label: "검사" },
   { href: "/editor", label: "보안 에디터" },
   { href: "/scenarios", label: "시나리오" },
 ];
