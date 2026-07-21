@@ -63,4 +63,43 @@ $("#scanBtn").onclick = async () => {
   if (tab && tab.id) { chrome.tabs.sendMessage(tab.id, { type: "AG_SCAN_PAGE" }); window.close(); }
 };
 
+// ── 마스터 on/off + 사이트별 설정 + 차단 로그 ──
+let CUR_HOST = "";
+
+async function loadToggles() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  try { CUR_HOST = tab && tab.url ? new URL(tab.url).hostname : ""; } catch (e) { CUR_HOST = ""; }
+  $("#siteName").textContent = CUR_HOST || "이 페이지";
+  const c = Object.assign({ enabled: true, disabledSites: [] }, await chrome.storage.local.get(["enabled", "disabledSites"]));
+  $("#masterToggle").checked = c.enabled;
+  $("#siteToggle").checked = (c.disabledSites || []).includes(CUR_HOST);
+}
+
+$("#masterToggle").onchange = (e) => chrome.storage.local.set({ enabled: e.target.checked });
+$("#siteToggle").onchange = async (e) => {
+  const c = Object.assign({ disabledSites: [] }, await chrome.storage.local.get(["disabledSites"]));
+  let list = c.disabledSites || [];
+  if (e.target.checked && !list.includes(CUR_HOST)) list.push(CUR_HOST);
+  if (!e.target.checked) list = list.filter((h) => h !== CUR_HOST);
+  chrome.storage.local.set({ disabledSites: list });
+};
+
+function paintLog(log) {
+  $("#logCount").textContent = log.length;
+  $("#logList").innerHTML = log.length ? log.map((e) => {
+    const d = new Date(e.ts);
+    const hh = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+    return `<div class="logit"><span class="o-${e.overall}">${e.overall.toUpperCase()}</span>` +
+      `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.site || e.source}</span>` +
+      `<span class="t">${hh}</span></div>`;
+  }).join("") : '<div class="logit">기록이 없어요</div>';
+}
+
+$("#logBox").addEventListener("toggle", (e) => {
+  if (e.target.open) chrome.runtime.sendMessage({ type: "AG_LOG_GET" }, paintLog);
+});
+$("#logClear").onclick = () =>
+  chrome.runtime.sendMessage({ type: "AG_LOG_CLEAR" }, paintLog);
+
 load();
+loadToggles();

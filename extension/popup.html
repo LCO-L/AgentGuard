@@ -26,11 +26,37 @@
   .test.ok{color:var(--green);} .test.bad{color:var(--red);}
   .save{font-size:10.5px;color:var(--green);text-align:center;margin-top:6px;opacity:0;transition:.2s;}
   .save.show{opacity:1;}
+  .switch{margin-left:auto;position:relative;width:36px;height:20px;display:inline-block;}
+  .switch input{display:none;}
+  .switch .sl{position:absolute;inset:0;background:#D1D5DB;border-radius:99px;transition:.2s;cursor:pointer;}
+  .switch .sl:before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;}
+  .switch input:checked+.sl{background:var(--accent);}
+  .switch input:checked+.sl:before{transform:translateX(16px);}
+  .chk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;}
+  .logbox{border-top:1px solid var(--line);padding-top:8px;margin-top:4px;}
+  .logbox summary{font-size:12px;font-weight:800;cursor:pointer;color:var(--sub);}
+  .logbox .cnt{background:var(--accent);color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;}
+  .loglist{max-height:150px;overflow:auto;margin-top:6px;}
+  .logit{display:flex;justify-content:space-between;gap:6px;font-size:11px;padding:5px 0;border-bottom:1px solid #F4F5F8;}
+  .logit .o-red{color:var(--red);font-weight:800;} .logit .o-yellow{color:#B45309;font-weight:800;} .logit .o-green{color:var(--green);font-weight:800;}
+  .logit .t{color:var(--sub);flex:0 0 auto;}
 </style>
 </head>
 <body>
-  <div class="hd"><span>🛡️</span><b>AgentGuard <span class="u">보안 도우미</span></b></div>
+  <div class="hd"><span>🛡️</span><b>AgentGuard <span class="u">보안 도우미</span></b>
+    <label class="switch" title="전체 켜기/끄기"><input type="checkbox" id="masterToggle" checked><span class="sl"></span></label>
+  </div>
   <div class="hint">링크·파일·페이지를 <b>우클릭</b>하면 즉시 검사해요. 아래에서 판단 엔진을 고르세요.</div>
+
+  <div class="row sitebox">
+    <label class="chk"><input type="checkbox" id="siteToggle"> 이 사이트(<span id="siteName">…</span>)에서는 끄기</label>
+  </div>
+
+  <details class="logbox" id="logBox">
+    <summary>차단·검사 기록 <span id="logCount" class="cnt">0</span></summary>
+    <div id="logList" class="loglist"></div>
+    <button class="btn ghost" id="logClear" style="width:100%;margin-top:6px">기록 지우기</button>
+  </details>
 
   <div class="row">
     <label>판단 엔진</label>

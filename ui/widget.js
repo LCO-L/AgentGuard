@@ -34,7 +34,7 @@
   // ── 스타일(Shadow DOM 내부) ──
   var CSS = `
   :host{ all: initial; }
-  *{ box-sizing:border-box; font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+  *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",system-ui,sans-serif; }
   .launcher{ position:fixed; right:22px; bottom:22px; width:60px; height:60px; border-radius:50%;
     background:linear-gradient(135deg,#5B5BD6,#7C6BF0); color:#fff; border:0; cursor:pointer;
     box-shadow:0 8px 26px rgba(91,91,214,.42); font-size:26px; z-index:2147483000;
@@ -117,13 +117,6 @@
   var style = document.createElement("style");
   style.textContent = CSS;
   root.appendChild(style);
-  // Pretendard(호스트 document head 에 1회 로드)
-  if (!document.getElementById("ag-pretendard")) {
-    var pf = document.createElement("link");
-    pf.id = "ag-pretendard"; pf.rel = "stylesheet";
-    pf.href = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css";
-    document.head.appendChild(pf);
-  }
 
   var launcher = document.createElement("button");
   launcher.className = "launcher";

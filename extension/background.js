@@ -12,7 +12,10 @@ const DEFAULTS = {
   provider: "auto",
   ollamaUrl: "", ollamaModel: "",
   claudeKey: "", claudeModel: "",
-  openrouterKey: "", openrouterModel: ""
+  openrouterKey: "", openrouterModel: "",
+  enabled: true,          // 마스터 on/off
+  disabledSites: [],      // 사이트별 제외
+  log: []                 // 차단/검사 로그(최근 50건, 로컬만)
 };
 
 async function getCfg() {
@@ -104,8 +107,59 @@ async function callApi(path, body) {
   return r.json();
 }
 
+// ── (B) LLM 심층 검사 계층 — 결과 캐싱(Map) + 차단 로그 ──
+const inspectCache = new Map(); // textHash → result (서비스워커 생애주기 내)
+const CACHE_MAX = 200;
+
+function hashText(t) {
+  let h = 5381;
+  for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
+  return h.toString(36) + ":" + t.length;
+}
+
+async function deepInspect(text, meta) {
+  const key = hashText(text);
+  if (inspectCache.has(key)) return Object.assign({ cached: true }, inspectCache.get(key));
+  const v = await callApi("/v1/inspect", { text, kind: "auto", explain: false });
+  if (inspectCache.size >= CACHE_MAX) inspectCache.delete(inspectCache.keys().next().value);
+  inspectCache.set(key, v);
+  await appendLog(meta || {}, v);
+  return v;
+}
+
+async function appendLog(meta, v) {
+  try {
+    const c = await getCfg();
+    const entry = {
+      ts: Date.now(),
+      site: meta.site || "",
+      source: meta.source || "inspect",
+      overall: v.overall || "unknown",
+      score: v.score ?? null,
+      issues: (v.issues || []).length
+    };
+    const log = [entry].concat(c.log || []).slice(0, 50);
+    await chrome.storage.local.set({ log });
+  } catch (e) { /* 로그 실패는 무시 */ }
+}
+
 // content/popup 에서 오는 요청(페이지 텍스트 검사 등)
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.type === "AG_INSPECT") {
+    const site = sender.tab && sender.tab.url ? new URL(sender.tab.url).hostname : "";
+    deepInspect(String(msg.text || "").slice(0, 40000), { site, source: msg.source || "입력창" })
+      .then(sendResponse)
+      .catch((e) => sendResponse({ error: String(e && e.message || e) }));
+    return true; // async sendResponse
+  }
+  if (msg.type === "AG_LOG_GET") {
+    getCfg().then((c) => sendResponse(c.log || []));
+    return true;
+  }
+  if (msg.type === "AG_LOG_CLEAR") {
+    chrome.storage.local.set({ log: [] }).then(() => sendResponse([]));
+    return true;
+  }
   if (msg.type === "AG_SCAN_TEXT") {
     callApi("/v1/scan/text", { text: msg.text, source: msg.source || "페이지" })
       .then((v) => { if (sender.tab && sender.tab.id) chrome.tabs.sendMessage(sender.tab.id, { type: "AG_RESULT", verdict: v }); })

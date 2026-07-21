@@ -42,3 +42,19 @@ def ai_models(provider: str, cfg: AIConfig = Depends(ai_config)) -> dict:
 def ai_test(cfg: AIConfig = Depends(ai_config)) -> dict:
     """헤더로 받은 provider/키/모델로 실제 1회 호출 → 연결 검증."""
     return backend.test_connection(cfg)
+
+
+# ── 온디바이스 원클릭 실행 (Ollama 자동 기동 + 모델 자동 pull) ──
+
+@router.post("/ondevice/start")
+def ondevice_start(model: str | None = None) -> dict:
+    """버튼 하나: ollama serve 기동 → 8B 모델 pull(백그라운드) 시작."""
+    from services import ondevice_service
+    return ondevice_service.start(model)
+
+
+@router.get("/ondevice/status")
+def ondevice_status() -> dict:
+    """진행 상태 폴 백: {state, progress, message, model}."""
+    from services import ondevice_service
+    return ondevice_service.status()

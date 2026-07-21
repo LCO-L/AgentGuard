@@ -137,10 +137,18 @@
     return hits;
   }
 
-  // 페이지 로드 후 자동 스캔
-  function run() { try { highlightPage(); } catch (e) { } }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(run, 400); });
-  else setTimeout(run, 400);
+  // 페이지 로드 후 자동 스캔 — 마스터 on/off·사이트 제외 설정 존중
+  function gatedRun() {
+    try {
+      chrome.storage.local.get({ enabled: true, disabledSites: [] }, function (c) {
+        if (!c.enabled) return;
+        if ((c.disabledSites || []).indexOf(location.hostname) >= 0) return;
+        try { highlightPage(); } catch (e) { }
+      });
+    } catch (e) { try { highlightPage(); } catch (e2) { } }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(gatedRun, 400); });
+  else setTimeout(gatedRun, 400);
 
   // ── background 메시지 ──
   chrome.runtime.onMessage.addListener(function (msg) {
