@@ -58,6 +58,8 @@ _HOMOGLYPHS = {
     "Μ": "M", "Η": "H", "Ζ": "Z",
 }
 _HOMO_TABLE = {ord(k): v for k, v in _HOMOGLYPHS.items()}
+# 외부(inspect)에서 offset 탐지에 쓰는 닮은꼴 문자 집합(정규식 char class 용)
+HOMO_TABLE_KEYS = "".join(_HOMOGLYPHS.keys())
 
 _ZW01 = ("​", "‌")  # 관례 A: ZWSP=0, ZWNJ=1
 

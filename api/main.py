@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, Response
 
-from api.routes import ai, chat, health, history, rules, scan, text, url
+from api.routes import ai, chat, health, history, inspect, rules, scan, text, url
 
 _UI_DIR = Path(__file__).resolve().parent.parent / "ui"
 
@@ -42,8 +42,8 @@ def create_app() -> FastAPI:
     )
 
     # v1 네임스페이스 — 향후 v2 추가 시 클라이언트 무중단
-    for r in (scan.router, url.router, text.router, chat.router, ai.router,
-              history.router, rules.router, health.router):
+    for r in (scan.router, url.router, text.router, inspect.router, chat.router,
+              ai.router, history.router, rules.router, health.router):
         app.include_router(r, prefix="/v1")
 
     @app.get("/", response_class=HTMLResponse, tags=["meta"])
@@ -88,6 +88,12 @@ def create_app() -> FastAPI:
         """지능적 AI 엔진 설정 페이지(온디바이스/Claude/OpenRouter)."""
         html = _UI_DIR / "settings.html"
         return html.read_text(encoding="utf-8") if html.exists() else "<h1>no settings</h1>"
+
+    @app.get("/editor", response_class=HTMLResponse, tags=["meta"])
+    def editor_page() -> str:
+        """Grammarly식 보안 에디터 — AI 전송 전 실시간 검사."""
+        html = _UI_DIR / "editor.html"
+        return html.read_text(encoding="utf-8") if html.exists() else "<h1>no editor</h1>"
 
     @app.get("/embed-demo", response_class=HTMLResponse, tags=["meta"])
     def embed_demo() -> str:

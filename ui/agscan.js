@@ -84,5 +84,56 @@
     return s;
   }
 
-  return { scanText: scanText, decodeZeroWidth: decodeZeroWidth, decodeTagChars: decodeTagChars, worst: worst, RISK: RISK };
+  // ── PII·시크릿 span 탐지 + 로컬 복원 가능 마스킹(백엔드 불필요) ──
+  var SECRET_PAT = [
+    ["OpenAI API 키", "critical", /\bsk-[A-Za-z0-9_-]{20,}\b/g],
+    ["Anthropic API 키", "critical", /\bsk-ant-[A-Za-z0-9_-]{20,}\b/g],
+    ["AWS 액세스 키", "critical", /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g],
+    ["GitHub 토큰", "critical", /\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/g],
+    ["Google API 키", "critical", /\bAIza[0-9A-Za-z_-]{35}\b/g],
+    ["JWT 토큰", "critical", /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g]
+  ];
+  var PII_PAT = [
+    ["주민등록번호", "high", /\b\d{6}-[1-4]\d{6}\b/g],
+    ["휴대폰 번호", "medium", /\b01[016789][- ]?\d{3,4}[- ]?\d{4}\b/g],
+    ["이메일 주소", "medium", /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g],
+    ["신용카드 번호", "high", /\b(?:\d[ -]?){13,16}\b/g]
+  ];
+  var SLUG = { "주민등록번호": "RRN", "휴대폰 번호": "PHONE", "이메일 주소": "EMAIL", "신용카드 번호": "CARD" };
+
+  function luhn(s) {
+    var d = (s.match(/\d/g) || []); if (d.length < 13 || d.length > 16) return false;
+    var sum = 0, alt = false;
+    for (var i = d.length - 1; i >= 0; i--) { var n = +d[i]; if (alt) { n *= 2; if (n > 9) n -= 9; } sum += n; alt = !alt; }
+    return sum % 10 === 0;
+  }
+  function _overlaps(list, s, e) { for (var i = 0; i < list.length; i++) { if (!(e <= list[i].start || s >= list[i].end)) return true; } return false; }
+
+  function scanPII(t) {
+    var out = [];
+    if (!t) return out;
+    SECRET_PAT.forEach(function (p) { var re = p[2]; re.lastIndex = 0; var m; while ((m = re.exec(t))) { if (!_overlaps(out, m.index, m.index + m[0].length)) out.push({ start: m.index, end: m.index + m[0].length, label: p[0], severity: p[1], category: "secret", text: m[0] }); } });
+    PII_PAT.forEach(function (p) { var re = p[2]; re.lastIndex = 0; var m; while ((m = re.exec(t))) { if (p[0] === "신용카드 번호" && !luhn(m[0])) continue; if (_overlaps(out, m.index, m.index + m[0].length)) continue; out.push({ start: m.index, end: m.index + m[0].length, label: p[0], severity: p[1], category: "pii", text: m[0] }); } });
+    out.sort(function (a, b) { return a.start - b.start; });
+    return out;
+  }
+
+  function redact(t, spans) {
+    spans = spans || scanPII(t);
+    if (!spans.length) return { masked: t, mapping: {}, count: 0 };
+    var mapping = {}, v2t = {}, cnt = {};
+    spans.forEach(function (s) {
+      var orig = s.text || t.slice(s.start, s.end);
+      if (v2t[orig]) { s.token = v2t[orig]; return; }
+      var slug = s.category === "secret" ? "SECRET" : (SLUG[s.label] || "PII");
+      cnt[slug] = (cnt[slug] || 0) + 1;
+      var tok = "[" + slug + "_" + cnt[slug] + "]";
+      v2t[orig] = tok; mapping[tok] = orig; s.token = tok;
+    });
+    var masked = t;
+    spans.slice().sort(function (a, b) { return b.start - a.start; }).forEach(function (s) { masked = masked.slice(0, s.start) + s.token + masked.slice(s.end); });
+    return { masked: masked, mapping: mapping, count: spans.length };
+  }
+
+  return { scanText: scanText, scanPII: scanPII, redact: redact, decodeZeroWidth: decodeZeroWidth, decodeTagChars: decodeTagChars, worst: worst, RISK: RISK };
 });

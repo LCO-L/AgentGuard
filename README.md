@@ -14,8 +14,9 @@
 | **보이지 않는 위협 실탐지** | 제로위드 스테가노를 **실제 디코딩**, 태그문자 밀수 복원, BiDi 위장, homoglyph(키릴·그리스) 라틴 정규화 후 재매칭 → "표현을 바꾼 우회"가 1층에서 무너짐 |
 | **포맷 확장** | HWP·HWPX·DOCX·XLSX·PPTX·PDF·MCP·확장 manifest + **RTF·SVG·ZIP·SKILL.md/AGENTS.md/스크립트** |
 | **대화형 보안 도우미** | 채널톡/Fin 스타일 플로팅 위젯 — 통역 카드 + "왜 위험해요?" 후속 대화(findings 근거, 인젝션 방어) |
-| **우클릭/공유 UX** | 크롬 익스텐션 우클릭 즉시검사 + Grammarly식 인라인 하이라이트, 아이폰 공유시트(PWA) |
-| **점수제** | 0–100 위험 점수 + 조합 부스트(다운로드+실행 등) |
+| **Grammarly for Security** | AI에 보내기 **직전** 실시간 검사: PII·시크릿 **복원 가능 마스킹**, 취약 코드·과잉권한 룰팩, 밑줄+수정안 |
+| **우클릭/공유/입력가드 UX** | 크롬 익스텐션 우클릭 즉시검사 + 인라인 하이라이트 + **AI 입력창 감시·전송 인터셉트**, 아이폰 공유시트(PWA) |
+| **점수제** | 0–100 위험 점수 + 조합 부스트(다운로드+실행 등), Critical/High/Medium 등급 |
 
 ## 실행
 
@@ -28,7 +29,7 @@ uv run python app.py                      # 서버 기동 (http://localhost:8000
 #   ollama pull qwen3:8b && ollama serve
 ```
 
-- 대시보드: `http://localhost:8000/`  · 설정: `/settings` · 임베드 위젯 데모: `/embed-demo`
+- 대시보드: `http://localhost:8000/` · **보안 에디터: `/editor`** · 설정: `/settings` · 위젯 데모: `/embed-demo`
 - 크롬 익스텐션: `extension/` 폴더를 `chrome://extensions`에서 로드 (`extension/README.md`)
 - 아이폰 공유시트: `docs/IOS_SHORTCUT.md`
 
@@ -40,6 +41,8 @@ uv run python app.py                      # 서버 기동 (http://localhost:8000
 | POST | `/v1/scan/batch` | 배치 스캔 (최대 20개) |
 | POST | `/v1/scan/url` | URL/링크 정적 분석 |
 | POST | `/v1/scan/text` | 텍스트/페이지 본문 인젝션·은닉 검사 |
+| POST | `/v1/inspect` | 실시간 span 인스펙션(PII·시크릿·취약코드·과잉권한·인젝션) — 에디터/익스텐션 |
+| POST | `/v1/redact` | 복원 가능 마스킹(`[SECRET_1]`/`[PII_n]` + 매핑) |
 | POST | `/v1/chat` | 대화형 보안 도우미(findings 근거) |
 | GET | `/v1/ai/status` · `/v1/ai/models` · POST `/v1/ai/test` | 엔진 상태·모델목록·연결테스트 |
 | GET | `/v1/scans` · `/v1/scans/{id}` · `/v1/rules` · `/v1/health` | 이력·룰·헬스 |
@@ -73,12 +76,15 @@ core/       순수 엔진
   surface   ★ RiskSurface 통합 계약
   analyzer  1층 결정적 룰 (textnorm 정규화로 은닉/우회에도 매칭)
   textnorm  제로위드·태그문자·BiDi·homoglyph 실탐지
+  pii       PII·시크릿 탐지 + 복원 가능 마스킹
+  codescan  취약 코드·과잉권한 룰팩(+수정안)
+  inspect   offset span 통합(실시간 밑줄 근거)
   scorer    0–100 점수 + 조합 부스트
   ai/       backend(3-provider) · intent · local_intent · interpret · rugpull
 adapters/   포맷별 얇은 어댑터 (registry가 매직바이트로 자동 선택)
-ui/         대시보드 · 설정페이지 · 위젯(widget.js) · agscan · PWA
-extension/  크롬 익스텐션(MV3) — 우클릭·인라인 하이라이트
-tests/      실작동 검증 스위트(unittest)
+ui/         대시보드 · 보안에디터 · 설정 · 위젯(widget.js) · agscan · PWA
+extension/  크롬 익스텐션(MV3) — 우클릭·인라인·AI 입력창 인터셉트
+tests/      실작동 검증 스위트(unittest, 32 테스트)
 ```
 
 **핵심 원칙:** 탐지=코드(1층), 판단·통역=AI(2·3층). 원본은 로컬만, AI엔 위험 메타만.
@@ -87,7 +93,7 @@ tests/      실작동 검증 스위트(unittest)
 ## 테스트
 
 ```bash
-AG_AI_PROVIDER=off python -m unittest -v tests.test_ultra   # 24 테스트
+AG_AI_PROVIDER=off python -m unittest -v tests.test_ultra   # 32 테스트
 ```
 
 ## 배포 (GitHub → Railway)
