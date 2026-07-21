@@ -21,6 +21,14 @@
 | 테스트 35개 | ✅ 전부 통과 |
 | 배포(Railway Nixpacks) | ✅ 빌드 오류 수정 |
 | VS Code 확장 | ✅ 완료 (`vscode-extension/` — Diagnostics+마스킹, tsc 컴파일 통과) |
+| 랜딩+온볼딩 투어 | ✅ 완료 (신호등 히어로·3단계 가이드·라이브 데모·확장 설치 CTA) |
+| 확장 즉시 설치 | ✅ `/extension.zip`(즉석) + `/extension.crx`(CRX3 RSA 서명, `scripts/pack_extension.py`) |
+| 확장 Grammarly 완성 | ✅ 인라인 물결(타깃 사이트)·교정 카드[마스킹/제거/무시]·LLM 심층 계층+캐시·팝업 on/off/사이트별/차단 로그 |
+| 온디바이스 원클릭 | ✅ `POST /v1/ai/ondevice/start` + 폴 백 상태 — **실측 qwen3-8b 통역 성공**(고객 기기에 직접 다운로드 구조) |
+| OpenRouter 파이프라인 | ✅ 강화 (에러 표면화·폴 백 체인·reasoning 처리·**운영 500(content=null) 수정**·예외 격리) |
+| 백신 비교뷰 | ✅ `/compare` — "같은 위험, 다른 이해" |
+| 외부 CDN 제거 | ✅ Pretendard CDN·글꼴 차단 이슈 해소(시스템 폰트 스택, 오프라인·프라이버시 강화) |
+| 테스트 | ✅ **46개 전부 통과** (기존 35 + OpenRouter 9 + 운영 재현 2) |
 | APK (Capacitor) | 🟡 **프로젝트 생성·sync 완료** (`web/android/`, Share Intent 추가, 가이드 `docs/APK.md`) — APK 바이너리 빌드는 Android Studio 필요 |
 | 설치형 패키징 | ✅ 원클릭 `install.sh` (Ollama 확인→모델 pull→실행→브라우저 오픈) / Tauri는 컷라인 보류 |
 

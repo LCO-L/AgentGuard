@@ -44,15 +44,28 @@ def _ollama_alive() -> bool:
         return False
 
 
-def _model_installed(model: str) -> bool:
+def _installed_models() -> list[str]:
     try:
         with urllib.request.urlopen(OLLAMA_URL + "/api/tags", timeout=3) as r:
             data = json.loads(r.read())
-        base = model.split(":")[0]
-        return any(base in (m.get("name") or m.get("model", ""))
-                   for m in data.get("models", []))
+        return [m.get("name") or m.get("model", "")
+                for m in data.get("models", []) if (m.get("name") or m.get("model"))]
     except Exception:
-        return False
+        return []
+
+
+def _model_installed(model: str) -> bool:
+    installed = _installed_models()
+    return model in installed or f"{model}:latest" in installed
+
+
+def _best_installed(model: str) -> str | None:
+    """요청 모델이 없으면 설치된 채팅 모델 중 최적(8B급 우선, 임베딩 제외)."""
+    installed = [n for n in _installed_models() if "embed" not in n.lower()]
+    if not installed:
+        return None
+    big = [n for n in installed if "8b" in n.lower()]
+    return big[0] if big else installed[0]
 
 
 def start(model: str | None = None) -> dict:
@@ -94,10 +107,16 @@ def _run(model: str) -> None:
                                             "터미널에서 `ollama serve`를 확인하세요.")
                 return
 
-        # ③ 모델 pull
+        # ③ 모델 준비 — 설치됨 → 즉시 / 비슷한 채팅 모델 있음 → 그걸로 즉시 / 없음 → pull
         if _model_installed(model):
-            _set(state="ready", progress=100,
+            _set(state="ready", progress=100, model=model,
                  message=f"준비 완료! {model} 온디바이스로 동작해요 🖥️")
+            return
+        alt = _best_installed(model)
+        if alt:
+            _set(state="ready", progress=100, model=alt,
+                 message=f"준비 완료! 설치된 {alt} 모델로 바로 시작해요 🖥️ "
+                         f"(추가 다운로드 없음)")
             return
 
         _set(state="pulling", progress=10,

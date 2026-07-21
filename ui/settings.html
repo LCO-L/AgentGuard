@@ -65,6 +65,28 @@
 
   <div class="wrap"><div class="reco" id="reco" style="display:none"></div></div>
 
+  <!-- 온디바이스 원클릭 실행 -->
+  <div class="wrap cards">
+    <div class="card" style="border:2px solid var(--accent);background:linear-gradient(135deg,#F0F0FD,#fff)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:800">온디바이스 실행</div>
+          <div style="font-size:12px;color:var(--sub)">버튼 하나면 Ollama가 켜지고 8B 모델이 자동으로 준비돼요</div>
+        </div>
+        <button id="odBtn" class="sel-btn" style="background:var(--accent);color:#fff;border:0;border-radius:9px;padding:10px 16px;font-weight:800;cursor:pointer">실행</button>
+      </div>
+      <div id="odBody" style="display:none;margin-top:10px">
+        <div style="height:8px;border-radius:99px;background:#EEF0F3;overflow:hidden">
+          <div id="odBar" style="height:100%;width:0;background:var(--accent);transition:width .5s"></div>
+        </div>
+        <div id="odMsg" style="margin-top:6px;font-size:12px;font-weight:700;color:var(--accent)"></div>
+        <a id="odLink" href="https://ollama.com/download" target="_blank" rel="noreferrer"
+           style="display:none;margin-top:4px;font-size:12px;font-weight:800;color:var(--accent)">Ollama 설치하기 →</a>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap cards">
     <!-- 온디바이스 -->
     <div class="card" data-p="ollama" id="card-ollama">
@@ -223,6 +245,36 @@
   reflect(); refreshStatus();
   if(CFG.provider==="ollama")loadModels("ollama");
   if(CFG.openrouterKey)loadModels("openrouter");
+
+  // ── 온디바이스 원클릭 실행 ──
+  (function(){
+    const btn=$("#odBtn"), body=$("#odBody"), bar=$("#odBar"), msg=$("#odMsg"), link=$("#odLink");
+    let poll=null;
+    function paint(d){
+      body.style.display="block";
+      bar.style.width=(d.progress||0)+"%";
+      msg.textContent=d.message||"";
+      msg.style.color=d.state==="ready"?"#30A46C":(d.state==="error"||d.state==="no_ollama")?"#E5484D":"var(--accent)";
+      link.style.display=d.state==="no_ollama"?"inline-block":"none";
+      btn.disabled=["checking","starting","pulling"].includes(d.state);
+      btn.textContent=btn.disabled?"준비 중…":(d.state==="ready"?"다시 실행":"실행");
+      if(d.state==="ready"&&d.model){ persist({provider:"ollama",ollamaModel:d.model}); }
+    }
+    async function tick(){
+      try{ const r=await fetch("/v1/ai/ondevice/status"); paint(await r.json()); }
+      catch(e){ msg.textContent="백엔드에 연결할 수 없어요"; }
+    }
+    btn.onclick=async()=>{
+      body.style.display="block"; btn.disabled=true; msg.textContent="준비 중…";
+      try{ const r=await fetch("/v1/ai/ondevice/start",{method:"POST"}); paint(await r.json()); }
+      catch(e){ msg.textContent="백엔드에 연결할 수 없어요"; btn.disabled=false; return; }
+      if(poll) clearInterval(poll);
+      poll=setInterval(async()=>{
+        const r=await fetch("/v1/ai/ondevice/status"); const d=await r.json(); paint(d);
+        if(!["checking","starting","pulling"].includes(d.state)) clearInterval(poll);
+      },1200);
+    };
+  })();
   </script>
 </body>
 </html>

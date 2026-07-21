@@ -70,6 +70,33 @@ def resolve_config(overrides: dict | None = None) -> AIConfig:
     )
 
 
+# provider 호스트별 마지막 오류 — 실패 원인 표면화(설정 페이지·로그용)
+_ERRORS: dict[str, str] = {}
+
+
+def last_error(host_hint: str = "") -> str:
+    if host_hint:
+        return _ERRORS.get(host_hint, "")
+    return "; ".join(f"{k}: {v}" for k, v in _ERRORS.items())
+
+
+def _record(url: str, err: Exception | str) -> None:
+    host = re.sub(r"^https?://([^/]+).*$", r"\1", url)
+    msg = str(err)
+    if isinstance(err, urllib.error.HTTPError):
+        try:
+            body = err.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            body = ""
+        # OpenRouter 등의 JSON 오류 본문에서 핵심 메시지 추출
+        try:
+            j = json.loads(body)
+            msg = f"HTTP {err.code}: {(j.get('error') or {}).get('message') or body[:200]}"
+        except Exception:
+            msg = f"HTTP {err.code}: {body[:200]}"
+    _ERRORS[host] = msg
+
+
 def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict | None:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST")
@@ -79,7 +106,11 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict |
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8", "replace"))
-    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+    except urllib.error.HTTPError as e:
+        _record(url, e)
+        return None
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
+        _record(url, e)
         return None
 
 
@@ -90,7 +121,11 @@ def _get_json(url: str, headers: dict, timeout: float) -> dict | None:
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8", "replace"))
-    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+    except urllib.error.HTTPError as e:
+        _record(url, e)
+        return None
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
+        _record(url, e)
         return None
 
 
@@ -114,19 +149,65 @@ def extract_json(text: str) -> dict | None:
 
 # ── provider 별 호출 ──────────────────────────────────────
 
+def _ollama_installed(cfg: AIConfig) -> list[str]:
+    """설치된 모델 목록(실패 시 빈 리스트)."""
+    data = _get_json(f"{cfg.ollama_url}/api/tags", {}, min(cfg.timeout, 4.0))
+    return [m.get("name", "") for m in (data or {}).get("models", []) if m.get("name")]
+
+
+def _ollama_pick(cfg: AIConfig) -> str:
+    """설치된 모델 중 최적 선택 — 기본값 > 8B급 > 임의 채팅 모델(임베딩 제외).
+
+    사용자가 모델을 명시하면 그대로 존중.
+    """
+    if cfg.model:
+        return cfg.model
+    want = cfg.model_for("ollama")
+    installed = _ollama_installed(cfg)
+    if not installed:
+        return want
+    # 풀네임(repo:tag) 정확 일치만 인정 — qwen3:8b ≠ qwen3:4b
+    if want in installed:
+        return want
+    if f"{want}:latest" in installed:
+        return f"{want}:latest"
+    chat = [n for n in installed if "embed" not in n.lower()]
+    if not chat:
+        return want
+    big = [n for n in chat if "8b" in n.lower()]
+    return big[0] if big else chat[0]
+
+
 def _call_ollama(system: str, user: str, cfg: AIConfig, max_tokens: int) -> str | None:
-    payload = {
-        "model": cfg.model_for("ollama"),
-        "messages": [{"role": "system", "content": system},
-                     {"role": "user", "content": user}],
-        "stream": False,
-        "options": {"temperature": 0, "num_predict": max_tokens},
-    }
-    data = _post_json(f"{cfg.ollama_url}/api/chat", payload, {}, cfg.timeout)
-    if not data:
-        return None
-    msg = (data.get("message") or {}).get("content")
-    return msg.strip() if isinstance(msg, str) else None
+    def _try(model: str) -> str | None:
+        payload = {
+            "model": model,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": user}],
+            "stream": False,
+            # qwen3 등 'thinking' 모델: 추론에 토큰을 다 쓰고 content가 비는 것 방지
+            "think": False,
+            "options": {"temperature": 0, "num_predict": max_tokens},
+        }
+        data = _post_json(f"{cfg.ollama_url}/api/chat", payload, {}, cfg.timeout)
+        if not data:
+            return None
+        m = data.get("message") or {}
+        msg = (m.get("content") or "").strip()
+        if not msg:
+            # 구형 Ollama(think 미지원): thinking 이라도 있으면 그걸로
+            msg = str(m.get("thinking") or "").strip()
+        return msg or None
+
+    model = _ollama_pick(cfg)
+    out = _try(model)
+    if out is None:
+        # 404 model-not-found 등: 설치된 다른 채팅 모델로 1회 재시도
+        alt = [n for n in _ollama_installed(cfg)
+               if n != model and "embed" not in n.lower()]
+        if alt:
+            out = _try(alt[0])
+    return out
 
 
 def _call_claude(system: str, user: str, cfg: AIConfig, max_tokens: int) -> str | None:
@@ -168,7 +249,12 @@ def _call_openrouter(system: str, user: str, cfg: AIConfig, max_tokens: int) -> 
     if not data:
         return None
     try:
-        return data["choices"][0]["message"]["content"].strip()
+        msg = data["choices"][0]["message"]
+        content = (msg.get("content") or "").strip()
+        if not content:
+            # qwen3·reasoning 계열은 content 대신 reasoning 에 담는 경우 처리
+            content = (msg.get("reasoning") or "").strip()
+        return content or None
     except (KeyError, IndexError, TypeError):
         return None
 
@@ -192,15 +278,57 @@ def _order(cfg: AIConfig) -> list[str]:
     return order
 
 
+def _viable(provider: str, cfg: AIConfig) -> bool:
+    """해당 provider가 실제 호출 가능한 구성인지."""
+    if provider == "ollama":
+        try:
+            req = urllib.request.Request(f"{cfg.ollama_url}/api/tags")
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
+                return resp.status == 200
+        except Exception:
+            return False
+    return bool(cfg.api_key)
+
+
 def complete(system: str, user: str, cfg: AIConfig,
              max_tokens: int = 500) -> tuple[str | None, str]:
-    """LLM 호출. 반환 (텍스트|None, 사용된_엔진). 실패 시 (None, "off")."""
+    """LLM 호출. 반환 (텍스트|None, 사용된_엔진). 실패 시 (None, "off").
+
+    명시된 provider를 먼저 존중하되, 실패하면 사용 가능한 나머지 provider로
+    자동 폴 백(무조건 작동). 폴 백 없이 실패하면 오프라인 규칙으로 이어진다.
+    """
+    tried = set()
     for provider in _order(cfg):
-        fn = _DISPATCH[provider]
-        out = fn(system, user, cfg, max_tokens)
+        tried.add(provider)
+        out = _safe_call(provider, system, user, cfg, max_tokens)
         if out:
             return out, provider
+    # 폴 백 체인: 시도하지 않은 provider 중 구성이 가능한 것
+    if cfg.provider != "off":
+        for provider in _PROVIDERS:
+            if provider in tried:
+                continue
+            if provider in ("claude", "openrouter") and not cfg.api_key:
+                continue
+            if provider == "ollama" and not _viable("ollama", cfg):
+                continue
+            out = _safe_call(provider, system, user, cfg, max_tokens)
+            if out:
+                return out, provider
     return None, "off"
+
+
+def _safe_call(provider: str, system: str, user: str, cfg: AIConfig,
+               max_tokens: int) -> str | None:
+    """provider 호출이 예외로 죽어도 None으로 격하 — API 500 방지(운영 배포 교훈).
+
+    예: OpenRouter가 content=null 을 낼 때 .strip() 예외 → 500이 아니라 폴 백.
+    """
+    try:
+        return _DISPATCH[provider](system, user, cfg, max_tokens)
+    except Exception as e:  # noqa: BLE001
+        _record(f"provider:{provider}", e)
+        return None
 
 
 def probe(cfg: AIConfig | None = None) -> dict:
@@ -252,7 +380,11 @@ def test_connection(cfg: AIConfig) -> dict:
     out, engine = complete("You are a connectivity test. Answer very briefly.",
                            "Reply with exactly: ok", cfg, max_tokens=8)
     ms = int((time.time() - t0) * 1000)
-    return {"ok": bool(out), "engine": engine if out else "off",
-            "provider": provider, "latency_ms": ms,
-            "sample": (out or "")[:80],
-            "model": cfg.model_for(engine) if out and engine in _PROVIDERS else ""}
+    result = {"ok": bool(out), "engine": engine if out else "off",
+              "provider": provider, "latency_ms": ms,
+              "sample": (out or "")[:80],
+              "model": cfg.model_for(engine) if out and engine in _PROVIDERS else ""}
+    if not out:
+        # 실패 원인 표면화(키 오류·모델 없음·레이트리밋 등)
+        result["error"] = last_error() or "provider 응답 없음(주소·모델명 확인)"
+    return result

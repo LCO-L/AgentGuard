@@ -41,7 +41,7 @@ export default function SettingsPage() {
       const d = await res.json();
       setTest((t) => ({
         ...t,
-        [provider]: d.ok ? `✓ 연결됨 · ${d.latency_ms}ms · ${d.model || d.engine}` : "✗ 연결 실패",
+        [provider]: d.ok ? `✓ 연결됨 · ${d.latency_ms}ms · ${d.model || d.engine}` : `✗ 연결 실패${d.error ? ` — ${d.error}` : ""}`,
       }));
     } catch {
       setTest((t) => ({ ...t, [provider]: "✗ 서버 없음" }));
@@ -101,6 +101,77 @@ export default function SettingsPage() {
     },
   ];
 
+// ── 온디바이스 원클릭 실행 카드 — 버튼 하나로 Ollama 기동+8B pull+즉시 사용 ──
+type OdState = { state: string; progress: number; message: string; model: string };
+
+function OndeviceCard({ onReady }: { onReady: (model: string) => void }) {
+  const [od, setOd] = useState<OdState | null>(null);
+  const busy = od && ["checking", "starting", "pulling"].includes(od.state);
+
+  useEffect(() => {
+    if (!busy) return;
+    const t = setInterval(async () => {
+      try {
+        const r = await fetch("/api/v1/ai/ondevice/status");
+        const d = (await r.json()) as OdState;
+        setOd(d);
+        if (d.state === "ready") onReady(d.model);
+      } catch { /* 서버 끊기면 다음 폴 백 */ }
+    }, 1200);
+    return () => clearInterval(t);
+  }, [busy, onReady]);
+
+  async function start() {
+    setOd({ state: "checking", progress: 0, message: "준비 중…", model: "" });
+    try {
+      const r = await fetch("/api/v1/ai/ondevice/start", { method: "POST" });
+      setOd(await r.json());
+    } catch {
+      setOd({ state: "error", progress: 0, message: "백엔드에 연결할 수 없어요", model: "" });
+    }
+  }
+
+  const color = od?.state === "ready" ? "text-risk-green"
+    : od?.state === "error" || od?.state === "no_ollama" ? "text-risk-red" : "text-brand";
+
+  return (
+    <Card className="border-brand/40 bg-gradient-to-br from-brand-soft/60 to-transparent p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white">
+          <Power size={19} />
+        </div>
+        <div className="flex-1">
+          <div className="text-[15px] font-extrabold">온디바이스 실행</div>
+          <div className="text-[12px] text-sub">
+            버튼 하나면 Ollama가 켜지고 8B 모델이 자동으로 준비돼요
+          </div>
+        </div>
+        <Button onClick={start} disabled={!!busy} className="px-4 py-2.5 text-[13px]">
+          {busy ? <Loader2 size={15} className="animate-spin" /> : <Power size={15} />}
+          {busy ? "준비 중…" : od?.state === "ready" ? "다시 실행" : "실행"}
+        </Button>
+      </div>
+      {od && (
+        <div className="mt-3">
+          <div className="h-2 overflow-hidden rounded-full bg-line/60">
+            <div
+              className="h-full rounded-full bg-brand transition-all duration-500"
+              style={{ width: `${od.progress}%` }}
+            />
+          </div>
+          <div className={cn("mt-1.5 text-[12px] font-bold", color)}>{od.message}</div>
+          {od.state === "no_ollama" && (
+            <a href="https://ollama.com/download" target="_blank" rel="noreferrer"
+              className="mt-1 inline-block text-[12px] font-extrabold text-brand underline underline-offset-4">
+              Ollama 설치하기 →
+            </a>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
       <style>{`.ag-input{width:100%;border:1px solid #E8E8EA;border-radius:9px;padding:9px 11px;font-size:13.5px;outline:none}.ag-input:focus{border-color:#5B5BD6}`}</style>
@@ -111,6 +182,9 @@ export default function SettingsPage() {
           API 키로. 셋 다 없어도 오프라인 규칙으로 항상 작동해요.
         </p>
       </div>
+
+      {/* ── 온디바이스 원클릭 실행 ── */}
+      <OndeviceCard onReady={(model) => patch({ provider: "ollama", ollamaModel: model })} />
 
       {cards.map((c) => {
         const on = status[c.p];

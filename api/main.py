@@ -96,6 +96,12 @@ def create_app() -> FastAPI:
         html = _UI_DIR / "editor.html"
         return html.read_text(encoding="utf-8") if html.exists() else "<h1>no editor</h1>"
 
+    @app.get("/compare", response_class=HTMLResponse, tags=["meta"])
+    def compare_page() -> str:
+        """백신 vs AgentGuard 비교 시연 — '같은 위험, 다른 이해'."""
+        html = _UI_DIR / "compare.html"
+        return html.read_text(encoding="utf-8") if html.exists() else "<h1>no compare</h1>"
+
     @app.get("/embed-demo", response_class=HTMLResponse, tags=["meta"])
     def embed_demo() -> str:
         """위젯이 붙은 '가상 회사 사이트' 데모."""
