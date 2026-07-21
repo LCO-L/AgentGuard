@@ -111,11 +111,7 @@ def create_app() -> FastAPI:
 
     @app.get("/logo.svg", tags=["meta"])
     def logo() -> Response:
-        """새 브랜드 로고(마스코트+워드마크) — 프로젝트 루트 AgentGuard_logo.svg 서빙."""
-        p = Path(__file__).resolve().parent.parent / "AgentGuard_logo.svg"
-        if p.exists():
-            return Response(content=p.read_bytes(), media_type="image/svg+xml",
-                            headers={"Cache-Control": "public, max-age=86400"})
+        """로고 — 벡터 방패(icon.svg)로 통일(래스터 로고 제거됨)."""
         return _serve("icon.svg", "image/svg+xml; charset=utf-8")
 
     @app.get("/settings", response_class=HTMLResponse, tags=["meta"])
