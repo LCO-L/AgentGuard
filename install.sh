@@ -69,6 +69,7 @@ if [ ! -f samples/evil.pdf ]; then
 fi
 
 # ── 5. 실행 ─────────────────────────────────────────────
+export AG_ONDEVICE=1   # 로컬 설치형: 웹 설정의 '온디바이스 실행' 원클릭 허용
 PORT="${PORT:-8000}"
 say "엔진: $AI_NOTE"
 say "백엔드 시작: http://localhost:$PORT  (대시보드: / · 에디터: /editor · 설정: /settings)"

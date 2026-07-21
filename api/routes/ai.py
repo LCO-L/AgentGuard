@@ -5,7 +5,9 @@
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+import os
+
+from fastapi import APIRouter, Depends, Request
 
 from api.deps import ai_config
 from core.ai import backend
@@ -46,9 +48,20 @@ def ai_test(cfg: AIConfig = Depends(ai_config)) -> dict:
 
 # ── 온디바이스 원클릭 실행 (Ollama 자동 기동 + 모델 자동 pull) ──
 
+def _local_only(request: Request) -> bool:
+    """온디바이스 자동 설치·실행은 로컬(설치형)에서만 허용 — 배포/원격 차단."""
+    host = request.client.host if request.client else ""
+    return bool(os.environ.get("AG_ONDEVICE")) or host in (
+        "127.0.0.1", "::1", "localhost", "testclient")
+
+
 @router.post("/ondevice/start")
-def ondevice_start(model: str | None = None) -> dict:
-    """버튼 하나: ollama serve 기동 → 8B 모델 pull(백그라운드) 시작."""
+def ondevice_start(request: Request, model: str | None = None) -> dict:
+    """온디바이스 원클릭(설치→실행→모델). subprocess 안전을 위해 로컬 전용."""
+    if not _local_only(request):
+        return {"state": "blocked", "progress": 0,
+                "message": "온디바이스 자동 설치는 이 컴퓨터에서 직접 실행할 때만 돼요. "
+                           "지금은 설정에서 Claude·OpenRouter 키를 넣거나 오프라인 규칙을 쓰세요."}
     from services import ondevice_service
     return ondevice_service.start(model)
 

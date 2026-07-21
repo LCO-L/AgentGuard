@@ -28,19 +28,47 @@ class Span:
     text: str = ""       # 매칭 원문(마스킹 매핑용 — 로그 금지)
 
 
-# ── 시크릿(크리티컬) ─────────────────────────────────────
+# ── 시크릿(크리티컬) — gitleaks/detect-secrets 수준 커버리지 ──────
 _SECRET_PATTERNS = [
-    ("SEC-OPENAI-01", "OpenAI API 키", re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")),
+    # OpenAI / Anthropic
+    ("SEC-OPENAI-01", "OpenAI API 키", re.compile(r"\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b")),
     ("SEC-ANTHROPIC-02", "Anthropic API 키", re.compile(r"\bsk-ant-[A-Za-z0-9_-]{20,}\b")),
-    ("SEC-AWS-03", "AWS 액세스 키", re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b")),
-    ("SEC-GITHUB-04", "GitHub 토큰", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b")),
-    ("SEC-GOOGLE-05", "Google API 키", re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b")),
-    ("SEC-SLACK-06", "Slack 토큰", re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b")),
-    ("SEC-STRIPE-07", "Stripe 키", re.compile(r"\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{20,}\b")),
-    ("SEC-JWT-08", "JWT 토큰", re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b")),
-    ("SEC-PEM-09", "개인 키(PEM)", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----")),
-    ("SEC-SLACKHOOK-10", "Slack 웹훅", re.compile(r"https://hooks\.slack\.com/services/[A-Za-z0-9/]+")),
+    # AWS
+    ("SEC-AWS-03", "AWS 액세스 키", re.compile(r"\b(?:AKIA|ASIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA)[0-9A-Z]{16}\b")),
+    ("SEC-AWS-SECRET-04", "AWS 시크릿 키", re.compile(r"(?i)aws.{0,20}?['\"][0-9a-zA-Z/+]{40}['\"]")),
+    # GitHub / GitLab
+    ("SEC-GITHUB-05", "GitHub 토큰", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b")),
+    ("SEC-GITHUB-FG-06", "GitHub Fine-grained 토큰", re.compile(r"\bgithub_pat_[A-Za-z0-9_]{22,}\b")),
+    ("SEC-GITLAB-07", "GitLab 토큰", re.compile(r"\bglpat-[A-Za-z0-9_-]{20,}\b")),
+    # Google
+    ("SEC-GOOGLE-08", "Google API 키", re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b")),
+    ("SEC-GOOGLE-OAUTH-09", "Google OAuth 토큰", re.compile(r"\bya29\.[0-9A-Za-z_-]{30,}\b")),
+    # Slack
+    ("SEC-SLACK-10", "Slack 토큰", re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b")),
+    ("SEC-SLACKHOOK-11", "Slack 웹훅", re.compile(r"https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24}")),
+    # Stripe / Twilio / SendGrid / Mailgun
+    ("SEC-STRIPE-12", "Stripe 키", re.compile(r"\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{20,}\b")),
+    ("SEC-TWILIO-13", "Twilio API 키", re.compile(r"\bSK[0-9a-fA-F]{32}\b")),
+    ("SEC-TWILIO-SID-14", "Twilio Account SID", re.compile(r"\bAC[0-9a-fA-F]{32}\b")),
+    ("SEC-SENDGRID-15", "SendGrid 키", re.compile(r"\bSG\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\b")),
+    ("SEC-MAILGUN-16", "Mailgun 키", re.compile(r"\bkey-[0-9a-f]{32}\b")),
+    # 패키지 레지스트리
+    ("SEC-NPM-17", "npm 토큰", re.compile(r"\bnpm_[A-Za-z0-9]{36}\b")),
+    ("SEC-PYPI-18", "PyPI 토큰", re.compile(r"\bpypi-AgEIcHlwaS[A-Za-z0-9_-]{50,}\b")),
+    ("SEC-HF-19", "HuggingFace 토큰", re.compile(r"\bhf_[A-Za-z0-9]{30,}\b")),
+    # 메신저 봇
+    ("SEC-DISCORD-20", "Discord 봇 토큰", re.compile(r"\b[MNO][A-Za-z0-9_-]{23,25}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27,}\b")),
+    ("SEC-TELEGRAM-21", "Telegram 봇 토큰", re.compile(r"\b\d{8,10}:AA[A-Za-z0-9_-]{32,}\b")),
+    # JWT / PEM / DB 접속 문자열
+    ("SEC-JWT-22", "JWT 토큰", re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b")),
+    ("SEC-PEM-23", "개인 키(PEM)", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----")),
+    ("SEC-DBURL-24", "DB 접속 문자열(비밀번호 포함)", re.compile(r"\b(?:postgres|postgresql|mysql|mongodb(?:\+srv)?|redis|amqp)://[^:@\s/]+:[^@\s/]+@[^\s/]+")),
 ]
+
+# 명백한 예시·플레이스홀더(오탐 억제) — gitleaks 의 allowlist·엔트로피 역할
+_PLACEHOLDER = re.compile(
+    r"(?i)(example|xxxx+|0000+|1111+|your[_-]?|placeholder|dummy|sample|redacted|"
+    r"changeme|<[^>]{2,}>|\.\.\.|\bfoo\b|\bbar\b|test[_-]?key|fake)")
 
 # 하드코딩된 비밀 대입: password = "...", api_key: '...', secret="..."
 _ASSIGN_SECRET = re.compile(
@@ -95,6 +123,8 @@ def find_spans(text: str) -> list[Span]:
     for rid, label, rx in _SECRET_PATTERNS:
         for m in rx.finditer(text):
             if _overlaps(spans, m.start(), m.end()):
+                continue
+            if _PLACEHOLDER.search(m.group(0)):  # 예시·플레이스홀더 오탐 억제
                 continue
             spans.append(Span(m.start(), m.end(), "secret", rid, label, "critical",
                               f"{label}로 보여요. AI로 보내면 그대로 노출·악용될 수 있어요.",

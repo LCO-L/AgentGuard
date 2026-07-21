@@ -255,7 +255,7 @@
       body.style.display="block";
       bar.style.width=(d.progress||0)+"%";
       msg.textContent=d.message||"";
-      msg.style.color=d.state==="ready"?"#30A46C":(d.state==="error"||d.state==="no_ollama")?"#E5484D":"var(--accent)";
+      msg.style.color=d.state==="ready"?"#30A46C":(d.state==="error"||d.state==="no_ollama"||d.state==="blocked")?"#E5484D":"var(--accent)";
       link.style.display=d.state==="no_ollama"?"inline-block":"none";
       btn.disabled=["checking","starting","pulling"].includes(d.state);
       btn.textContent=btn.disabled?"준비 중…":(d.state==="ready"?"다시 실행":"실행");
@@ -267,7 +267,8 @@
     }
     btn.onclick=async()=>{
       body.style.display="block"; btn.disabled=true; msg.textContent="준비 중…";
-      try{ const r=await fetch("/v1/ai/ondevice/start",{method:"POST"}); paint(await r.json()); }
+      try{ const r=await fetch("/v1/ai/ondevice/start",{method:"POST"}); const d=await r.json(); paint(d);
+        if(d.state==="blocked"){ btn.disabled=false; return; } }
       catch(e){ msg.textContent="백엔드에 연결할 수 없어요"; btn.disabled=false; return; }
       if(poll) clearInterval(poll);
       poll=setInterval(async()=>{

@@ -80,15 +80,36 @@ def start(model: str | None = None) -> dict:
     return status()
 
 
+def _install_ollama() -> bool:
+    """Ollama 자동 설치(로컬 전용). macOS=Homebrew, Linux=공식 설치 스크립트."""
+    import platform
+    try:
+        if platform.system() == "Darwin":
+            if not shutil.which("brew"):
+                return False  # Homebrew 없음 → GUI 앱 수동 설치 안내
+            subprocess.run(["brew", "install", "ollama"],
+                           check=True, capture_output=True, timeout=900)
+        else:  # Linux 등
+            subprocess.run("curl -fsSL https://ollama.com/install.sh | sh",
+                           shell=True, check=True, capture_output=True, timeout=900)
+        return shutil.which("ollama") is not None
+    except Exception:
+        return False
+
+
 def _run(model: str) -> None:
     global _proc
     try:
-        # ① 설치 확인
+        # ① 설치 확인 → 없으면 자동 설치
         if not shutil.which("ollama"):
-            _set(state="no_ollama", progress=0,
-                 message="Ollama가 설치되어 있지 않아요. https://ollama.com 에서 "
-                         "설치 후 다시 눌러주세요. (설치 없이도 오프라인 규칙으로 동작해요)")
-            return
+            _set(state="starting", progress=2,
+                 message="Ollama 자동 설치 중… (최초 1회, 수 분 걸릴 수 있어요)")
+            if not _install_ollama() or not shutil.which("ollama"):
+                _set(state="no_ollama", progress=0,
+                     message="자동 설치를 완료하지 못했어요. https://ollama.com 에서 "
+                             "설치 후 다시 눌러주세요. (설치 없이도 오프라인 규칙으로 동작해요)")
+                return
+            _set(progress=4, message="Ollama 설치 완료 ✓ 실행 준비 중…")
 
         # ② serve 기동
         if not _ollama_alive():
