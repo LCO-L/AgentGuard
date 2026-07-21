@@ -1,0 +1,11 @@
+/node_modules
+/.next
+/out
+/build
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts.timestamp
+/android
+/ios
+.DS_Store

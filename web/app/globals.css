@@ -1,0 +1,70 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: theme("colors.canvas");
+  color: theme("colors.ink");
+  font-family: theme("fontFamily.sans");
+  /* 한국어 가독성: 어절 단위 줄바꿈 */
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 스크롤바(미세 디테일) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d3d7de;
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b9bec8;
+  background-clip: content-box;
+}
+
+/* 보안 에디터 인라인 밑줄 — 매핑(위험=빨강) + 시그니파이어(클릭 가능해 보임) */
+.ul-critical {
+  border-bottom: 2.5px solid theme("colors.risk.critical");
+  background: rgba(196, 40, 60, 0.09);
+  border-radius: 2px;
+  cursor: help;
+}
+.ul-high {
+  border-bottom: 2.5px solid theme("colors.risk.red");
+  background: rgba(229, 72, 77, 0.08);
+  border-radius: 2px;
+  cursor: help;
+}
+.ul-medium {
+  border-bottom: 2.5px wavy theme("colors.risk.yellow");
+  background: rgba(255, 178, 36, 0.1);
+  border-radius: 2px;
+  cursor: help;
+}
+.ul-low {
+  border-bottom: 2px dotted theme("colors.sub");
+  cursor: help;
+}
