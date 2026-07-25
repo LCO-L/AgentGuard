@@ -26,7 +26,7 @@
 > 🔴 **국세청을 사칭한 파일이에요.** 열자마자 자동으로 실행되는 명령이 들어 있어요.
 > 낯선 주소에서 다른 프로그램을 몰래 내려받아요. → **열지 말고 삭제하세요.**
 
-한 문장으로: **"Grammarly가 글 쓸 때 문법을 잡아주듯, AgentGuard는 AI에 보내기 직전에 보안을 잡아줍니다."**
+한 문장으로: **"AgentGuard는 AI에 보내기 직전, 쓰던 그 자리에서 보안을 잡아줍니다."**
 
 ---
 
@@ -53,7 +53,7 @@
 문서(HWP·워드·PDF·엑셀·PPT)·AI 도구 설정(MCP)·브라우저 확장·링크·스크립트 — **뭐든 넣으면** 위험을
 찾아 🔴🟡🟢 등급과 **0~100점**으로 보여주고, 무엇이 왜 위험한지 한국어로 설명합니다.
 
-### 2️⃣ AI에 보내기 직전, 실시간으로 지켜줌 (Grammarly for Security)
+### 2️⃣ AI에 보내기 직전, 실시간으로 지켜줌
 글을 쓰면 **위험한 부분에 빨간 밑줄**이 그어집니다.
 - **비밀·개인정보**(API 키·주민번호·카드번호)는 `[SECRET_1]`처럼 **가렸다가 나중에 되돌릴 수 있게 마스킹**
 - **위험한 코드**(`eval`, SQL 결합, `rm -rf /`)엔 밑줄 + **안전한 수정 예시**
@@ -234,6 +234,19 @@ AG_AI_PROVIDER=off python -m unittest -v tests.test_ultra   # 35개 전부 통�
 - [`docs/PRODUCTS.md`](docs/PRODUCTS.md) — 하나의 엔진, 여러 산출물
 - [`docs/ONDEVICE_OLLAMA.md`](docs/ONDEVICE_OLLAMA.md) — 온디바이스 설정·트러블슈팅
 - [`docs/MASTER_STATUS.md`](docs/MASTER_STATUS.md) — 전체 구현 현황
+- [`docs/OPEN_SOURCE.md`](docs/OPEN_SOURCE.md) — 깃허브 공개 전 체크리스트
+
+## 📄 라이선스
+
+**MIT License** — © 2026 이동훈 (DONGHUN LEE). 자유롭게 쓰고 고치고 배포할 수 있으며,
+저작권 고지(만든 사람 이름)와 LICENSE 파일만 유지하면 됩니다. 전문은 [`LICENSE`](LICENSE) 참고.
+
+> 만든 사람: **이동훈 (DONGHUN LEE)** — 설계·엔진·UI 전부 단독 개발.
+
+## 🤝 기여
+
+이슈·PR 환영합니다. 새 탐지 시나리오는 `core/rulepacks/scenarios_data.py` 에
+`Scenario(...)` **한 줄**이면 추가돼요 — 좋은 첫 기여 지점입니다.
 
 <div align="center">
 

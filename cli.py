@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """AgentGuard CLI — 터미널/CI 게이트용 스캐너.
 
 사용:

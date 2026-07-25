@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """시크릿·PII 팩 — core.pii 를 Hit 으로 감싼다(마스킹은 inspect 가 토큰 채움)."""
 from __future__ import annotations
 

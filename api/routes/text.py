@@ -1,4 +1,4 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """텍스트 스캔 라우트 — 붙여넣기/페이지 본문 프롬프트 인젝션 검사.
 
 크롬 익스텐션이 현재 페이지의 보이지 않는 명령을 검사할 때 호출.

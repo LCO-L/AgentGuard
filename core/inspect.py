@@ -1,5 +1,5 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
-"""Span 인스펙션 — Grammarly식 실시간 밑줄의 근거(레지스트리 기반).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
+"""Span 인스펙션 — 실시간 보안 밑줄의 근거(레지스트리 기반).
 
 시나리오 레지스트리(core.rulepacks)가 모든 탐지를 담당하므로, 이 모듈은
 그 Hit 들을 모아 severity 집계 + 복원 가능 마스킹만 얹는다.

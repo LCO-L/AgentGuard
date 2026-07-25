@@ -1,5 +1,5 @@
 /**
- * AgentGuard VS Code 익스텐션 — "AI 시대의 Grammarly" IDE 판.
+ * AgentGuard VS Code 익스텐션 — 실시간 보안 검사의 IDE 판.
  *
  * 편집 중 문서를 /v1/inspect 로 병내 Diagnostics(밑줄)를 긋고,
  * CodeAction으로 시크릿 마스킹(/v1/redact)·무시를 제공한다.

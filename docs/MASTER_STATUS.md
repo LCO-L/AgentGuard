@@ -23,7 +23,7 @@
 | VS Code 확장 | ✅ 완료 (`vscode-extension/` — Diagnostics+마스킹, tsc 컴파일 통과) |
 | 랜딩+온볼딩 투어 | ✅ 완료 (신호등 히어로·3단계 가이드·라이브 데모·확장 설치 CTA) |
 | 확장 즉시 설치 | ✅ `/extension.zip`(즉석) + `/extension.crx`(CRX3 RSA 서명, `scripts/pack_extension.py`) |
-| 확장 Grammarly 완성 | ✅ 인라인 물결(타깃 사이트)·교정 카드[마스킹/제거/무시]·LLM 심층 계층+캐시·팝업 on/off/사이트별/차단 로그 |
+| 확장 실시간 코치 완성 | ✅ 인라인 물결(타깃 사이트)·교정 카드[마스킹/제거/무시]·LLM 심층 계층+캐시·팝업 on/off/사이트별/차단 로그 |
 | 온디바이스 원클릭 | ✅ `POST /v1/ai/ondevice/start` + 폴 백 상태 — **실측 qwen3-8b 통역 성공**(고객 기기에 직접 다운로드 구조) |
 | OpenRouter 파이프라인 | ✅ 강화 (에러 표면화·폴 백 체인·reasoning 처리·**운영 500(content=null) 수정**·예외 격리) |
 | 백신 비교뷰 | ✅ `/compare` — "같은 위험, 다른 이해" |
@@ -117,7 +117,7 @@
 - **점수제**: severity 가중치 + 조합 부스트(다운로드+실행, 은닉명령+유출 등) → 0–100.
 - **3층 방어**: 1층 룰 · 2층 AI 의도 · 3층 러그풀(지문 diff).
 
-### 3.2 SecureType(Grammarly for Security)
+### 3.2 SecureType(전송 전 실시간 검사)
 - **PII·시크릿 복원 가능 마스킹**: OpenAI/AWS/GitHub/JWT 키·주민번호·카드(Luhn)·전화·이메일 → `[SECRET_1]`/`[PII_n]` + 매핑(복원 == 원본 검증).
 - **취약 코드·과잉권한**: eval·문자열결합 SQL·CORS *·pickle·shell=True·verify=False·rm -rf·DROP TABLE·chmod 777·curl|bash + 수정안(fix/suggestion).
 - **offset span 통합**(`/v1/inspect`) + 마스킹(`/v1/redact`).
@@ -141,7 +141,7 @@
 ### 3.6 UX 산출물
 - **대시보드**(순수 HTML + Next.js): 파일·텍스트·링크 통합 검사 + 통역 카드.
 - **보안 에디터**(순수 HTML + Next.js): 500ms 디바운스 실시간 밑줄 + 코치 카드 + 마스킹 + 안전하게 전송.
-- **대화형 위젯**(`widget.js`): 채널톡/Fin 스타일 + Grammarly식 페이지 인라인 하이라이트 + 후속 대화.
+- **대화형 위젯**(`widget.js`): 채널톡/Fin 스타일 + 실시간 페이지 인라인 하이라이트 + 후속 대화.
 - **크롬 익스텐션**: 우클릭 즉시검사 · 인라인 하이라이트 · **AI 입력창 전송 인터셉트**(마스킹 후 전송) · 다운로드 가로채기.
 - **PWA**: 아이폰 공유시트(Web Share Target) + iOS 단축어 가이드.
 - **설정 페이지**: 3-엔진 지능적 설정(상태·모델·테스트).
@@ -236,7 +236,7 @@ AG_AI_PROVIDER=off python -m unittest tests.test_ultra                      # 35
 | 9 | PII·시크릿 마스킹 엔진 | ✅ |
 | 10 | 취약코드·과잉권한 룰팩 | ✅ |
 | 11 | Span 인스펙션 + /v1/inspect·/v1/redact | ✅ |
-| 12 | Grammarly식 웹 보안 에디터 | ✅ |
+| 12 | 실시간 웹 보안 에디터 | ✅ |
 | 13 | 익스텐션 AI 입력창 인터셉트 | ✅ |
 | 14 | 시나리오 레지스트리(데이터 한 줄 확장) | ✅ |
 | 15 | Next.js 프론트엔드(노먼 원칙) | ✅ 로컬 검증 완료(보안 패치·위젯·PWA 마운트) |

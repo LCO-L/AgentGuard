@@ -1,5 +1,5 @@
 "use client";
-// Grammarly식 보안 에디터 — 500ms 디바운스 · textarea 뒤 backdrop 밑줄 · 코치 패널.
+// 실시간 보안 에디터 — 500ms 디바운스 · textarea 뒤 backdrop 밑줄 · 코치 패널.
 // 노먼: 즉각 피드백(밑줄)·제약(위험 시 전송 버튼 경고색)·오류복구(마스킹 미리보기).
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -33,7 +33,7 @@ function buildSegments(text: string, issues: InspectResult["issues"], allow: Set
   for (const i of shown) {
     if (i.start < lastEnd) continue;
     if (i.start > pos) segs.push({ t: text.slice(pos, i.start) });
-    // Grammarly 패리티: 카테고리=색상 물결 (없으면 심각도 색 폴 백)
+    // 카테고리=색상 물결 (없으면 심각도 색 폴 백)
     segs.push({ t: text.slice(i.start, i.end), cls: `ul-${i.category}` });
     pos = i.end;
     lastEnd = i.end;
@@ -238,7 +238,7 @@ export function SecurityEditor() {
         </div>
       )}
 
-      {/* Grammarly 'G' 원형 플로팅 — 점수 링 + 건수 배지, 클릭 시 코치로 */}
+      {/* 우하단 원형 플로팅 — 점수 링 + 건수 배지, 클릭 시 코치로 */}
       <GuardianFab
         result={result}
         onClick={() => document.getElementById("coach-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" })}

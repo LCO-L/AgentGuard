@@ -1,4 +1,4 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """인스펙션 서비스 — 웹 보안 에디터·익스텐션의 실시간 백엔드.
 
 span 인스펙션(core.inspect) + 복원 가능 마스킹(core.pii)을 얇게 감싼다.

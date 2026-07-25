@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 import { categoryLabel, sevTone } from "@/lib/cn";
 import type { Issue, InspectResult } from "@/lib/types";
 
-// Grammarly 4색 카테고리 도트 — 밑줄 물결과 같은 색(매핑 일관)
+// 4색 카테고리 도트 — 밑줄 물결과 같은 색(매핑 일관)
 const CAT_DOT: Record<string, string> = {
   inject: "#E5484D",
   secret: "#F5A623",

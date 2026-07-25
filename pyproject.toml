@@ -2,6 +2,8 @@
 name = "agentguard"
 version = "0.1.0"
 description = "AgentGuard — 포맷 무관 통합 보안 엔진 (파일/AI도구 위험 검사 + 자연어 통역 API)"
+license = { text = "MIT" }
+authors = [{ name = "이동훈 (DONGHUN LEE)" }]
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",

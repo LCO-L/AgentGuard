@@ -1,49 +1,110 @@
 <!DOCTYPE html>
-<!-- © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). -->
+<!-- © 2026 DONGHUN LEE · AgentGuard · MIT License. -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AgentGuard — 탐지 시나리오</title>
 <style>
-  :root{--ink:#16181D;--sub:#6B7280;--line:#E8E8EA;--accent:#1E5BFF;--bg:#EEF0F3;--card:#fff;
-    --crit:#C4283C;--red:#E5484D;--yellow:#B45309;--green:#30A46C;}
-  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif;}
-  body{background:var(--bg);color:var(--ink);word-break:keep-all;line-height:1.6;padding:20px 16px 60px;}
-  .wrap{max-width:900px;margin:0 auto;}
-  h1{font-size:23px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;}
-  .lead{color:var(--sub);font-size:13.5px;margin:5px 0 16px;}
-  .info{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px;}
-  .info code{background:var(--bg);border-radius:6px;padding:2px 6px;font-family:ui-monospace,Menlo,monospace;font-size:12px;}
-  .pill{background:rgba(30,91,255,.1);color:var(--accent);font-weight:800;font-size:11px;border-radius:99px;padding:3px 9px;}
-  .cnt{margin-left:auto;font-weight:800;}
-  .cat{margin-bottom:8px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;}
-  .cat .n{font-size:12px;color:var(--sub);}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
-  .sc{background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:12px;}
-  .sc .h{display:flex;justify-content:space-between;align-items:center;}
-  .sc .id{font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:700;color:var(--sub);}
-  .sc .sev{font-size:10.5px;font-weight:800;text-transform:uppercase;}
-  .sc .t{font-size:14px;font-weight:800;margin-top:2px;}
-  .sc .w{font-size:12.5px;color:#3A3D46;}
-  .sc .fix{margin-top:5px;font-size:11px;font-weight:700;color:var(--green);}
-  .critical{border-left-color:var(--crit);} .high{border-left-color:var(--red);}
-  .medium{border-left-color:#FFB224;} .low{border-left-color:var(--sub);}
-  .sev.critical{color:var(--crit);} .sev.high{color:var(--red);} .sev.medium{color:var(--yellow);} .sev.low{color:var(--sub);}
-  .empty{color:var(--sub);text-align:center;padding:40px 0;}
+  :root{
+    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
+    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
+    --bg:#F5F6F8; --card:#FFFFFF;
+    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
+    --crit:#B3273B; --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64;
+    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);word-break:keep-all;line-height:1.62;padding:30px 20px 72px;
+    -webkit-font-smoothing:antialiased;letter-spacing:-.011em;
+    background-image:radial-gradient(120% 62% at 50% -12%, rgba(51,70,211,.06), transparent 60%);
+    background-attachment:fixed;}
+  ::selection{background:var(--accent-weak);}
+  .wrap{max-width:920px;margin:0 auto;}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  h1{font-size:26px;line-height:1.14;font-weight:800;letter-spacing:-.036em;margin-top:9px;}
+  .lead{color:var(--sub);font-size:13.5px;margin:7px 0 18px;max-width:56ch;}
+  .lead b{color:var(--ink);}
+
+  .toolbar{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+  .search{position:relative;}
+  .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none;}
+  .search input{width:100%;border:1px solid var(--line);border-radius:13px;padding:12px 14px 12px 40px;
+    font-size:14px;font-family:inherit;background:var(--card);box-shadow:var(--shadow);color:var(--ink);
+    transition:border-color .14s, box-shadow .14s;}
+  .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-weak);}
+  .search input::placeholder{color:var(--muted);}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .filters .lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-right:2px;}
+  .fchip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;
+    font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink-2);
+    box-shadow:0 1px 2px rgba(14,17,22,.04);transition:.14s cubic-bezier(.2,.7,.2,1);}
+  .fchip:hover{transform:translateY(-1px);color:var(--ink);}
+  .fchip.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 4px 12px -4px rgba(14,17,22,.4);}
+  .fchip .n{opacity:.6;font-weight:600;margin-left:3px;font-variant-numeric:tabular-nums;}
+  .fsep{width:1px;height:18px;background:var(--line);margin:0 4px;}
+
+  .info{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;font-size:13px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px;box-shadow:var(--shadow);color:var(--ink-2);}
+  .info code{background:rgba(14,17,22,.05);border-radius:6px;padding:2px 7px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;color:var(--ink);}
+  .pill{background:var(--accent-weak);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;padding:3px 10px;}
+  .cnt{margin-left:auto;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  .cat{margin:22px 0 10px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;}
+  .cat .n{font-size:11.5px;color:var(--muted);font-weight:700;background:rgba(14,17,22,.045);border-radius:99px;padding:2px 9px;font-variant-numeric:tabular-nums;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:680px){.grid{grid-template-columns:1fr;}}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;
+    box-shadow:0 1px 2px rgba(14,17,22,.04);position:relative;overflow:hidden;
+    transition:transform .16s cubic-bezier(.2,.7,.2,1), box-shadow .16s;}
+  .sc:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .sc:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3.5px;}
+  .sc.critical:before{background:var(--crit);} .sc.high:before{background:var(--red);}
+  .sc.medium:before{background:var(--yellow);} .sc.low:before{background:var(--muted);}
+  .sc .h{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .sc .id{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;font-weight:600;color:var(--muted);}
+  .sc .sev{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+  .sc .t{font-size:14px;font-weight:700;margin-top:3px;letter-spacing:-.015em;}
+  .sc .w{font-size:12.5px;color:var(--ink-2);margin-top:2px;}
+  .sc .fix{margin-top:7px;font-size:11px;font-weight:700;color:var(--green);display:inline-flex;align-items:center;gap:4px;}
+  .sev.critical{color:var(--crit);} .sev.high{color:var(--red);} .sev.medium{color:var(--yellow-ink);} .sev.low{color:var(--sub);}
+  .empty{color:var(--muted);text-align:center;padding:52px 0;font-size:13.5px;}
+  .empty b{display:block;color:var(--sub);font-size:15px;margin-bottom:5px;}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>🧩 탐지 시나리오</h1>
-    <div class="lead">지금 잡을 수 있는 보안 시나리오예요. 새 공격 유형은 <b>데이터 한 줄</b>이면 추가됩니다.</div>
+    <div class="eyebrow">DETECTION CATALOG</div>
+    <h1>탐지 시나리오</h1>
+    <div class="lead">지금 잡을 수 있는 보안 시나리오 전부입니다. 새 공격 유형은 <b>데이터 한 줄</b>이면 추가돼요 — 코드 수정 없이 인스펙션·에디터·익스텐션·통역이 함께 잡습니다.</div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="시나리오 검색 — 이름·ID·설명 (예: rm -rf, 주민번호, DAN)">
+      </div>
+      <div class="filters" id="sevFilters">
+        <span class="lbl">심각도</span>
+        <button class="fchip on" data-sev="">전체</button>
+        <button class="fchip" data-sev="critical">Critical</button>
+        <button class="fchip" data-sev="high">High</button>
+        <button class="fchip" data-sev="medium">Medium</button>
+        <button class="fchip" data-sev="low">Low</button>
+      </div>
+      <div class="filters" id="catFilters" style="display:none">
+        <span class="lbl">분류</span>
+      </div>
+    </div>
+
     <div class="info">
       <span class="pill">＋ 확장성</span>
-      <span class="sub"><code>rulepacks/scenarios_data.py</code> 에 Scenario(...) 한 줄을 추가하면
-        인스펙션·에디터·익스텐션·통역이 자동으로 잡습니다.</span>
+      <span><code>rulepacks/scenarios_data.py</code> 에 Scenario(...) 한 줄을 추가하면 즉시 탐지됩니다.</span>
       <span class="cnt" id="total">…</span>
     </div>
+
     <div id="body"><div class="empty">불러오는 중…</div></div>
   </div>
 
@@ -51,11 +112,22 @@
   <script>
   const CAT={secret:"비밀값",pii:"개인정보",vuln:"취약코드",agency:"과잉권한",inject:"인젝션",stego:"은닉"};
   const esc=s=>String(s==null?"":s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
-  fetch("/v1/scenarios").then(r=>r.json()).then(d=>{
-    const scen=d.scenarios||[]; const stats=d.stats||{};
-    document.getElementById("total").textContent="총 "+((stats.regex_scenarios)||scen.length)+"개 시나리오";
+  let ALL=[], SEV="", CATSEL="", Q="";
+
+  function paint(){
+    const q=Q.trim().toLowerCase();
+    const list=ALL.filter(s=>
+      (!SEV||s.severity===SEV) && (!CATSEL||s.category===CATSEL) &&
+      (!q || (s.id+" "+s.title+" "+s.why+" "+(CAT[s.category]||s.category)).toLowerCase().includes(q)));
+    document.getElementById("total").textContent=(q||SEV||CATSEL)
+      ? `${list.length} / ${ALL.length}개` : `총 ${ALL.length}개 시나리오`;
+    if(!list.length){
+      document.getElementById("body").innerHTML=
+        '<div class="empty"><b>조건에 맞는 시나리오가 없어요</b>검색어나 필터를 바꿔보세요.</div>';
+      return;
+    }
     const by={};
-    scen.forEach(s=>{(by[s.category]=by[s.category]||[]).push(s);});
+    list.forEach(s=>{(by[s.category]=by[s.category]||[]).push(s);});
     let html="";
     Object.keys(by).forEach(cat=>{
       html+='<div class="cat">'+(CAT[cat]||cat)+'<span class="n">'+by[cat].length+'</span></div><div class="grid">';
@@ -67,8 +139,34 @@
       });
       html+='</div>';
     });
-    document.getElementById("body").innerHTML=html||'<div class="empty">시나리오가 없어요.</div>';
-  }).catch(()=>{document.getElementById("body").innerHTML='<div class="empty">백엔드에 연결할 수 없어요.</div>';});
+    document.getElementById("body").innerHTML=html;
+  }
+
+  function buildCatFilters(){
+    const box=document.getElementById("catFilters");
+    const cats=[...new Set(ALL.map(s=>s.category))];
+    if(cats.length<2){ box.style.display="none"; return; }
+    box.style.display="flex";
+    const counts={}; ALL.forEach(s=>counts[s.category]=(counts[s.category]||0)+1);
+    box.innerHTML='<span class="lbl">분류</span>'+
+      '<button class="fchip on" data-cat="">전체</button>'+
+      cats.map(c=>'<button class="fchip" data-cat="'+esc(c)+'">'+(CAT[c]||c)+'<span class="n">'+counts[c]+'</span></button>').join("");
+    box.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{
+      box.querySelectorAll(".fchip").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+      CATSEL=b.dataset.cat; paint();
+    });
+  }
+
+  document.querySelectorAll("#sevFilters [data-sev]").forEach(b=>b.onclick=()=>{
+    document.querySelectorAll("#sevFilters .fchip").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+    SEV=b.dataset.sev; paint();
+  });
+  document.getElementById("q").addEventListener("input",e=>{ Q=e.target.value; paint(); });
+
+  fetch("/v1/scenarios").then(r=>r.json()).then(d=>{
+    ALL=d.scenarios||[];
+    buildCatFilters(); paint();
+  }).catch(()=>{document.getElementById("body").innerHTML='<div class="empty"><b>백엔드에 연결할 수 없어요</b>서버가 실행 중인지 확인해 주세요.</div>';});
   </script>
 </body>
 </html>

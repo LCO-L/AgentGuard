@@ -2,6 +2,8 @@
   "name": "agentguard-web",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
+  "author": "이동훈 (DONGHUN LEE)",
   "description": "AgentGuard ULTRA — 온디바이스 통합 보안 프론트엔드 (Next.js)",
   "scripts": {
     "dev": "next dev",

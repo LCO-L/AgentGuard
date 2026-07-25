@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """위험도 종합 — 🔴🟡🟢 + 0~100 점수(가중치·조합 부스트).
 
 단순 "가장 나쁜 색"만으로는 '다운로드 + 자동실행'처럼 위험이 결합됐을 때를

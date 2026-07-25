@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """URL/링크 스캔 — 외부 fetch 없이 메타 정적 분석(온디바이스 원칙).
 
 ULTRA: 퓨니코드(homoglyph 도메인)·@위장·단축URL·과다 서브도메인·실행 다운로드·

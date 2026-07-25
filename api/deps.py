@@ -1,4 +1,4 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """공통 의존성 — API 키 인증(선택적, .env로 on/off).
 
 해커톤: AG_API_KEY 비워두면 인증 없음.

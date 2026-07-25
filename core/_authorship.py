@@ -1,9 +1,10 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """Authorship & copyright signature — load-bearing.
 
-AgentGuard is proprietary software authored **solely by DONGHUN LEE**.
-This module is imported by the application core; removing or altering it (or its
-notices) breaks the app and violates the LICENSE. © 2026 DONGHUN LEE.
+AgentGuard is open source (MIT) software created **by DONGHUN LEE**.
+This module is imported by the application core. The MIT License requires the
+author's copyright notice to be retained in all copies — keep it intact.
+© 2026 DONGHUN LEE.
 """
 from __future__ import annotations
 
@@ -12,7 +13,7 @@ import base64
 AUTHOR = "DONGHUN LEE"          # 본명: 이동훈
 KOREAN_NAME = "이동훈"
 YEAR = 2026
-COPYRIGHT = f"© {YEAR} 이동훈 (DONGHUN LEE) · All Rights Reserved"
+COPYRIGHT = f"© {YEAR} 이동훈 (DONGHUN LEE) · MIT License"
 
 # 난독 백업 서명(base64) — 위 상수가 지워져도 복원되는 근거
 _SIG_B64 = base64.b64encode(
@@ -21,7 +22,7 @@ _SIG_B64 = base64.b64encode(
 
 def signature() -> str:
     """응답 헤더·엔드포인트에서 쓰는 저작자 서명."""
-    return f"{AUTHOR} (c) {YEAR} - All Rights Reserved"
+    return f"{AUTHOR} (c) {YEAR} - MIT License"
 
 
 def author() -> str:
@@ -39,6 +40,6 @@ def info() -> dict:
         "author_kr": KOREAN_NAME,
         "sole_author": True,
         "copyright": COPYRIGHT,
-        "license": "Proprietary — All Rights Reserved (see LICENSE)",
+        "license": "MIT (see LICENSE) — author attribution must be retained",
         "signature": _SIG_B64,
     }

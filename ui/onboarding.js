@@ -1,4 +1,4 @@
-/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
+/* © 2026 DONGHUN LEE · AgentGuard · MIT License. */
 /* AgentGuard 온보딩 투어 — 처음 온 사용자를 말풍선으로 자연스럽게 이끈다.
  *
  * 스포트라이트(대상만 밝게 + 펄스) + 말풍선(설명·다음) 으로 단계 안내.
@@ -153,12 +153,14 @@
   function start() { idx = 0; host.classList.add("on"); render(); }
   window.AGOnboard = { start: start, reset: function () { try { localStorage.removeItem(KEY); } catch (e) {} } };
 
-  // 시작 조건: 진입할 때마다 항상 온보딩(공유 시트 자동검사 때만 제외). ?tour=1도 항상.
+  // 시작 조건: 첫 방문에만 자동 시작(매번 뜨면 방해). ?tour=1 이나 '?' 버튼으로는 언제든.
   var p = location.pathname.replace(/\/+$/, "") || "/";
+  var seen = false;
+  try { seen = localStorage.getItem(KEY) === "1"; } catch (e) {}
   if ((location.search || "").indexOf("tour=1") >= 0) {
     try { history.replaceState(null, "", location.pathname); } catch (e) {}
     setTimeout(start, 500);
-  } else if (p === "/" && !/[?&](url|text|title)=/.test(location.search || "")) {
+  } else if (!seen && p === "/" && !/[?&](url|text|title)=/.test(location.search || "")) {
     setTimeout(start, 700);
   }
 })();

@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """취약 코드 + 과잉권한 — 시나리오 레지스트리(scenarios_data)의 얇은 뷰.
 
 실제 룰은 core/rulepacks/scenarios_data.py 에 데이터로 있다(vuln/agency 카테고리).

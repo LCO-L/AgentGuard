@@ -1,4 +1,4 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """FastAPI 앱 조립 — CORS·라우팅·버저닝.
 
 모든 비즈니스 로직은 services/core에 있고, 여기는 껍데기뿐.
@@ -122,7 +122,7 @@ def create_app() -> FastAPI:
 
     @app.get("/editor", response_class=HTMLResponse, tags=["meta"])
     def editor_page() -> str:
-        """Grammarly식 보안 에디터 — AI 전송 전 실시간 검사."""
+        """실시간 보안 에디터 — AI 전송 전 실시간 검사."""
         html = _UI_DIR / "editor.html"
         return html.read_text(encoding="utf-8") if html.exists() else "<h1>no editor</h1>"
 
@@ -200,7 +200,8 @@ def create_app() -> FastAPI:
         return {
             "service": "AgentGuard ULTRA",
             "docs": "/docs",
-            "pages": ["/", "/editor", "/compare", "/scenarios", "/settings", "/embed-demo"],
+            "pages": ["/", "/editor", "/compare", "/scenarios", "/audit",
+                      "/settings", "/embed-demo"],
             "downloads": ["/extension.zip", "/extension.crx"],
             "endpoints": [
                 "POST /v1/scan", "POST /v1/scan/batch", "POST /v1/scan/url",

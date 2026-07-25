@@ -1,5 +1,5 @@
-/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
-/* AgentGuard 익스텐션 — 입력창 가드(Grammarly for Security, Outbound/Inbound).
+/* © 2026 DONGHUN LEE · AgentGuard · MIT License. */
+/* AgentGuard 익스텐션 — 입력창 가드(전송 전 실시간 검사, Outbound/Inbound).
  *
  * 사람이 AI에게 보내는 '바로 그 순간'을 지킨다:
  *  - textarea / contenteditable 감시(input·paste, 500ms 디바운스)
@@ -107,7 +107,7 @@
     var r = active.getBoundingClientRect();
     badge.className = "badge " + a.level;
     badge.style.display = "flex";
-    // Grammarly G 버튼 패리티: 필드 우하단 원형 배지
+    // 우하단 원형 플로팅 버튼: 필드 우하단 원형 배지
     badge.style.left = Math.max(8, r.right - 46) + "px";
     badge.style.top = Math.max(8, r.bottom - 46) + "px";
     bn.textContent = a.count;
@@ -313,7 +313,7 @@
 
   function openCoach(u, sp) {
     var red = sp.kind === "inject";
-    // Grammarly 제안 카드 패리티: 상단 카테고리 칩(컬러 도트) → 설명 → 액션
+    // 교정 카드: 상단 카테고리 칩(컬러 도트) → 설명 → 액션
     coach.innerHTML =
       '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">' +
         '<span style="width:8px;height:8px;border-radius:50%;background:' + (red ? "#E5484D" : "#F5A623") + '"></span>' +

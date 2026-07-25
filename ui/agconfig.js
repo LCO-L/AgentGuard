@@ -1,4 +1,4 @@
-/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
+/* © 2026 DONGHUN LEE · AgentGuard · MIT License. */
 /* AGConfig — AI provider 설정 공유 모듈(대시보드·위젯·설정 페이지 공용).
  *
  * 단일 진실원천: localStorage["ag_cfg"]. 설정 페이지에서 정하면 같은 origin 의

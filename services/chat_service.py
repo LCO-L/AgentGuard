@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """대화형 보안 도우미 — Fin/채널톡 스타일 위젯의 두뇌.
 
 통역 카드에서 끝나지 않고, 사용자가 "왜 위험해요?" "어떻게 대응해요?" 를

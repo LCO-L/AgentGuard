@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """정규식 팩 — scenarios_data 의 선언형 시나리오를 offset span 으로.
 
 새 정규식 시나리오는 scenarios_data.SCENARIOS 에 한 줄만 추가하면 여기서 자동 처리.

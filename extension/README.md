@@ -1,7 +1,7 @@
 # 🛡️ AgentGuard 크롬 익스텐션
 
 링크·파일·페이지에 숨은 명령과 프롬프트 인젝션을 **우클릭 한 번**으로 즉시 검사합니다.
-Grammarly가 문법 오류에 밑줄을 긋듯, AgentGuard는 **보이지 않는 명령·닮은꼴 문자**에
+AgentGuard는 **보이지 않는 명령·닮은꼴 문자**에
 빨간 밑줄을 긋고 호버하면 "여기 숨은 명령: send id_rsa" 처럼 꺼내 보여줍니다.
 
 ## 기능
@@ -14,7 +14,7 @@ Grammarly가 문법 오류에 밑줄을 긋듯, AgentGuard는 **보이지 않는
 | **다운로드 가로채기** | 파일 내려받기 시 URL을 미리 검사해 위험하면 알림 |
 | **3-엔진 선택** | 온디바이스(Ollama) · Claude · OpenRouter — 팝업에서 전환 |
 
-### AI 입력창 가드 (Grammarly for Security)
+### AI 입력창 가드
 
 `chatgpt.com`, `claude.ai`, `gemini.google.com` 등에서 입력창에 글을 쓰면(500ms 디바운스):
 - `sk-...` API 키, 주민번호, 카드번호, 이메일 등 **민감정보**와 "이전 지시 무시" 같은
@@ -44,7 +44,7 @@ Grammarly가 문법 오류에 밑줄을 긋듯, AgentGuard는 **보이지 않는
 manifest.json   MV3 선언(contextMenus·downloads·storage)
 background.js   우클릭 메뉴·다운로드 가로채기·백엔드 호출
 content.js      인라인 하이라이트 + 결과 오버레이 카드(Shadow DOM)
-inputguard.js   AI 입력창 감시 + 전송 인터셉트 + 마스킹(Grammarly for Security)
+inputguard.js   AI 입력창 감시 + 전송 인터셉트 + 마스킹(전송 전 실시간 검사)
 agscan.js       온디바이스 경량 스캐너(textnorm+pii 의 JS 이식)
 popup.html/js   3-엔진 설정 + 상태·연결 테스트
 ```

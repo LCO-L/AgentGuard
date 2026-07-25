@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """오프라인 의도 엔진 — LLM 이 없을 때의 2층(공기·결합 신호).
 
 1층 룰이 개별 신호를 잡는다면, 여기선 **여러 악성 신호가 한 텍스트에 공존**하는지를

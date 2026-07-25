@@ -1,5 +1,5 @@
 "use client";
-// 보안 에디터 페이지 — AI 전송 전 실시간 검사(Grammarly for Security).
+// 보안 에디터 페이지 — AI 전송 전 실시간 검사(전송 전 실시간 검사).
 
 import { ShieldAlert } from "lucide-react";
 import { SecurityEditor } from "@/components/SecurityEditor";

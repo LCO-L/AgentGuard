@@ -1,0 +1,6 @@
+# 모든 변경은 저장소 소유자(만든 사람)의 리뷰 승인 없이는 머지될 수 없다.
+# 사용법: 아래 @아이디를 본인 깃허브 아이디로 바꾼 뒤,
+# Settings → Branches → main 보호 규칙에서 "Require review from Code Owners" 를 켠다.
+# (docs/OPEN_SOURCE.md 체크리스트 참고)
+
+* @OWNER-GITHUB-ID

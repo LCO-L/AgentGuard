@@ -1,4 +1,4 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """스캔 이력 저장소 — 원본은 저장하지 않는다(비저장 원칙).
 
 보관: scan_id, 시각, 포맷, 이름, overall, findings, card, fingerprint.

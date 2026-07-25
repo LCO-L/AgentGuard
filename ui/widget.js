@@ -1,4 +1,4 @@
-/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
+/* © 2026 DONGHUN LEE · AgentGuard · MIT License. */
 /* AgentGuard 보안 도우미 위젯 — 채널톡/Intercom Fin 스타일.
  * 아무 사이트에 <script src=".../widget.js"></script> 한 줄로 임베드.
  * Shadow DOM 으로 호스트 페이지 CSS 와 격리. 온디바이스 우선(헤더로 provider/키 주입).
@@ -90,7 +90,7 @@
   .inbar input{ flex:1; border:1px solid #E1E3EA; border-radius:11px; padding:10px 12px; font-size:14px; outline:none; }
   .inbar .send{ background:#1E5BFF; border:0; color:#fff; width:40px; height:40px; border-radius:11px; cursor:pointer; font-size:16px; flex:0 0 auto; }
   .foot{ text-align:center; font-size:10.5px; color:#9AA0AA; padding:0 0 8px; background:#fff; }
-  /* Grammarly식 호버 툴팁 */
+  /* 실시간 호버 툴팁 */
   .ag-tip{ position:fixed; z-index:2147483600; max-width:280px; background:#16181D; color:#fff;
     border-radius:12px; padding:11px 13px; font-size:12.5px; line-height:1.5; box-shadow:0 10px 30px rgba(0,0,0,.32);
     display:none; word-break:keep-all; }
@@ -319,7 +319,7 @@
   root.appendChild(tip);
 
   // ════════════════════════════════════════════════════════
-  //  Grammarly식 온디바이스 인라인 스캐너 (백엔드 불필요)
+  //  실시간 온디바이스 인라인 스캐너 (백엔드 불필요)
   //  페이지 텍스트에서 숨은 명령·닮은꼴·보이지 않는 글자를 형광펜으로.
   // ════════════════════════════════════════════════════════
   var ZW = /[​‌‍⁠﻿᠎‎‏]/;
@@ -442,13 +442,13 @@
     scanUrl: function (u) { open(); scanUrl(u); },
     scanFile: function (f) { open(); scanFile(f); },
     scanPage: function () { open(); scanPage(); },
-    highlightPage: highlightPage,                   // Grammarly식 인라인 하이라이트
+    highlightPage: highlightPage,                   // 실시간 인라인 하이라이트
     scanTextLocal: scanText,                         // 온디바이스 경량 스캐너(백엔드 불필요)
     ingest: function (v) { open(); addCard(v); },   // 외부(익스텐션)에서 결과 주입
     config: CFG
   };
 
-  // Grammarly식 자동 인라인 스캔(기본 on) — 페이지 로드 후 숨은 위험을 형광펜으로
+  // 실시간 자동 인라인 스캔(기본 on) — 페이지 로드 후 숨은 위험을 형광펜으로
   if (CFG.autoscan !== false) {
     var runHL = function () { try { highlightPage(); } catch (e) { } };
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", runHL);

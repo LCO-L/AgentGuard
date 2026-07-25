@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """팩 레지스트리 — 등록된 모든 팩을 순회해 Hit 을 모은다.
 
 ★ 새 팩 추가 = 파일 1개 + PACKS 에 한 줄. 엔진(inspect)은 이 레지스트리만 부른다.

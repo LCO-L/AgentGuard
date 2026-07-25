@@ -1,6 +1,6 @@
 /* AgentGuard 익스텐션 — content script.
  *
- * 1) Grammarly식 인라인 하이라이트: 페이지의 숨은 명령·닮은꼴·보이지 않는 글자에
+ * 1) 실시간 인라인 하이라이트: 페이지의 숨은 명령·닮은꼴·보이지 않는 글자에
  *    빨간 밑줄 + 호버 미니카드(AGScan, 온디바이스·백엔드 불필요).
  * 2) 우하단 플로팅 배지(발견 개수).
  * 3) 우클릭/다운로드 검사 결과(background) → 화면 오버레이 통역 카드.
@@ -92,7 +92,7 @@
     if (o === "red" || o === "yellow") { nEl.style.display = "flex"; nEl.textContent = "!"; }
   }
 
-  // ── Grammarly식 인라인 하이라이트 ──
+  // ── 실시간 인라인 하이라이트 ──
   var ZW = /[​‌‍⁠﻿᠎‎‏]/, TAG = /[\u{E0000}-\u{E007F}]/u;
   var _pageHits = 0;
   function showTip(rect, findings) {

@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """③ 통역 카드 생성 — LLM(ollama/claude/openrouter) 우선, 폴백 보장(생존선).
 
 원본은 절대 AI로 안 감. Finding(위험 메타)만 전달.

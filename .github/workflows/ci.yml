@@ -1,0 +1,106 @@
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
+# CI 게이트 — 이 체크를 통과해야만 main에 머지할 수 있다(브랜치 보호에서 required 지정).
+# 모든 PR·push가 기록에 남고, 테스트가 깨지면 어떤 코드도 들어오지 못한다.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: 엔진 테스트 (unittest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+      - name: 데모 샘플 생성
+        run: python samples/make_samples.py
+      - name: 전체 테스트 (AI 오프라인 규칙 모드)
+        env:
+          AG_AI_PROVIDER: off
+        run: python -m unittest discover -s tests -v
+
+  cli-gate:
+    name: CLI 게이트 (악성 red · 정상 green)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+      - name: 데모 샘플 생성
+        run: python samples/make_samples.py
+      - name: 악성 샘플은 반드시 걸려야 한다 (exit 2 기대)
+        env:
+          AG_AI_PROVIDER: off
+        run: |
+          set +e
+          python cli.py samples/evil.* --fail-on yellow
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "::error::악성 샘플이 통과했습니다 (exit=$code, 기대=2)"; exit 1
+          fi
+      - name: 정상 샘플은 통과해야 한다 (exit 0 기대)
+        env:
+          AG_AI_PROVIDER: off
+        run: python cli.py samples/clean.* --fail-on yellow
+
+  js-syntax:
+    name: UI·확장 JS 문법 검사
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: node --check (ui/ · extension/)
+        run: |
+          for f in ui/*.js extension/*.js; do
+            echo "check: $f"
+            node --check "$f"
+          done
+
+  api-smoke:
+    name: API 스모크 (전 페이지 200)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: 의존성 설치
+        run: pip install -r requirements.txt httpx
+      - name: in-process ASGI로 페이지·핵심 엔드포인트 확인
+        env:
+          AG_AI_PROVIDER: off
+        run: |
+          python - <<'EOF'
+          import httpx
+          from api.main import app
+          transport = httpx.ASGITransport(app=app)
+          client = httpx.Client(transport=transport, base_url="http://t")
+          pages = ["/", "/editor", "/compare", "/scenarios", "/audit", "/settings",
+                   "/embed-demo", "/nav.js", "/onboarding.js", "/agconfig.js",
+                   "/widget.js", "/agscan.js", "/manifest.webmanifest", "/sw.js",
+                   "/icon.svg", "/extension.zip", "/v1/health", "/v1/scenarios"]
+          bad = [(p, client.get(p).status_code) for p in pages
+                 if client.get(p).status_code != 200]
+          assert not bad, f"non-200: {bad}"
+          print(f"OK — {len(pages)} endpoints all 200")
+          EOF

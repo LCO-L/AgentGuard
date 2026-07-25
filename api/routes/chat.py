@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """대화형 보안 도우미 라우트 — Fin/채널톡 위젯 백엔드."""
 from __future__ import annotations
 

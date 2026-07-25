@@ -23,7 +23,7 @@ npm run dev                              # http://localhost:3000
 app/
   layout.tsx         셸(TopNav) + 전역 스타일
   page.tsx           대시보드(파일·텍스트·링크 통합 검사)
-  editor/page.tsx    보안 에디터(Grammarly식 실시간 밑줄)
+  editor/page.tsx    보안 에디터(실시간 보안 밑줄)
   settings/page.tsx  3-엔진 설정(온디바이스/Claude/OpenRouter)
   scenarios/page.tsx 시나리오 카탈로그(확장성 가시화)
 components/          디자인 시스템(ui) + RiskCard·SecurityEditor·CoachPanel·TopNav·EngineIndicator

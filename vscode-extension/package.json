@@ -1,7 +1,7 @@
 {
   "name": "agentguard",
   "displayName": "AgentGuard — AI 보안 가드",
-  "description": "편집 중인 문서·프롬프트·코드의 인젝션·시크릿·취약 패턴을 IDE 안에서 실시간 경고 (AI 시대의 Grammarly)",
+  "description": "편집 중인 문서·프롬프트·코드의 인젝션·시크릿·취약 패턴을 IDE 안에서 실시간 경고 (AI 전송 전 실시간 보안 검사)",
   "version": "0.1.0",
   "publisher": "agentguard",
   "license": "MIT",

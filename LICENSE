@@ -1,33 +1,21 @@
-Copyright © 2026 이동훈 (DONGHUN LEE). All Rights Reserved.
+MIT License
 
-AgentGuard — Proprietary Software License
-==========================================
+Copyright (c) 2026 이동훈 (DONGHUN LEE)
 
-This software, including its source code, design, assets, and documentation
-(collectively, the "Software"), is the exclusive property of 이동훈 (DONGHUN LEE)
-("the Owner").
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-1. OWNERSHIP
-   The Software and all intellectual property rights therein are and shall
-   remain the sole property of the Owner, 이동훈 (DONGHUN LEE).
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-2. RESTRICTIONS
-   Without the prior written permission of the Owner, you may NOT:
-     - copy, clone, fork, mirror, or reproduce the Software;
-     - distribute, publish, sublicense, sell, or transfer the Software;
-     - modify, adapt, translate, or create derivative works;
-     - use the Software or any part of it in any product or service.
-
-3. NO GRANT
-   No license or right is granted by implication, estoppel, or otherwise.
-   Access to this repository does not confer any right to use the Software.
-
-4. WATERMARK & ATTRIBUTION
-   All copies carry the ownership watermark "© 이동훈 (DONGHUN LEE)". Removal,
-   obscuring, or alteration of this watermark or of these notices is prohibited.
-
-5. NO WARRANTY
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
-
-For licensing inquiries, contact the Owner: 이동훈 (DONGHUN LEE).
-Unauthorized use is a violation of applicable copyright law.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 # AgentGuard.app 빌드 — macOS.
 #   기본:   ./scripts/build_mac_app.sh          (네이티브 WKWebView 앱, 실패 시 셸-런처)
 #   DMG도:  ./scripts/build_mac_app.sh --dmg

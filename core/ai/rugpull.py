@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """3층 러그풀 — 승인 후 변화 감지(지문 비교). 포맷 무관.
 
 RiskSurface.fingerprint를 로컬 저장 → 재검사 시 diff.

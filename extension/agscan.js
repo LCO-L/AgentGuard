@@ -1,4 +1,4 @@
-/* © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary). */
+/* © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License. */
 /* AGScan — 온디바이스 경량 위험 스캐너(브라우저·Node 공용, 백엔드 불필요).
  *
  * 파이썬 core/textnorm.py + core/pii.py 의 JS 이식본. 페이지·입력창 텍스트에서

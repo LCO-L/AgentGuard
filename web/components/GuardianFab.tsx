@@ -1,5 +1,5 @@
 "use client";
-// Grammarly 'G' 버튼 패리티 — 우하단 원형 플로팅: 점수 링 + 위험 건수 배지 + 상태색.
+// 우하단 원형 플로팅 버튼 — 우하단 원형 플로팅: 점수 링 + 위험 건수 배지 + 상태색.
 // 클릭 시 코치 패널로 이동. 색상=신호등(개념모델 일관).
 
 import { motion, useReducedMotion } from "framer-motion";

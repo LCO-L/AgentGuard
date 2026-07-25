@@ -1,4 +1,4 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 """공용 유틸 — 엔트로피·매직바이트·URL 추출·해시."""
 from __future__ import annotations
 

@@ -1,2 +1,2 @@
-# © 2026 이동훈 (DONGHUN LEE) · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 이동훈 (DONGHUN LEE) · AgentGuard · MIT License.
 # AI 레이어 — 2·3층 + ③ 통역 (전부 포맷 무관 공용)

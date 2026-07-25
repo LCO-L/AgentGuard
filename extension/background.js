@@ -1,4 +1,4 @@
-/* © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary). */
+/* © 2026 DONGHUN LEE · AgentGuard · MIT License. */
 /* AgentGuard 익스텐션 — 백그라운드 서비스 워커.
  *
  * 역할:

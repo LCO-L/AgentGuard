@@ -1,8 +1,8 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
 """PII·시크릿 탐지 + 복원 가능 마스킹 — Outbound 유출 방지(SecureType Outbound).
 
 AI에게 보내기 직전, 텍스트 속 비밀값·개인정보를 **문자 offset span**으로 잡아
-Grammarly식 밑줄에 쓰게 하고, [SECRET_1]/[PII_이름_1] 같은 **복원 가능 토큰**으로
+실시간 밑줄에 쓰게 하고, [SECRET_1]/[PII_이름_1] 같은 **복원 가능 토큰**으로
 마스킹한다. 매핑을 함께 돌려주므로 AI 응답을 받은 뒤 원래 값으로 되돌릴 수 있다.
 
 원칙(가드코치 문서): 원문·비밀값·토큰 매핑은 서버 로그에 남기지 않는다(호출측 책임).

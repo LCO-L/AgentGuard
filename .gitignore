@@ -37,3 +37,12 @@ vscode-extension/out/
 
 # ── 초기 쓰기 테스트 잔여물 ──
 .write_test
+
+# ── 내부 문서 (깃허브 공개 제외 — 로컬 보관용. docs/OPEN_SOURCE.md 스크리닝 결과) ──
+docs/PRESENTER_GUIDE.md
+docs/MASTER_STATUS.md
+docs/ENTERPRISE.md
+docs/OPEN_SOURCE.md
+docs/개발해야하는*.md
+docs/AI\ 시대의*.md
+docs/가드코치기능.md

@@ -1,5 +1,5 @@
-# © 2026 DONGHUN LEE · All Rights Reserved · AgentGuard (Proprietary).
-"""인스펙션 라우트 — 실시간 보안 에디터·익스텐션(Grammarly for Security).
+# © 2026 DONGHUN LEE · AgentGuard · MIT License.
+"""인스펙션 라우트 — 실시간 보안 에디터·익스텐션(전송 전 실시간 검사).
 
 POST /v1/inspect  텍스트 → span 이슈 + 요약 + 마스킹 프리뷰
 POST /v1/redact   텍스트 → 복원 가능 마스킹(+매핑)

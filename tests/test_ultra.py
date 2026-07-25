@@ -237,7 +237,7 @@ class TestScenarioRegistry(unittest.TestCase):
 
 
 class TestSecureType(unittest.TestCase):
-    """Grammarly for Security — PII/시크릿 마스킹, 취약코드, 통합 인스펙션."""
+    """전송 전 실시간 검사 — PII/시크릿 마스킹, 취약코드, 통합 인스펙션."""
 
     def test_secret_and_pii_detection(self):
         spans = pii.find_spans("키 sk-abcdef1234567890ABCDEFGH 주민 900101-1234567")
