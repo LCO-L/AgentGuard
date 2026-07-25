@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from pathlib import Path
 
 CACHE_DIR = Path(os.environ.get("AG_CACHE_DIR", ".cache"))
 CACHE_FILE = CACHE_DIR / "fingerprints.json"
+_lock = threading.Lock()  # 동시 스캔 시 read-modify-write 경합으로 지문이 유실되지 않게
 
 
 def _load() -> dict:
@@ -33,16 +35,17 @@ def check_rugpull(name: str, fingerprint: str) -> dict:
     """지문 비교. {"changed": bool, "first_seen": bool, "msg": str}"""
     if not fingerprint:
         return {"changed": False, "first_seen": False, "msg": ""}
-    store = _load()
-    old = store.get(name)
-    if old is None:
-        store[name] = fingerprint
-        _save(store)
-        return {"changed": False, "first_seen": True,
-                "msg": "처음 보는 대상. 지문을 저장했어요."}
-    if old != fingerprint:
-        store[name] = fingerprint
-        _save(store)
-        return {"changed": True, "first_seen": False,
-                "msg": "승인한 뒤 내용이 몰래 바뀌었어요."}
+    with _lock:
+        store = _load()
+        old = store.get(name)
+        if old is None:
+            store[name] = fingerprint
+            _save(store)
+            return {"changed": False, "first_seen": True,
+                    "msg": "처음 보는 대상. 지문을 저장했어요."}
+        if old != fingerprint:
+            store[name] = fingerprint
+            _save(store)
+            return {"changed": True, "first_seen": False,
+                    "msg": "승인한 뒤 내용이 몰래 바뀌었어요."}
     return {"changed": False, "first_seen": False, "msg": "지문이 이전과 같아요."}

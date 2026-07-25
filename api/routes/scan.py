@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.concurrency import run_in_threadpool
 
 from api.deps import ai_config, check_size, verify_api_key
 from core.ai.backend import AIConfig
@@ -19,7 +20,9 @@ async def scan(file: UploadFile = File(...),
     data = await file.read()
     check_size(data, file.filename or "")
     try:
-        verdict = scan_service.scan_bytes(data, file.filename or "upload.bin", cfg)
+        # 스캔은 블로킹(LLM 호출 포함) → 스레드풀로 넘겨 이벤트 루프를 막지 않는다(동시 사용자 보호)
+        verdict = await run_in_threadpool(
+            scan_service.scan_bytes, data, file.filename or "upload.bin", cfg)
     except ValueError as e:
         raise HTTPException(status_code=415, detail=str(e))
     except Exception as e:
@@ -38,4 +41,5 @@ async def scan_batch(files: list[UploadFile] = File(...),
         data = await f.read()
         check_size(data, f.filename or "")
         payload.append((data, f.filename or "upload.bin"))
-    return {"results": scan_service.scan_batch(payload, cfg)}
+    # 배치는 파일 수 × LLM 호출로 오래 걸림 → 반드시 스레드풀에서(전체 사용자 멈춤 방지)
+    return {"results": await run_in_threadpool(scan_service.scan_batch, payload, cfg)}

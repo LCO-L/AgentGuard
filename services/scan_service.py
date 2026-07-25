@@ -24,7 +24,8 @@ from services import history_service
 
 def scan_bytes(data: bytes, filename: str, cfg: AIConfig | None = None) -> Verdict:
     """업로드 바이트 → Verdict. API·CLI·배치 어디서든 호출 가능."""
-    suffix = "_" + (filename or "upload.bin")
+    # basename만 사용 — 업로드 파일명에 경로 구분자가 섞여도 임시 디렉토리를 벗어나지 않게
+    suffix = "_" + os.path.basename(filename or "upload.bin")
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(data)
         path = tmp.name

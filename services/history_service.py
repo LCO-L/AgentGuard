@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import uuid
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -18,6 +19,7 @@ from core.model import Verdict
 
 HISTORY_PATH = Path(os.environ.get("AG_HISTORY_PATH", ".cache/history.jsonl"))
 _MAX_KEEP = int(os.environ.get("AG_HISTORY_MAX", "1000"))
+_lock = threading.Lock()  # 동시 스캔 시 append·trim 경합으로 기록이 깨지지 않게
 
 
 def save(surface_kind: str, name: str, verdict: Verdict, fingerprint: str) -> str:
@@ -32,14 +34,16 @@ def save(surface_kind: str, name: str, verdict: Verdict, fingerprint: str) -> st
         "card": asdict(verdict.card) if verdict.card else None,
         "fingerprint": fingerprint,
     }
-    HISTORY_PATH.parent.mkdir(exist_ok=True)
-    with HISTORY_PATH.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
-    _trim()
+    with _lock:
+        HISTORY_PATH.parent.mkdir(exist_ok=True)
+        with HISTORY_PATH.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        _trim()
     return scan_id
 
 
 def _trim() -> None:
+    """_lock 안에서만 호출 — 전체 재작성이므로 동시 append와 겹치면 기록이 유실된다."""
     try:
         lines = HISTORY_PATH.read_text(encoding="utf-8").splitlines()
         if len(lines) > _MAX_KEEP:
