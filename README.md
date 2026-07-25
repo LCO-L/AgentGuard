@@ -229,12 +229,12 @@ AG_AI_PROVIDER=off python -m unittest -v tests.test_ultra   # 35개 전부 통�
 - Railway Variables(선택): `AG_AI_PROVIDER`, `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`, `AG_API_KEY`
 
 ## 📚 더 보기
-- [`docs/DEMO_SCENARIOS.md`](docs/DEMO_SCENARIOS.md) — 모든 기능 시연 대본(복붙 입력값)
-- [`docs/PRESENTER_GUIDE.md`](docs/PRESENTER_GUIDE.md) — 발표자 가이드
+- [`docs/DEMO_SCENARIOS.md`](docs/DEMO_SCENARIOS.md) — 모든 기능을 따라해 볼 수 있는 예시 모음(복붙 입력값)
 - [`docs/PRODUCTS.md`](docs/PRODUCTS.md) — 하나의 엔진, 여러 산출물
-- [`docs/ONDEVICE_OLLAMA.md`](docs/ONDEVICE_OLLAMA.md) — 온디바이스 설정·트러블슈팅
-- [`docs/MASTER_STATUS.md`](docs/MASTER_STATUS.md) — 전체 구현 현황
-- [`docs/OPEN_SOURCE.md`](docs/OPEN_SOURCE.md) — 깃허브 공개 전 체크리스트
+- [`docs/ONDEVICE_OLLAMA.md`](docs/ONDEVICE_OLLAMA.md) — 온디바이스 설정·문제 해결
+- [`docs/IOS_SHORTCUT.md`](docs/IOS_SHORTCUT.md) — 아이폰에서 "꾹 눌러 검사"
+- [`docs/APK.md`](docs/APK.md) / [`docs/MAC_APP.md`](docs/MAC_APP.md) — 안드로이드·맥 앱 빌드
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — 기여 방법 (시나리오 한 줄부터!)
 
 ## 📄 라이선스
 

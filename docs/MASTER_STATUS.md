@@ -282,3 +282,28 @@ AG_AI_PROVIDER=off python -m unittest tests.test_ultra                      # 35
 - Railway **Variables** 권장: `AG_AI_PROVIDER`(기본 auto), 선택 `ANTHROPIC_API_KEY`/`OPENROUTER_API_KEY`, `AG_API_KEY`.
 - 순수 HTML UI 전부를 FastAPI 가 서빙하므로 백엔드 1개 배포로 대시보드·에디터·비교·시나리오·설정·확장다운로드가 모두 동작.
   (Next.js `web/` 는 로컬/Vercel 별도)
+
+---
+
+## 9. 2026-07-25 세션 — UI/UX 총정비 + MIT 오픈소스 전환
+
+### UI/UX (순수 HTML 전 페이지 디자인 시스템 통일 — 대시보드 토큰 기준)
+- `nav.js`: 이모지 → SVG 스트로크 아이콘, 글래스 바, 활성 상태·모바일 대응 강화
+- `dashboard`: 전역 드래그&드롭 오버레이 · URL Enter/텍스트 ⌘⏎ 단축키 · 스피너/에러 상태 · 점수 카운트업
+- `editor`: 전면 리스킨(로직 보존) + 위험 게이지 · 글자수 · ⌘⏎ 전송 · 코치 카드 스태거 애니메이션
+- `settings`·`scenarios`·`compare`: 리스킨. 시나리오엔 **검색+심각도/분류 필터**, 비교엔 **파일 없이 데모 칩**(scan/text)
+- `audit`: 등급 필터(카드/칩) + **CSV 내보내기**
+- `onboarding`: 매번 강제 시작 버그 → 첫 방문만(?tour=1·? 버튼은 언제든), sw 캐시 v2
+
+### MIT 오픈소스 전환 (서비스와 동시 공개 준비)
+- LICENSE=MIT · NOTICE/AUTHORS 갱신(만든 사람 이동훈/DONGHUN LEE 표기 유지 — MIT가 고지 보존 요구)
+- 소스 헤더 67파일 일괄 전환(`scripts/relicense_mit.py`) · `_authorship.py`/응답 헤더 MIT 표기
+- pyproject·web/package.json license 필드 · README 라이선스/기여 섹션
+- "Grammarly" 브랜드 표현 전량 제거(공개 파일 기준 0건)
+- GitHub 거버넌스: CI 4잡(테스트/CLI 게이트/JS 문법/API 스모크) · CODEOWNERS · PR/이슈 템플릿
+  (빈 이슈 금지) · CONTRIBUTING · SECURITY(BYOK 명시) · `docs/OPEN_SOURCE.md` 공개 체크리스트
+- 문서 스크리닝: 내부 문서 7종 `.gitignore` 공개 제외(이 문서 포함)
+
+### 검증
+- unittest 46/46 · 전 페이지/엔드포인트 21개 200(ASGI) · 외부+인라인 JS 문법 전부 통과 · CI yaml 파싱 OK
+
