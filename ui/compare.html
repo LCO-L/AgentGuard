@@ -7,31 +7,31 @@
 <title>AgentGuard — 같은 위험, 다른 이해</title>
 <style>
   :root{
-    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
-    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
-    --bg:#F5F6F8; --card:#FFFFFF;
-    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
-    --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64;
-    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
-    --r:16px;
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --ink:#101319; --ink-2:#3C414C; --sub:#697080; --muted:#9BA1AE;
+    --line:rgba(16,19,25,.08); --line-2:rgba(16,19,25,.05);
+    --bg:#F6F6F7; --card:#FFFFFF;
+    --accent:#1E5BFF; --accent-weak:rgba(30,91,255,.08);
+    --red:#D2403C; --yellow:#DE930F; --yellow-ink:#8A5300; --green:#1F9D64;
+    --shadow:0 1px 2px rgba(16,19,25,.04), 0 8px 24px -12px rgba(16,19,25,.12);
+    --r:14px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+  body{font-family:var(--font);
     background:var(--bg);color:var(--ink);word-break:keep-all;line-height:1.62;
-    -webkit-font-smoothing:antialiased;letter-spacing:-.011em;
-    background-image:radial-gradient(120% 62% at 50% -12%, rgba(51,70,211,.06), transparent 60%);
-    background-attachment:fixed;}
+    -webkit-font-smoothing:antialiased;letter-spacing:-.01em;}
   ::selection{background:var(--accent-weak);}
   .wrap{max-width:980px;margin:0 auto;padding:30px 18px 72px;}
-  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center;}
-  h1{font-size:27px;letter-spacing:-.036em;text-align:center;font-weight:800;line-height:1.14;margin-top:9px;}
+  .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);text-align:center;}
+  h1{font-size:25px;letter-spacing:-.032em;text-align:center;font-weight:700;line-height:1.18;margin-top:9px;}
   .lead{text-align:center;color:var(--sub);font-size:13.5px;margin:8px auto 20px;max-width:52ch;}
 
-  .drop{border:1.5px dashed rgba(14,17,22,.16);border-radius:var(--r);background:var(--card);padding:28px;
+  .drop{border:1.5px dashed rgba(16,19,25,.16);border-radius:var(--r);background:var(--card);padding:28px;
     text-align:center;color:var(--sub);font-size:13px;cursor:pointer;transition:.18s cubic-bezier(.2,.7,.2,1);
     margin-bottom:12px;box-shadow:var(--shadow);}
-  .drop:hover{border-color:rgba(14,17,22,.28);transform:translateY(-1px);}
+  .drop:hover{border-color:rgba(16,19,25,.28);transform:translateY(-1px);}
   .drop.on{border-color:var(--accent);color:var(--accent);background:var(--accent-weak);transform:translateY(-1px);}
   .drop b{color:var(--ink);font-weight:700;font-size:14.5px;}
   .drop .sub{display:block;margin-top:5px;font-size:12px;color:var(--muted);}
@@ -40,34 +40,35 @@
   .demos .lbl{font-size:12px;color:var(--muted);font-weight:600;align-self:center;}
   .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;
     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink-2);
-    box-shadow:0 1px 2px rgba(14,17,22,.04);transition:.14s cubic-bezier(.2,.7,.2,1);}
-  .chip:hover{transform:translateY(-1px);border-color:rgba(14,17,22,.2);color:var(--ink);}
+    box-shadow:0 1px 2px rgba(16,19,25,.04);transition:.14s cubic-bezier(.2,.7,.2,1);}
+  .chip:hover{transform:translateY(-1px);border-color:rgba(16,19,25,.2);color:var(--ink);}
   .chip.clean{color:var(--green);border-color:rgba(31,157,100,.32);background:rgba(31,157,100,.06);}
 
   .vs{display:flex;justify-content:center;margin:0 0 14px;}
-  .vs span{background:var(--ink);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:5px 14px;
-    letter-spacing:.08em;box-shadow:0 6px 16px -6px rgba(14,17,22,.5);}
+  .vs span{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:5px 14px;
+    letter-spacing:.08em;box-shadow:0 6px 16px -6px rgba(16,19,25,.5);}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:760px){.grid{grid-template-columns:1fr;}}
   .pane{border:1px solid var(--line);border-radius:var(--r);background:var(--card);overflow:hidden;box-shadow:var(--shadow);}
-  .pane .hd{padding:12px 16px;font-size:12px;font-weight:800;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:7px;letter-spacing:-.005em;}
-  .pane.av .hd{background:rgba(14,17,22,.03);color:var(--sub);}
+  .pane .hd{padding:12px 16px;font-size:12px;font-weight:600;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:7px;letter-spacing:-.005em;}
+  .pane.av .hd{background:rgba(16,19,25,.03);color:var(--sub);}
   .pane.ag .hd{background:var(--accent-weak);color:var(--accent);}
   .pane .bd{padding:16px;min-height:210px;font-size:13.5px;line-height:1.65;}
-  .avcode{font-family:ui-monospace,"SF Mono",Menlo,monospace;background:#14161B;color:#E6E8ED;border-radius:12px;
+  .avcode{font-family:var(--mono);background:#14161B;color:#E6E8ED;border-radius:12px;
     padding:15px 16px;font-size:12.5px;line-height:1.8;white-space:pre-line;}
   .avcode .dim{color:#8B93A3;}
   .avq{margin:11px 2px 0;font-size:12.5px;color:var(--sub);}
-  .sig{font-size:15.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;line-height:1.35;}
+  .sig{font-size:15px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;line-height:1.35;}
+  .sig .sdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:1px;}
   .sig.red{color:var(--red)} .sig.yellow{color:var(--yellow-ink)} .sig.green{color:var(--green)}
   .kv{padding:8px 0;border-top:1px solid var(--line-2);} .kv:first-of-type{border-top:0;}
   .kv .k{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
-  .act{margin-top:11px;border-radius:11px;padding:11px 13px;font-size:13px;font-weight:700;letter-spacing:-.01em;}
+  .act{margin-top:11px;border-radius:10px;padding:11px 13px;font-size:13px;font-weight:600;letter-spacing:-.01em;}
   .act.red{background:rgba(210,59,55,.08);color:var(--red)} .act.yellow{background:rgba(224,147,15,.1);color:var(--yellow-ink)} .act.green{background:rgba(31,157,100,.09);color:var(--green)}
   .meta{margin-top:10px;font-size:11px;color:var(--muted);font-weight:600;}
   .empty{color:var(--muted);text-align:center;padding:48px 0;font-size:13px;}
   .busy{display:flex;align-items:center;justify-content:center;gap:9px;color:var(--sub);padding:48px 0;font-size:13px;}
-  .spin{width:15px;height:15px;border:2.5px solid rgba(14,17,22,.08);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;}
+  .spin{width:15px;height:15px;border:2.5px solid rgba(16,19,25,.08);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;}
   @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -95,11 +96,11 @@
 
   <div class="grid">
     <div class="pane av">
-      <div class="hd">🦠 기존 백신의 말</div>
+      <div class="hd"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="6"/><path d="M12 7V4"/><path d="M7.8 8.8 5.6 6.6"/><path d="M16.2 8.8l2.2-2.2"/><path d="M6 13H3"/><path d="M21 13h-3"/></svg>기존 백신의 말</div>
       <div class="bd" id="avBody"><div class="empty">파일이나 데모를 넣으면 여기에 백신식 경고가 떠요</div></div>
     </div>
     <div class="pane ag">
-      <div class="hd">🛡️ AgentGuard의 말</div>
+      <div class="hd"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7Z"/></svg>AgentGuard의 말</div>
       <div class="bd" id="agBody"><div class="empty">파일이나 데모를 넣으면 여기에 쉬운 말 통역이 떠요</div></div>
     </div>
   </div>
@@ -137,18 +138,18 @@ function paintAV(v){
     : '<div class="avcode">⚠ Threat detected!\n'+(name||"Trojan.Generic")+'\n'+
       '<span class="dim">Severity: '+(v.overall==="red"?"High":"Medium")+
       '  ·  Action: Quarantine\nDetails: '+(v.findings||[]).length+' signature(s) matched</span></div>'+
-      '<div class="avq">…그래서 이 파일이 뭘 한다는 걸까요? 🤔</div>';
+      '<div class="avq">…그래서 이 파일이 뭘 한다는 걸까요?</div>';
 }
 
 function paintAG(v){
   const c=v.card||{}, o=v.overall;
   ag.innerHTML =
-    '<div class="sig '+o+'">'+({red:"🔴",yellow:"🟡",green:"🟢"})[o]+" "+esc(c.headline||"검사 완료")+" · "+KO[o]+'</div>'+
+    '<div class="sig '+o+'"><i class="sdot"></i>'+esc(c.headline||"검사 완료")+" · "+KO[o]+'</div>'+
     (c.hidden?'<div class="kv"><div class="k">무엇이 숨어있나</div>'+esc(c.hidden)+"</div>":"")+
     (c.how?'<div class="kv"><div class="k">어떻게 작동하나</div>'+esc(c.how)+"</div>":"")+
     (c.impact?'<div class="kv"><div class="k">내 기기에 무슨 피해</div>'+esc(c.impact)+"</div>":"")+
-    (c.action?'<div class="act '+o+'">👉 '+esc(c.action)+"</div>":"")+
-    '<div class="meta">🔒 기기 안에서 검사 · 판단: '+(c.source==="claude"?"Claude":c.source==="ollama"?"온디바이스 AI":c.source==="openrouter"?"OpenRouter":"오프라인 규칙")+"</div>";
+    (c.action?'<div class="act '+o+'">'+esc(c.action)+"</div>":"")+
+    '<div class="meta">기기 안에서 검사 · 판단: '+(c.source==="claude"?"Claude":c.source==="ollama"?"온디바이스 AI":c.source==="openrouter"?"OpenRouter":"오프라인 규칙")+"</div>";
 }
 
 function busy(){

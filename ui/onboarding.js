@@ -15,15 +15,15 @@
       body: "파일·링크·AI 프롬프트 속 <b>숨은 위험</b>을 찾아 누구나 아는 말로 알려드려요.<br>30초만 함께 둘러볼까요?" },
     { sel: ".tabs", title: "① 무엇이든 검사해요",
       body: "파일을 끌어다 놓거나, 텍스트·링크를 붙여넣으면 바로 검사해요." },
-    { sel: ".demos", title: "② 처음이면 데모부터 ✨", pulse: true,
+    { sel: ".demos", title: "② 처음이면 데모부터", pulse: true,
       body: "이 버튼들을 눌러보세요. <b>‘숨은 글자’</b> 데모는 눈에 안 보이는 명령을 꺼내서 보여줘요!" },
     { sel: '#ag-topnav a[href="/editor"]', title: "③ AI에 보내기 ‘전’ 검사",
       body: "보안 에디터는 주민번호·API키를 <b>가려주고</b>, 위험한 코드에 밑줄을 그어 수정안을 알려줘요." },
-    { sel: "#ag-topnav .agx", title: "④ 브라우저에 설치하기 🧩", pulse: true, ext: true,
+    { sel: "#ag-topnav .agx", title: "④ 브라우저에 설치하기", pulse: true, ext: true,
       body: "확장을 설치하면 <b>어느 사이트에서든 우클릭</b>으로 바로 검사할 수 있어요." },
-    { center: true, icon: "🖥️", title: "핵심 — 진짜 ‘온디바이스’ AI", ondevice: true, pulse: true,
+    { center: true, title: "핵심 — 진짜 ‘온디바이스’ AI", ondevice: true, pulse: true,
       body: "AgentGuard는 <b>당신의 기기 안에서</b> Ollama로 직접 판단해요. 서버로 원문을 보내지 않아요.<br><b>지금 한 번만 켜보세요</b> — 이게 진짜 온디바이스예요." },
-    { center: true, icon: "🎉", title: "준비 끝!",
+    { center: true, title: "준비 끝!",
       body: "이제 무엇이든 검사해보세요.<br>이 안내는 상단 <b>?</b> 버튼으로 언제든 다시 볼 수 있어요." },
   ];
 
@@ -32,7 +32,7 @@
   host.id = "ag-onboard";
   host.innerHTML =
     '<style>' +
-    '#ag-onboard{position:fixed;inset:0;z-index:2147483200;display:none;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif}' +
+    '#ag-onboard{position:fixed;inset:0;z-index:2147483200;display:none;font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}' +
     '#ag-onboard.on{display:block}' +
     '#ag-onboard .veil{position:fixed;inset:0;background:transparent;transition:background .3s, backdrop-filter .3s}' +
     '#ag-onboard .veil.blur{background:rgba(12,16,30,.42);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}' +
@@ -70,15 +70,15 @@
       '<li>받은 zip의 <b>압축을 풀어요</b></li>' +
       '<li>주소창에 <b>chrome://extensions</b> 열고 우측 위 <b>개발자 모드</b> 켜기</li>' +
       '<li><b>‘압축해제된 확장 프로그램 폴더를 로드’</b> → 압축 푼 폴더 선택</li>' +
-      '</ol></div><a class="dl" href="/extension.zip" download>⬇️ 확장 다운로드</a>';
+      '</ol></div><a class="dl" href="/extension.zip" download>확장 다운로드</a>';
   }
 
   function ondeviceHTML() {
     return '<div class="steps"><ol>' +
       '<li>버튼 하나로 Ollama가 <b>내 컴퓨터에</b> 준비돼요(4bit 소형 모델)</li>' +
       '<li>검사·판단이 <b>인터넷 없이</b> 기기 안에서 이뤄져요</li>' +
-      '<li>원문·비밀값이 <b>기기 밖으로 안 나가요</b> 🔒</li>' +
-      '</ol></div><a class="dl" href="/settings?ondevice=1">🖥️ 온디바이스 실행 켜기 →</a>';
+      '<li>원문·비밀값이 <b>기기 밖으로 안 나가요</b></li>' +
+      '</ol></div><a class="dl" href="/settings?ondevice=1">온디바이스 실행 켜기 →</a>';
   }
 
   function place(step) {

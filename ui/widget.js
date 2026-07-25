@@ -35,7 +35,7 @@
   // ── 스타일(Shadow DOM 내부) ──
   var CSS = `
   :host{ all: initial; }
-  *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",system-ui,sans-serif; }
+  *{ box-sizing:border-box; font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif; }
   .launcher{ position:fixed; right:22px; bottom:22px; width:60px; height:60px; border-radius:50%;
     background:linear-gradient(135deg,#1E5BFF,#3D7BFF); color:#fff; border:0; cursor:pointer;
     box-shadow:0 8px 26px rgba(30,91,255,.42); font-size:26px; z-index:2147483000;

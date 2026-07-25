@@ -7,25 +7,25 @@
 <title>AgentGuard — 탐지 시나리오</title>
 <style>
   :root{
-    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
-    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
-    --bg:#F5F6F8; --card:#FFFFFF;
-    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
-    --crit:#B3273B; --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64;
-    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
-    --r:16px;
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --ink:#101319; --ink-2:#3C414C; --sub:#697080; --muted:#9BA1AE;
+    --line:rgba(16,19,25,.08); --line-2:rgba(16,19,25,.05);
+    --bg:#F6F6F7; --card:#FFFFFF;
+    --accent:#1E5BFF; --accent-weak:rgba(30,91,255,.08);
+    --crit:#B3273B; --red:#D2403C; --yellow:#DE930F; --yellow-ink:#8A5300; --green:#1F9D64;
+    --shadow:0 1px 2px rgba(16,19,25,.04), 0 8px 24px -12px rgba(16,19,25,.12);
+    --r:14px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+  body{font-family:var(--font);
     background:var(--bg);color:var(--ink);word-break:keep-all;line-height:1.62;padding:30px 20px 72px;
-    -webkit-font-smoothing:antialiased;letter-spacing:-.011em;
-    background-image:radial-gradient(120% 62% at 50% -12%, rgba(51,70,211,.06), transparent 60%);
-    background-attachment:fixed;}
+    -webkit-font-smoothing:antialiased;letter-spacing:-.01em;}
   ::selection{background:var(--accent-weak);}
   .wrap{max-width:920px;margin:0 auto;}
-  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
-  h1{font-size:26px;line-height:1.14;font-weight:800;letter-spacing:-.036em;margin-top:9px;}
+  .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);}
+  h1{font-size:25px;line-height:1.18;font-weight:700;letter-spacing:-.032em;margin-top:9px;}
   .lead{color:var(--sub);font-size:13.5px;margin:7px 0 18px;max-width:56ch;}
   .lead b{color:var(--ink);}
 
@@ -41,33 +41,33 @@
   .filters .lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-right:2px;}
   .fchip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;
     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink-2);
-    box-shadow:0 1px 2px rgba(14,17,22,.04);transition:.14s cubic-bezier(.2,.7,.2,1);}
+    box-shadow:0 1px 2px rgba(16,19,25,.04);transition:.14s cubic-bezier(.2,.7,.2,1);}
   .fchip:hover{transform:translateY(-1px);color:var(--ink);}
-  .fchip.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 4px 12px -4px rgba(14,17,22,.4);}
+  .fchip.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 4px 12px -4px rgba(16,19,25,.4);}
   .fchip .n{opacity:.6;font-weight:600;margin-left:3px;font-variant-numeric:tabular-nums;}
   .fsep{width:1px;height:18px;background:var(--line);margin:0 4px;}
 
   .info{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;font-size:13px;
     display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px;box-shadow:var(--shadow);color:var(--ink-2);}
-  .info code{background:rgba(14,17,22,.05);border-radius:6px;padding:2px 7px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;color:var(--ink);}
+  .info code{background:rgba(16,19,25,.05);border-radius:6px;padding:2px 7px;font-family:var(--mono);font-size:11.5px;color:var(--ink);}
   .pill{background:var(--accent-weak);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;padding:3px 10px;}
   .cnt{margin-left:auto;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
 
-  .cat{margin:22px 0 10px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;}
-  .cat .n{font-size:11.5px;color:var(--muted);font-weight:700;background:rgba(14,17,22,.045);border-radius:99px;padding:2px 9px;font-variant-numeric:tabular-nums;}
+  .cat{margin:22px 0 10px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;}
+  .cat .n{font-size:11.5px;color:var(--muted);font-weight:700;background:rgba(16,19,25,.045);border-radius:99px;padding:2px 9px;font-variant-numeric:tabular-nums;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   @media(max-width:680px){.grid{grid-template-columns:1fr;}}
   .sc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;
-    box-shadow:0 1px 2px rgba(14,17,22,.04);position:relative;overflow:hidden;
+    box-shadow:0 1px 2px rgba(16,19,25,.04);position:relative;overflow:hidden;
     transition:transform .16s cubic-bezier(.2,.7,.2,1), box-shadow .16s;}
   .sc:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
   .sc:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3.5px;}
   .sc.critical:before{background:var(--crit);} .sc.high:before{background:var(--red);}
   .sc.medium:before{background:var(--yellow);} .sc.low:before{background:var(--muted);}
   .sc .h{display:flex;justify-content:space-between;align-items:center;gap:8px;}
-  .sc .id{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;font-weight:600;color:var(--muted);}
-  .sc .sev{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
-  .sc .t{font-size:14px;font-weight:700;margin-top:3px;letter-spacing:-.015em;}
+  .sc .id{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);}
+  .sc .sev{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+  .sc .t{font-size:14px;font-weight:600;margin-top:3px;letter-spacing:-.015em;}
   .sc .w{font-size:12.5px;color:var(--ink-2);margin-top:2px;}
   .sc .fix{margin-top:7px;font-size:11px;font-weight:700;color:var(--green);display:inline-flex;align-items:center;gap:4px;}
   .sev.critical{color:var(--crit);} .sev.high{color:var(--red);} .sev.medium{color:var(--yellow-ink);} .sev.low{color:var(--sub);}

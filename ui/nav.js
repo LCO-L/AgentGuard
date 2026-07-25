@@ -38,9 +38,9 @@
     "align-items:center;gap:12px;padding:0 16px;background:rgba(255,255,255,.82);" +
     "-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);" +
     "border-bottom:1px solid rgba(14,17,22,.08);" +
-    "font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;" +
+    "font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','SF Pro Text','Segoe UI',Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;" +
     "-webkit-font-smoothing:antialiased;letter-spacing:-.011em}" +
-    "#ag-topnav .agb{display:flex;align-items:center;gap:7px;font-weight:800;font-size:14px;color:#0E1116;text-decoration:none;white-space:nowrap;letter-spacing:-.02em}" +
+    "#ag-topnav .agb{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:#101319;text-decoration:none;white-space:nowrap;letter-spacing:-.02em}" +
     "#ag-topnav .agb img{width:20px;height:20px;display:block}" +
     "#ag-topnav .agb .u{color:#1E5BFF}" +
     "#ag-topnav .agl{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}" +
@@ -49,14 +49,13 @@
     "font-size:13px;font-weight:600;color:#6A7080;text-decoration:none;white-space:nowrap;" +
     "transition:color .14s,background .14s,transform .14s cubic-bezier(.2,.7,.2,1)}" +
     "#ag-topnav a.agi svg{width:15px;height:15px;flex:0 0 auto}" +
-    "#ag-topnav a.agi:hover{color:#0E1116;background:rgba(14,17,22,.05)}" +
-    "#ag-topnav a.agi.on{background:#0E1116;color:#fff;box-shadow:0 5px 14px -4px rgba(14,17,22,.42)}" +
-    "#ag-topnav .agx{display:inline-flex;align-items:center;gap:6px;background:#1E5BFF;color:#fff;" +
-    "padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap;" +
-    "background-image:linear-gradient(180deg,rgba(255,255,255,.14),transparent);" +
-    "box-shadow:0 6px 16px -6px rgba(30,91,255,.6);transition:transform .14s cubic-bezier(.2,.7,.2,1),box-shadow .14s}" +
+    "#ag-topnav a.agi:hover{color:#101319;background:rgba(16,19,25,.05)}" +
+    "#ag-topnav a.agi.on{background:rgba(16,19,25,.06);color:#101319;font-weight:600}" +
+    "#ag-topnav .agx{display:inline-flex;align-items:center;gap:6px;background:#101319;color:#fff;" +
+    "padding:8px 13px;border-radius:9px;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;" +
+    "box-shadow:0 1px 2px rgba(16,19,25,.2);transition:transform .14s cubic-bezier(.2,.7,.2,1),background .14s}" +
     "#ag-topnav .agx svg{width:14px;height:14px}" +
-    "#ag-topnav .agx:hover{transform:translateY(-1px);box-shadow:0 10px 22px -6px rgba(30,91,255,.66)}" +
+    "#ag-topnav .agx:hover{transform:translateY(-1px);background:#23262E}" +
     "#ag-topnav .agx:active{transform:translateY(0)}" +
     "#ag-help-fab{position:fixed;right:22px;bottom:150px;z-index:2147483647;width:46px;height:46px;" +
     "border-radius:50%;border:0;background:#0E1116;color:#fff;font-size:19px;font-weight:800;cursor:pointer;" +
@@ -100,7 +99,7 @@
   nav.id = "ag-topnav";
   nav.setAttribute("aria-label", "AgentGuard");
   nav.innerHTML =
-    '<a class="agb" href="/"><img src="/icon.svg" alt=""> <span class="t">AgentGuard <span class="u">ULTRA</span></span></a>' +
+    '<a class="agb" href="/"><img src="/icon.svg" alt=""> <span class="t">AgentGuard</span></a>' +
     '<div class="agl">' + items + "</div>" +
     '<a class="agx" href="/extension.zip" download title="크롬 확장 프로그램(zip) 다운로드 → 압축해제 후 로드">' +
     ICONS.ext + '<span class="tx">확장 설치</span></a>';

@@ -7,38 +7,38 @@
 <title>AgentGuard — AI 엔진 설정</title>
 <style>
   :root{
-    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
-    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
-    --bg:#F5F6F8; --card:#FFFFFF;
-    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
-    --green:#1F9D64; --red:#D23B37; --yellow:#E0930F;
-    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
-    --r:16px; --r-sm:11px;
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --ink:#101319; --ink-2:#3C414C; --sub:#697080; --muted:#9BA1AE;
+    --line:rgba(16,19,25,.08); --line-2:rgba(16,19,25,.05);
+    --bg:#F6F6F7; --card:#FFFFFF;
+    --accent:#1E5BFF; --accent-weak:rgba(30,91,255,.08);
+    --green:#1F9D64; --red:#D2403C; --yellow:#DE930F;
+    --shadow:0 1px 2px rgba(16,19,25,.04), 0 8px 24px -12px rgba(16,19,25,.12);
+    --r:14px; --r-sm:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+  body{font-family:var(--font);
     background:var(--bg);color:var(--ink);
     word-break:keep-all;line-height:1.62;padding:32px 20px 80px;display:flex;flex-direction:column;align-items:center;gap:18px;
-    -webkit-font-smoothing:antialiased;letter-spacing:-.011em;
-    background-image:radial-gradient(120% 62% at 50% -12%, rgba(51,70,211,.06), transparent 60%);
-    background-attachment:fixed;}
+    -webkit-font-smoothing:antialiased;letter-spacing:-.01em;}
   ::selection{background:var(--accent-weak);}
   .wrap{width:100%;max-width:560px;}
   .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-  .top b{font-size:22px;font-weight:800;letter-spacing:-.032em;} .top b .u{color:var(--accent);}
+  .top b{font-size:21px;font-weight:700;letter-spacing:-.03em;} .top b .u{color:var(--accent);}
   .top a{font-size:12.5px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);
     background:rgba(255,255,255,.72);border-radius:999px;padding:7px 13px;font-weight:600;box-shadow:var(--shadow);
     transition:transform .16s;}
   .top a:hover{transform:translateY(-1px);}
   .lead{font-size:13.5px;color:var(--sub);margin-bottom:8px;}
 
-  .reco{background:linear-gradient(135deg,#1E5BFF,#3D7BFF);color:#fff;border-radius:14px;
-    padding:14px 16px;font-size:13.5px;font-weight:600;display:flex;gap:10px;align-items:center;
-    box-shadow:0 10px 26px -8px rgba(30,91,255,.5);}
-  .reco b{font-weight:800;} .reco button{margin-left:auto;background:rgba(255,255,255,.22);border:0;
-    color:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
-  .reco button:hover{background:rgba(255,255,255,.3);}
+  .reco{background:var(--card);color:var(--ink);border:1px solid rgba(30,91,255,.28);border-radius:12px;
+    padding:13px 15px;font-size:13px;font-weight:500;display:flex;gap:10px;align-items:center;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .reco:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+  .reco b{font-weight:700;color:var(--accent);} .reco button{margin-left:auto;background:var(--accent);border:0;
+    color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .reco button:hover{filter:brightness(1.06);}
 
   .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px;
     transition:.16s cubic-bezier(.2,.7,.2,1);box-shadow:var(--shadow);}
@@ -77,11 +77,12 @@
   .saved.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .note{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.75;}
   .cards{display:flex;flex-direction:column;gap:12px;}
-  .seg{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;box-shadow:var(--shadow);}
-  .segb{flex:1;border:0;background:transparent;border-radius:10px;padding:11px;cursor:pointer;font-family:inherit;color:var(--ink);
+  .seg{display:flex;gap:3px;background:rgba(16,19,25,.045);border-radius:13px;padding:3px;}
+  .segb{flex:1;border:0;background:transparent;border-radius:10px;padding:11px;cursor:pointer;font-family:inherit;color:var(--sub);
     display:flex;flex-direction:column;gap:2px;align-items:center;transition:.15s cubic-bezier(.2,.7,.2,1);}
-  .segb b{font-size:14px;font-weight:700;letter-spacing:-.02em;} .segb span{font-size:11px;color:var(--sub);}
-  .segb.on{background:var(--ink);color:#fff;box-shadow:0 5px 14px -4px rgba(14,17,22,.42);} .segb.on span{color:rgba(255,255,255,.82);}
+  .segb b{font-size:14px;font-weight:600;letter-spacing:-.02em;} .segb span{font-size:11px;color:var(--muted);}
+  .segb:hover{color:var(--ink);}
+  .segb.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(16,19,25,.08), 0 3px 8px -2px rgba(16,19,25,.08);} .segb.on span{color:var(--sub);}
   .polrow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:var(--ink);}
   .polrow>span:first-child{flex:1;line-height:1.5;}
   .sw{position:relative;width:42px;height:24px;flex:0 0 auto;}
@@ -114,9 +115,9 @@
 
   <!-- 온디바이스 원클릭 실행 -->
   <div class="wrap cards">
-    <div class="card" style="border:2px solid var(--accent);background:linear-gradient(135deg,#EFF6FF,#fff)">
+    <div class="card" style="border:1px solid rgba(30,91,255,.3)">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+        <div style="width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13.5h6L11 21l8-10.5h-6Z"/></svg></div>
         <div style="flex:1">
           <div style="font-size:15px;font-weight:800">온디바이스 실행</div>
           <div style="font-size:12px;color:var(--sub)">버튼 하나면 Ollama가 켜지고 4bit 양자화 소형 모델(qwen2.5:3b)이 자동으로 준비돼요</div>
@@ -138,15 +139,15 @@
 
   <!-- 엔진 모드: 온디바이스 / API (온디바이스가 기본) -->
   <div class="wrap"><div class="seg" id="seg">
-    <button class="segb" data-mode="ondevice"><b>🖥️ 온디바이스</b><span>내 컴퓨터 · 기본</span></button>
-    <button class="segb" data-mode="api"><b>☁️ API</b><span>Claude · OpenRouter</span></button>
+    <button class="segb" data-mode="ondevice"><b>온디바이스</b><span>내 컴퓨터 · 기본</span></button>
+    <button class="segb" data-mode="api"><b>API</b><span>Claude · OpenRouter</span></button>
   </div></div>
 
   <div class="wrap cards">
     <!-- 온디바이스 -->
     <div class="card" data-p="ollama" id="card-ollama">
       <div class="chead">
-        <div class="ico">🖥️</div>
+        <div class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20h6"/><path d="M12 16.5V20"/></svg></div>
         <div class="tt"><b>온디바이스 (Ollama)</b><span>내 컴퓨터에서 실행 · 파일이 밖으로 안 나감</span></div>
         <span class="st no" id="st-ollama">확인 중…</span>
         <button class="sel-btn" data-p="ollama">선택</button>
@@ -156,7 +157,7 @@
           <input id="ollamaUrl" type="text" placeholder="http://localhost:11434"></div>
         <div class="field"><label>모델</label>
           <div class="modelrow"><select id="ollamaModel"><option value="">기본(qwen2.5:3b · 4bit)</option></select>
-            <button class="mini" data-load="ollama">↻ 설치된 모델</button></div></div>
+            <button class="mini" data-load="ollama">설치된 모델</button></div></div>
         <div class="test"><button data-test="ollama">연결 테스트</button><span class="res" id="res-ollama"></span></div>
       </div>
     </div>
@@ -164,7 +165,7 @@
     <!-- Claude -->
     <div class="card" data-p="claude" id="card-claude">
       <div class="chead">
-        <div class="ico">☁️</div>
+        <div class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 1 1 .6-8.96A6 6 0 0 1 19.3 10.7 3.8 3.8 0 0 1 18 18Z"/></svg></div>
         <div class="tt"><b>Claude</b><span>Anthropic API · 가장 정교한 통역</span></div>
         <span class="st no" id="st-claude">키 필요</span>
         <button class="sel-btn" data-p="claude">선택</button>
@@ -174,7 +175,7 @@
           <input id="claudeKey" type="password" placeholder="sk-ant-..."></div>
         <div class="field"><label>모델</label>
           <div class="modelrow"><select id="claudeModel"></select>
-            <button class="mini" data-load="claude">↻</button></div></div>
+            <button class="mini" data-load="claude">불러오기</button></div></div>
         <div class="test"><button data-test="claude">연결 테스트</button><span class="res" id="res-claude"></span></div>
       </div>
     </div>
@@ -182,7 +183,7 @@
     <!-- OpenRouter -->
     <div class="card" data-p="openrouter" id="card-openrouter">
       <div class="chead">
-        <div class="ico">☁️</div>
+        <div class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="12" r="2.2"/><circle cx="18.5" cy="5.5" r="2.2"/><circle cx="18.5" cy="18.5" r="2.2"/><path d="M7.6 10.9l8.8-4.4"/><path d="M7.6 13.1l8.8 4.4"/></svg></div>
         <div class="tt"><b>OpenRouter</b><span>수백 개 모델을 한 키로 · qwen/gpt/llama 등</span></div>
         <span class="st no" id="st-openrouter">키 필요</span>
         <button class="sel-btn" data-p="openrouter">선택</button>
@@ -192,7 +193,7 @@
           <input id="openrouterKey" type="password" placeholder="sk-or-..."></div>
         <div class="field"><label>모델</label>
           <div class="modelrow"><select id="openrouterModel"><option value="">기본(qwen/qwen3-8b)</option></select>
-            <button class="mini" data-load="openrouter">↻ 목록</button></div></div>
+            <button class="mini" data-load="openrouter">목록</button></div></div>
         <div class="test"><button data-test="openrouter">연결 테스트</button><span class="res" id="res-openrouter"></span></div>
       </div>
     </div>
@@ -202,7 +203,7 @@
   <div class="wrap cards">
     <div class="card">
       <div class="chead">
-        <div class="ico">🛡️</div>
+        <div class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7Z"/></svg></div>
         <div class="tt"><b>기업 정책</b><span>차단 모드 · 회사 전용 민감어</span></div>
       </div>
       <div class="body">
@@ -291,7 +292,7 @@
     const r=$("#reco");
     if(p.ollama && CFG.provider!=="ollama"){
       r.style.display="flex";
-      r.innerHTML=`✨ <b>온디바이스(Ollama)</b>가 감지됐어요. 인터넷 없이 가장 안전해요. <button id="useReco">이걸로 설정</button>`;
+      r.innerHTML=`<b>온디바이스(Ollama)</b>가 감지됐어요. 인터넷 없이 가장 안전해요.&nbsp;<button id="useReco">이걸로 설정</button>`;
       $("#useReco").onclick=()=>{ persist({provider:"ollama"}); applyMode("ondevice"); reflect(); r.style.display="none"; loadModels("ollama"); };
     } else { r.style.display="none"; }
   }

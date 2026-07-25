@@ -7,36 +7,38 @@
 <title>AgentGuard — 보안 에디터 (AI 전송 전 검사)</title>
 <style>
   :root{
-    --ink:#0E1116; --ink-2:#3A3F4B; --sub:#6A7080; --muted:#9AA0AD;
-    --line:rgba(14,17,22,.09); --line-2:rgba(14,17,22,.055);
-    --bg:#F5F6F8; --card:#FFFFFF;
-    --accent:#1E5BFF; --accent-weak:rgba(51,70,211,.09);
-    --red:#D23B37; --yellow:#E0930F; --yellow-ink:#8A5300; --green:#1F9D64; --crit:#B3273B;
-    --shadow:0 1px 2px rgba(14,17,22,.04), 0 10px 30px -10px rgba(14,17,22,.16);
-    --r:16px; --r-sm:11px;
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --ink:#101319; --ink-2:#3C414C; --sub:#697080; --muted:#9BA1AE;
+    --line:rgba(16,19,25,.08); --line-2:rgba(16,19,25,.05);
+    --bg:#F6F6F7; --card:#FFFFFF;
+    --accent:#1E5BFF; --accent-weak:rgba(30,91,255,.08);
+    --red:#D2403C; --yellow:#DE930F; --yellow-ink:#8A5300; --green:#1F9D64; --crit:#B3273B;
+    --shadow:0 1px 2px rgba(16,19,25,.04), 0 8px 24px -12px rgba(16,19,25,.12);
+    --r:14px; --r-sm:10px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{-webkit-text-size-adjust:100%;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+    font-family:var(--font);
     background:var(--bg); color:var(--ink); word-break:keep-all; line-height:1.6;
     height:100vh; display:flex; flex-direction:column;
-    -webkit-font-smoothing:antialiased; letter-spacing:-.011em;
+    -webkit-font-smoothing:antialiased; letter-spacing:-.01em;
   }
   ::selection{background:var(--accent-weak);}
   .top{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 18px;
     background:rgba(255,255,255,.86); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);}
   .top .tt{min-width:0;}
-  .top b{font-size:15.5px; font-weight:800; letter-spacing:-.024em; white-space:nowrap;}
+  .top b{font-size:15px; font-weight:700; letter-spacing:-.022em; white-space:nowrap;}
   .top b .u{color:var(--accent);}
-  .top .sub{display:block; font-size:11.5px; color:var(--sub); font-weight:500; margin-top:1px;}
+  .top .sub{display:block; font-size:11.5px; color:var(--sub); font-weight:400; margin-top:1px;}
   .top .right{display:flex; gap:9px; align-items:center;}
-  .tabs{display:flex; gap:3px; background:rgba(14,17,22,.045); border-radius:11px; padding:4px;}
+  .tabs{display:flex; gap:2px; background:rgba(16,19,25,.045); border-radius:10px; padding:3px;}
   .tabs button{border:0; background:transparent; border-radius:8px; padding:7px 13px; font-size:12.5px;
     font-weight:600; cursor:pointer; font-family:inherit; color:var(--sub); transition:.14s cubic-bezier(.2,.7,.2,1); white-space:nowrap;}
   .tabs button:hover{color:var(--ink);}
-  .tabs button.on{background:var(--ink); color:#fff; box-shadow:0 4px 12px -4px rgba(14,17,22,.4);}
+  .tabs button.on{background:#fff; color:var(--ink); box-shadow:0 1px 2px rgba(16,19,25,.08), 0 3px 8px -2px rgba(16,19,25,.08);}
   .engchip{font-size:11.5px; color:var(--ink-2); text-decoration:none; border:1px solid var(--line);
     background:#fff; border-radius:999px; padding:6px 11px; font-weight:600; white-space:nowrap; box-shadow:0 1px 2px rgba(14,17,22,.04);}
 
@@ -50,7 +52,7 @@
   .chip:hover{transform:translateY(-1px); border-color:rgba(14,17,22,.2); color:var(--ink);}
   .wrap{position:relative; flex:1; min-height:0; background:#fff;}
   .backdrop,#ed{position:absolute; inset:0; margin:0; border:0; padding:18px 20px;
-    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:13.5px; line-height:1.75;
+    font-family:var(--mono); font-size:13.5px; line-height:1.75;
     white-space:pre-wrap; word-break:break-word; overflow:auto; letter-spacing:0; tab-size:2;}
   .backdrop{color:transparent; pointer-events:none; z-index:1;}
   #ed{background:transparent; color:var(--ink); caret-color:var(--accent); resize:none; outline:none; z-index:2;}
@@ -80,8 +82,8 @@
   .icard .t{font-size:13.5px; font-weight:700; margin:3px 0 2px; letter-spacing:-.015em;}
   .icard .why{font-size:12.5px; color:var(--ink-2);}
   .icard .fix{font-size:12px; color:var(--sub); margin-top:6px;}
-  .icard .sug{margin-top:6px; background:rgba(14,17,22,.035); border:1px solid var(--line-2); border-radius:8px;
-    padding:7px 9px; font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11.5px; color:var(--ink);
+  .icard .sug{margin-top:6px; background:rgba(16,19,25,.03); border:1px solid var(--line-2); border-radius:8px;
+    padding:7px 9px; font-family:var(--mono); font-size:11.5px; color:var(--ink);
     white-space:pre-wrap; word-break:break-all;}
   .icard .acts{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
   .icard .acts button{border:0; border-radius:8px; padding:6px 11px; font-size:12px; font-weight:700; cursor:pointer;
@@ -155,10 +157,10 @@
     </div>
 
     <div class="coach">
-      <div class="coach-hd"><span>🛡️ Security Coach</span><span class="n" id="issueCount">0</span></div>
+      <div class="coach-hd"><span style="display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7Z"/></svg>Security Coach</span><span class="n" id="issueCount">0</span></div>
       <div class="coach-note" id="coachNote" style="display:none"></div>
       <div class="coach-body" id="coachBody">
-        <div class="empty"><span class="big">🛡️</span>여기에 위험 요소와 수정안이<br>실시간으로 나타납니다.</div>
+        <div class="empty"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7Z"/></svg>여기에 위험 요소와 수정안이<br>실시간으로 나타납니다.</div>
       </div>
     </div>
   </div>
@@ -231,7 +233,7 @@
 
   function renderCoach(d){
     const note=$("#coachNote");
-    if(d.coach_note){ note.style.display="block"; note.textContent="💡 "+d.coach_note; } else note.style.display="none";
+    if(d.coach_note){ note.style.display="block"; note.textContent=d.coach_note; } else note.style.display="none";
     const s=d.summary||{critical:0,high:0,medium:0,low:0};
     const issues=(d.issues||[]).filter(i=>!allow.has(i.rule_id+":"+i.start));
     $("#issueCount").textContent=issues.length;
@@ -248,7 +250,7 @@
     const hasSan=issues.some(i=>["secret","pii","inject","stego"].includes(i.category));
     sb.innerHTML=((s.critical+s.high)>0? (hasSan?"정리 후 전송":"위험 확인 후 전송") : "안전하게 전송")+' <kbd>⌘⏎</kbd>';
 
-    if(!issues.length){ coachBody.innerHTML='<div class="empty"><span class="big">✅</span>지금은 위험 신호가 없어요.</div>'; return; }
+    if(!issues.length){ coachBody.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7Z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.6"/></svg>지금은 위험 신호가 없어요.</div>'; return; }
     coachBody.innerHTML=issues.map((i,idx)=>{
       const canMask=(i.category==="secret"||i.category==="pii"||i.category==="org");
       const canRemove=(i.category==="inject"||i.category==="stego");
