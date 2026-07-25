@@ -18,7 +18,7 @@ say "uv $(uv --version | awk '{print $2}') 확인"
 
 # ── 2. 온디바이스 AI (Ollama) 원클릭: 설치 → 서버 실행 → 소형 모델 ──
 # 소형·빠른 모델을 기본값으로(원클릭 데모용). 더 큰 모델은 AG_INSTALL_MODEL 로 지정.
-MODEL="${AG_INSTALL_MODEL:-qwen2.5:3b}"
+MODEL="${AG_INSTALL_MODEL:-hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M}"
 AI_NOTE=""
 
 # 2-1. Ollama 미설치면 자동 설치 (OS 감지)

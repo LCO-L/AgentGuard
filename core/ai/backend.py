@@ -22,7 +22,7 @@ import urllib.request
 from dataclasses import dataclass
 
 DEFAULT_OLLAMA_URL = "http://localhost:11434"
-DEFAULT_OLLAMA_MODEL = "qwen2.5:3b"  # Ollama 기본 Q4_K_M(4bit)·~1.8GB — 온디바이스 소형
+DEFAULT_OLLAMA_MODEL = "hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M"  # Qwen3 4B Instruct·unsloth 4bit(Q4_K_M)·~2.5GB — 온디바이스 소형
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5"
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3-8b"
 

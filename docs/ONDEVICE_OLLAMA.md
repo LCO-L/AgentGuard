@@ -13,8 +13,8 @@ curl -fsSL https://ollama.com/install.sh | sh
 # 2) 서버 실행(보통 설치 시 자동 시작. 아니면)
 ollama serve      # http://localhost:11434
 
-# 3) 모델 내려받기(최초 1회, 4bit 소형 ~1.8GB)
-ollama pull qwen2.5:3b
+# 3) 모델 내려받기(최초 1회, 4bit 소형 ~2.5GB)
+ollama pull hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M
 ```
 
 ### 🟢 가장 쉬운 길 — 버튼 하나 (수동 설치 불필요)
@@ -23,7 +23,7 @@ ollama pull qwen2.5:3b
 
 1. **Ollama 설치** — `brew`가 있으면 brew로, 없으면 **공식 배포본을 직접 내려받아**(`~/.agentguard/`) 실행 파일 확보 → *Homebrew가 없어도 됩니다*
 2. **`ollama serve` 자동 기동**
-3. **`qwen2.5:3b`(4bit ~1.8GB) 자동 pull** — 이미 받은 채팅 모델이 있으면 그걸로 즉시 시작(추가 다운로드 없음)
+3. **Qwen3 4B(unsloth 4bit ~2.5GB) 자동 pull** — 이미 받은 채팅 모델이 있으면 그걸로 즉시 시작(추가 다운로드 없음)
 4. **준비 완료** → 온디바이스로 검사
 
 > 설치형(내 컴퓨터에서 실행)에서 100% 자동. 클라우드 배포는 GPU·권한 한계로 성공이 환경에 따라 다릅니다.
@@ -55,7 +55,7 @@ ollama pull qwen2.5:3b
 ```bash
 AG_AI_PROVIDER=ollama                 # 기본 판단 엔진(요청 헤더가 우선)
 AG_OLLAMA_URL=http://localhost:11434  # Ollama 주소
-AG_OLLAMA_MODEL=qwen2.5:3b           # 기본 모델(4bit 소형 ~1.8GB)
+AG_OLLAMA_MODEL=hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M  # 기본 모델(4bit 소형 ~2.5GB)
 AG_OLLAMA_NUM_CTX=8192               # 컨텍스트 길이(긴 문서면 늘리기)
 AG_AI_TIMEOUT=20                     # 초. 대형 모델 첫 응답이 느리면 늘리기
 ```
@@ -75,7 +75,7 @@ AG_AI_TIMEOUT=20                     # 초. 대형 모델 첫 응답이 느리�
 
 | 용도 | 모델 | 비고 |
 |---|---|---|
-| 기본(온디바이스) | `qwen2.5:3b` | 4bit ~1.8GB · 한국어·JSON 양호 · 저메모리 |
+| 기본(온디바이스) | `hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M` | Qwen3 4B Instruct·4bit ~2.5GB · 한국어·JSON 양호 · non-thinking이라 빠름 |
 | 더 빠름/가벼움 | `llama3.2:3b`, `qwen2.5:1.5b` | 속도·메모리 우선 |
 | 고품질 | `qwen2.5:7b`, `qwen3:8b` 이상 | 메모리 여유 시 |
 

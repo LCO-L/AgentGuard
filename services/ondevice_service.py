@@ -14,7 +14,8 @@ import subprocess
 import threading
 import urllib.request
 
-DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL", "qwen2.5:3b")  # 4bit(Q4_K_M)·소형
+DEFAULT_MODEL = os.environ.get("AG_OLLAMA_MODEL",
+                               "hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M")  # Qwen3 4B·unsloth 4bit(Q4_K_M)
 OLLAMA_URL = os.environ.get("AG_OLLAMA_URL", "http://localhost:11434")
 _HOME = os.path.expanduser(os.environ.get("AG_HOME", "~/.agentguard"))
 _OLLAMA_BIN: str | None = None  # 패키지매니저 대신 직접 설치한 경우의 실행 파일 경로
