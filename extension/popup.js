@@ -2,13 +2,14 @@
 const DEF = {
   apiBase: "https://agentguard.maeum.ai", provider: "ollama",
   ollamaUrl: "", ollamaModel: "", claudeKey: "", claudeModel: "",
-  openrouterKey: "", openrouterModel: ""
+  openrouterKey: "", openrouterModel: "", clientId: ""
 };
 const $ = (s) => document.querySelector(s);
 let CFG = Object.assign({}, DEF);
 
 function aiHeaders(c) {
   const h = { "Content-Type": "application/json" };
+  if (c.clientId) h["X-AG-Client"] = c.clientId;
   if (c.provider) h["X-AI-Provider"] = c.provider;
   if (c.provider === "claude") { if (c.claudeKey) h["X-AI-Key"] = c.claudeKey; }
   else if (c.provider === "openrouter") { if (c.openrouterKey) h["X-AI-Key"] = c.openrouterKey; }

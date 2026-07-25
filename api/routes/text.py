@@ -10,7 +10,7 @@ from dataclasses import asdict
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from api.deps import ai_config, verify_api_key
+from api.deps import ag_client, ai_config, verify_api_key
 from core.ai.backend import AIConfig
 from services import text_service
 
@@ -24,5 +24,6 @@ class TextRequest(BaseModel):
 
 
 @router.post("")
-def scan_text(req: TextRequest, cfg: AIConfig = Depends(ai_config)) -> dict:
-    return asdict(text_service.scan_text_content(req.text, req.source, cfg))
+def scan_text(req: TextRequest, cfg: AIConfig = Depends(ai_config),
+              client: str = Depends(ag_client)) -> dict:
+    return asdict(text_service.scan_text_content(req.text, req.source, cfg, client))

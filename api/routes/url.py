@@ -7,7 +7,7 @@ from dataclasses import asdict
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from api.deps import ai_config, verify_api_key
+from api.deps import ag_client, ai_config, verify_api_key
 from core.ai.backend import AIConfig
 from services import url_service
 
@@ -20,5 +20,6 @@ class UrlRequest(BaseModel):
 
 
 @router.post("")
-def scan_url(req: UrlRequest, cfg: AIConfig = Depends(ai_config)) -> dict:
-    return asdict(url_service.scan_url(req.url, cfg))
+def scan_url(req: UrlRequest, cfg: AIConfig = Depends(ai_config),
+             client: str = Depends(ag_client)) -> dict:
+    return asdict(url_service.scan_url(req.url, cfg, client))

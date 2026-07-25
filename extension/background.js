@@ -17,16 +17,24 @@ const DEFAULTS = {
   openrouterKey: "", openrouterModel: "",
   enabled: true,          // 마스터 on/off
   disabledSites: [],      // 사이트별 제외
-  log: []                 // 차단/검사 로그(최근 50건, 로컬만)
+  log: [],                // 차단/검사 로그(최근 50건, 로컬만)
+  clientId: ""            // 브라우저별 익명 ID — 러그풀·이력을 이 브라우저 단위로 격리
 };
 
 async function getCfg() {
   const c = await chrome.storage.local.get(DEFAULTS);
-  return Object.assign({}, DEFAULTS, c);
+  const cfg = Object.assign({}, DEFAULTS, c);
+  if (!cfg.clientId) {  // 최초 1회 생성 후 보존
+    cfg.clientId = (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "")
+      : Math.random().toString(36).slice(2) + Date.now().toString(36));
+    chrome.storage.local.set({ clientId: cfg.clientId });
+  }
+  return cfg;
 }
 
 function aiHeaders(c) {
   const h = { "Content-Type": "application/json" };
+  if (c.clientId) h["X-AG-Client"] = c.clientId;
   if (c.provider) h["X-AI-Provider"] = c.provider;
   if (c.provider === "claude") { if (c.claudeKey) h["X-AI-Key"] = c.claudeKey; if (c.claudeModel) h["X-AI-Model"] = c.claudeModel; }
   else if (c.provider === "openrouter") { if (c.openrouterKey) h["X-AI-Key"] = c.openrouterKey; if (c.openrouterModel) h["X-AI-Model"] = c.openrouterModel; }

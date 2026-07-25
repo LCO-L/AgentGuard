@@ -31,20 +31,25 @@ def _save(store: dict) -> None:
                           encoding="utf-8")
 
 
-def check_rugpull(name: str, fingerprint: str) -> dict:
-    """지문 비교. {"changed": bool, "first_seen": bool, "msg": str}"""
+def check_rugpull(name: str, fingerprint: str, client: str = "") -> dict:
+    """지문 비교. {"changed": bool, "first_seen": bool, "msg": str}
+
+    client가 있으면 사용자 단위로 격리 — 다른 사용자의 동명 파일이
+    "변조 감지" 거짓 경보를 내지 않는다. 없으면(CLI 등) 기존 전역 동작.
+    """
     if not fingerprint:
         return {"changed": False, "first_seen": False, "msg": ""}
+    key = f"{client}|{name}" if client else name
     with _lock:
         store = _load()
-        old = store.get(name)
+        old = store.get(key)
         if old is None:
-            store[name] = fingerprint
+            store[key] = fingerprint
             _save(store)
             return {"changed": False, "first_seen": True,
                     "msg": "처음 보는 대상. 지문을 저장했어요."}
         if old != fingerprint:
-            store[name] = fingerprint
+            store[key] = fingerprint
             _save(store)
             return {"changed": True, "first_seen": False,
                     "msg": "승인한 뒤 내용이 몰래 바뀌었어요."}

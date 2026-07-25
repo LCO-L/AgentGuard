@@ -22,7 +22,8 @@ _MAX_KEEP = int(os.environ.get("AG_HISTORY_MAX", "1000"))
 _lock = threading.Lock()  # 동시 스캔 시 append·trim 경합으로 기록이 깨지지 않게
 
 
-def save(surface_kind: str, name: str, verdict: Verdict, fingerprint: str) -> str:
+def save(surface_kind: str, name: str, verdict: Verdict, fingerprint: str,
+         client: str = "") -> str:
     scan_id = uuid.uuid4().hex[:12]
     record = {
         "scan_id": scan_id,
@@ -33,6 +34,7 @@ def save(surface_kind: str, name: str, verdict: Verdict, fingerprint: str) -> st
         "findings": [asdict(f) for f in verdict.findings],
         "card": asdict(verdict.card) if verdict.card else None,
         "fingerprint": fingerprint,
+        "client": client,  # 사용자(브라우저) 식별 — 이력 격리용. ""=CLI/구버전
     }
     with _lock:
         HISTORY_PATH.parent.mkdir(exist_ok=True)
@@ -53,11 +55,15 @@ def _trim() -> None:
         pass
 
 
-def list_scans(limit: int = 50, offset: int = 0) -> dict:
+def list_scans(limit: int = 50, offset: int = 0,
+               client: str | None = None) -> dict:
+    """client=None 이면 전체(기업 감사 뷰), 문자열이면 해당 사용자 것만."""
     if not HISTORY_PATH.exists():
         return {"total": 0, "items": []}
     lines = HISTORY_PATH.read_text(encoding="utf-8").splitlines()
     records = [json.loads(l) for l in lines if l.strip()]
+    if client is not None:
+        records = [r for r in records if r.get("client", "") == client]
     records.reverse()  # 최신순
     return {"total": len(records),
             "items": records[offset:offset + limit]}

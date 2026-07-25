@@ -21,7 +21,7 @@ _MAX = 100_000
 
 
 def scan_text_content(text: str, source: str = "text",
-                      cfg: AIConfig | None = None) -> Verdict:
+                      cfg: AIConfig | None = None, client: str = "") -> Verdict:
     cfg = cfg or backend.resolve_config()
     text = (text or "")[:_MAX]
 
@@ -46,5 +46,5 @@ def scan_text_content(text: str, source: str = "text",
     card = interpret(findings, sev, cfg)
     v = Verdict(surface_kind="text", overall=sev, score=sc, findings=findings,
                 card=card, engine=card.source if card else "fallback")
-    v.scan_id = history_service.save("text", s.name, v, fingerprint="")
+    v.scan_id = history_service.save("text", s.name, v, fingerprint="", client=client)
     return v

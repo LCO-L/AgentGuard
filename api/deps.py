@@ -45,6 +45,20 @@ def ai_config(
     })
 
 
+_CLIENT_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+
+def ag_client(x_ag_client: str | None = Header(default=None)) -> str:
+    """브라우저·확장별 익명 식별자 — 러그풀 지문·검사 이력을 사용자 단위로 격리.
+
+    프론트가 localStorage에 만든 랜덤 ID를 헤더로 보낸다.
+    없거나(CLI·구버전) 형식이 어긋나면 ""(전역 공유·기존 동작)로 취급.
+    """
+    if x_ag_client and _CLIENT_RE.match(x_ag_client):
+        return x_ag_client
+    return ""
+
+
 def org_terms(x_ag_org_terms: str | None = Header(default=None)) -> list[str]:
     """회사 전용 민감어(기업 규칙) — 줄바꿈/쉼표 구분·URL 인코딩 헤더 → 리스트."""
     if not x_ag_org_terms:

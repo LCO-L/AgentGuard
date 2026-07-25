@@ -29,10 +29,27 @@
   }
   function set(patch) { var c = load(); Object.assign(c, patch); save(c); return c; }
 
+  // 브라우저별 익명 ID — 러그풀 지문·검사 이력을 이 브라우저 단위로 격리(서버가 X-AG-Client로 인식)
+  var CID_KEY = "ag_client_id";
+  function clientId() {
+    try {
+      var id = localStorage.getItem(CID_KEY);
+      if (!id) {
+        id = (self.crypto && crypto.randomUUID)
+          ? crypto.randomUUID().replace(/-/g, "")
+          : Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem(CID_KEY, id);
+      }
+      return id;
+    } catch (e) { return ""; }
+  }
+
   // 선택된 provider 에 맞는 요청 헤더(키는 그 provider 것만)
   function headers(c) {
     c = c || load();
     var h = {};
+    var cid = clientId();
+    if (cid) h["X-AG-Client"] = cid;
     if (c.provider) h["X-AI-Provider"] = c.provider;
     if (c.provider === "claude") {
       if (c.claudeKey) h["X-AI-Key"] = c.claudeKey;
@@ -55,5 +72,5 @@
       auto: "✨ 자동", off: "⚙️ 오프라인 규칙" })[c.provider] || "✨ 자동";
   }
 
-  window.AGConfig = { KEY: KEY, DEF: DEF, load: load, save: save, set: set, headers: headers, label: label };
+  window.AGConfig = { KEY: KEY, DEF: DEF, load: load, save: save, set: set, headers: headers, label: label, clientId: clientId };
 })();

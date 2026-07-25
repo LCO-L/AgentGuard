@@ -30,7 +30,7 @@ _LOOKALIKE = re.compile(
     r"gov-[a-z]|nts-[a-z]|국세청|update-gov|-verify|-login|-secure|account-)", re.I)
 
 
-def scan_url(url: str, cfg: AIConfig | None = None) -> Verdict:
+def scan_url(url: str, cfg: AIConfig | None = None, client: str = "") -> Verdict:
     cfg = cfg or backend.resolve_config()
     findings: list[Finding] = []
 
@@ -105,5 +105,5 @@ def scan_url(url: str, cfg: AIConfig | None = None) -> Verdict:
     card = interpret(findings, sev, cfg)
     v = Verdict(surface_kind="url", overall=sev, score=sc, findings=findings,
                 card=card, engine=card.source if card else "fallback")
-    v.scan_id = history_service.save("url", url, v, fingerprint="")
+    v.scan_id = history_service.save("url", url, v, fingerprint="", client=client)
     return v
