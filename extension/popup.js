@@ -329,5 +329,12 @@ $("#logClear").onclick = () =>
   };
 })();
 
+// 빌드 확인용 버전 태그(헤더에 표시) — 리로드가 실제로 반영됐는지 눈으로 확인
+try {
+  const v = chrome.runtime.getManifest().version;
+  const el = document.querySelector(".hd b");
+  if (el) el.insertAdjacentHTML("afterend", `<span style="font-size:10px;color:#9AA0AA;margin-left:5px;font-weight:700">v${v}</span>`);
+} catch (e) {}
+
 load().then(() => { if (window.__odInit) window.__odInit(); });
 loadToggles();
