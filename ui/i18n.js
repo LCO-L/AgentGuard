@@ -324,7 +324,7 @@
     "백엔드(FastAPI) · 웹(Next.js) · 크롬 확장(MV3) · PWA · 안드로이드(Capacitor) · macOS 앱 · 온디바이스 AI(Ollama)":
       "backend (FastAPI) · web (Next.js) · Chrome extension (MV3) · PWA · Android (Capacitor) · macOS app · on-device AI (Ollama)",
     "까지 단독 구축했습니다.": "— all built solo.",
-    "외주·협업 문의 → lee@maeum.io": "Contract & collaboration → lee@maeum.io",
+    "외주·협업 문의 → maeum.io": "Contract & collaboration → maeum.io",
     "온디바이스 AI 런타임": "On-device AI runtime",
     "데이터가 기기 밖으로 나가지 않게": "So data never leaves the device",
     "자체 온디바이스 AI 런타임 기술(특허 출원)을 보유하고 있습니다. AgentGuard의 \"원본은 기기 안에서만\" 원칙도 같은 철학 위에 서 있습니다.":
