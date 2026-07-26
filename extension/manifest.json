@@ -3,7 +3,7 @@
   "name": "AgentGuard — 온디바이스 보안 도우미",
   "version": "1.0.0",
   "description": "링크·파일·페이지에 숨은 명령과 프롬프트 인젝션을 우클릭으로 즉시 검사. 원본은 기기 안에서만 봅니다.",
-  "permissions": ["contextMenus", "downloads", "storage", "notifications", "activeTab", "scripting"],
+  "permissions": ["contextMenus", "downloads", "storage", "notifications", "activeTab", "scripting", "declarativeNetRequestWithHostAccess"],
   "host_permissions": ["<all_urls>"],
   "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
   "background": { "service_worker": "background.js" },

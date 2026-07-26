@@ -57,6 +57,32 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+// ── Ollama 403(오리진 차단) 자동 우회 ──
+// 확장이 로컬 Ollama(:11434)로 보내면 브라우저가 Origin: chrome-extension://… 를 붙이는데,
+// Ollama 기본 설정은 그 오리진을 허용 목록에 두지 않아 403 을 낸다. 해결: 그 요청에서만
+// Origin 헤더를 제거하면 Ollama 가 curl 같은 무-오리진 요청으로 보고 허용한다(설정 변경 불필요).
+// MV3 declarativeNetRequest(modifyHeaders) — host_permissions(<all_urls>) 범위에서 동작.
+const OLLAMA_DNR_RULE_ID = 8787;
+async function ensureOllamaAccess() {
+  try {
+    if (!chrome.declarativeNetRequest || !chrome.declarativeNetRequest.updateDynamicRules) return;
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [OLLAMA_DNR_RULE_ID],
+      addRules: [{
+        id: OLLAMA_DNR_RULE_ID,
+        priority: 1,
+        action: { type: "modifyHeaders", requestHeaders: [{ header: "origin", operation: "remove" }] },
+        condition: {
+          regexFilter: "^https?://(localhost|127\\.0\\.0\\.1):11434/",
+          resourceTypes: ["xmlhttprequest"]
+        }
+      }]
+    });
+  } catch (e) { /* DNR 미지원/실패 시 조용히 — 사용자가 OLLAMA_ORIGINS 로 우회 가능 */ }
+}
+chrome.runtime.onInstalled.addListener(ensureOllamaAccess);
+ensureOllamaAccess();  // 서비스워커 기동 시에도(업그레이드·재시작 대비)
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab || !tab.id) return;
   if (info.menuItemId === "ag-link") return runScan(tab.id, "url", { url: info.linkUrl });

@@ -194,6 +194,9 @@ $("#logClear").onclick = () =>
       body: JSON.stringify({ model: model, stream: false, think: false,
         messages: [{ role: "user", content: "hi" }], options: { num_predict: 1 } })
     });
+    if (r.status === 403) {  // 구형 Ollama: Origin 제거로도 안 되면 서버 설정 필요
+      const e = new Error("ORIGIN_403"); e.origin403 = true; throw e;
+    }
     if (!r.ok) throw new Error("chat HTTP " + r.status);
     const d = await r.json();
     if (!(d.message || d.done)) throw new Error("no response");
@@ -277,8 +280,15 @@ $("#logClear").onclick = () =>
         "#B45309");
     } catch (e) {
       btn.disabled = false;
-      show(0, "온디바이스 준비 중 문제가 생겼어요: " + String(e && e.message || e).slice(0, 120) +
-        " — 다시 눌러 재시도할 수 있어요", "#E5484D");
+      if (e && e.origin403) {
+        // 확장의 Origin 제거로도 403 → 구형 Ollama. 한 줄 설정이면 끝.
+        show(0, "Ollama가 브라우저 확장의 연결을 막고 있어요(403). 터미널에서 아래 한 줄이면 해결돼요:\n" +
+          "launchctl setenv OLLAMA_ORIGINS \"*\" 후 Ollama 재시작 (Windows: 시스템 환경변수 OLLAMA_ORIGINS=*).\n" +
+          "또는 설치형 백엔드(./install.sh)를 쓰면 이 과정이 아예 필요 없어요.", "#E5484D");
+      } else {
+        show(0, "온디바이스 준비 중 문제가 생겼어요: " + String(e && e.message || e).slice(0, 120) +
+          " — 다시 눌러 재시도할 수 있어요", "#E5484D");
+      }
     }
   };
 
