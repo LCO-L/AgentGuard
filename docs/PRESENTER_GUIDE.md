@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](PRESENTER_GUIDE.en.md)
+
 # 🎤 AgentGuard ULTRA — 발표자 가이드
 
 > 이 문서는 **발표자가 심사위원·청중에게 설명**하기 위한 대본이자 치트시트입니다.

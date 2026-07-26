@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](SECURITY.en.md)
+
 # 보안 정책 (Security Policy)
 
 AgentGuard는 보안 도구입니다. 도구 자체의 취약점 제보를 진지하게 다룹니다.

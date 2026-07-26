@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](README.en.md)
+
 # AgentGuard Web (Next.js)
 
 설치형 온디바이스 UI이자 **APK(Capacitor)의 공통 웹 프론트**. 같은 `core/` 엔진(FastAPI)을 호출합니다.

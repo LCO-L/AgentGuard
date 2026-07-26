@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](ENTERPRISE.en.md)
+
 # 💼 AgentGuard for Enterprise — AI 입력 단계의 실시간 DLP
 
 > **한 줄:** 직원이 ChatGPT·Claude·Copilot 같은 LLM에 **개인정보·회사기밀·소스코드**를 붙여넣기 **전에** 탐지하고, 되돌릴 수 있게 가려주고, 더 조심하도록 코치합니다.

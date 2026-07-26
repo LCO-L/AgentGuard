@@ -5,6 +5,8 @@ title: "[제안] "
 labels: ["enhancement"]
 ---
 
+> 🇰🇷 **한국어** | [🇺🇸 English](feature_request.en.md)
+
 ## 어떤 기능인가요?
 
 ## 왜 필요한가요? (어떤 상황에서 아쉬웠나요)

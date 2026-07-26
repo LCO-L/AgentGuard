@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](ONDEVICE_OLLAMA.en.md)
+
 # 🖥️ 온디바이스 AI (Ollama) — 설정 & 트러블슈팅
 
 > AgentGuard의 2층(의도 분석)·통역·대화를 **인터넷 없이 내 컴퓨터 안에서** 돌립니다.

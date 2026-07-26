@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](MAC_APP.en.md)
+
 # 🍎 AgentGuard — macOS 앱 빌드 가이드
 
 > 더블클릭하면 **로컬 백엔드(온디바이스)가 자동으로 켜지고**, 네이티브 창(WKWebView)에 AgentGuard가 뜹니다.

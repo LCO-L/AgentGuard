@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](APK.en.md)
+
 # 📱 AgentGuard APK 빌드 가이드 (Capacitor)
 
 > 상태: **프로젝트 생성·sync 완료** (`web/android/`). APK 바이너리 빌드는 Android Studio/SDK가 필요한 로컬 작업.

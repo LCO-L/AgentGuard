@@ -1,3 +1,5 @@
+> 🇰🇷 **한국어** | [🇺🇸 English](CONTRIBUTING.en.md)
+
 # AgentGuard에 기여하기
 
 환영합니다! 이 프로젝트는 **MIT 라이선스** 오픈소스이며, 만든 사람

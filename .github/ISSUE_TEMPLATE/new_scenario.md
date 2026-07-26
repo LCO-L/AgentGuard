@@ -5,6 +5,8 @@ title: "[시나리오] "
 labels: ["scenario", "good first issue"]
 ---
 
+> 🇰🇷 **한국어** | [🇺🇸 English](new_scenario.en.md)
+
 ## 어떤 위험인가요?
 
 <!-- 예: AI에게 '감사 모드'라고 속여 시스템 프롬프트를 빼내는 문구 -->

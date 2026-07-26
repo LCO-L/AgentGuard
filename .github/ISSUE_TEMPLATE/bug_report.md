@@ -5,6 +5,8 @@ title: "[버그] "
 labels: ["bug"]
 ---
 
+> 🇰🇷 **한국어** | [🇺🇸 English](bug_report.en.md)
+
 ## 무슨 일이 일어났나요?
 
 <!-- 스크린샷 환영 -->

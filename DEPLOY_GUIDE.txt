@@ -1,0 +1,138 @@
+================================================================================
+ AgentGuard 배포 안내 (DEPLOY GUIDE)
+ — sandbox_4 작업 규칙(CLAUDE.md)에 맞춘 절차. English version at the bottom.
+ 작성일: 2026-07-27
+================================================================================
+
+[0] 배포 구조 한눈에 보기
+--------------------------------------------------------------------------------
+ - 백엔드(엔진+순수 HTML UI 전부) = Railway. main 브랜치 = 프로덕션.
+   railway.json이 자동 인식된다: builder=NIXPACKS,
+   buildCommand = python scripts/pack_extension.py (실패해도 || echo 로 계속),
+   startCommand = python -m uvicorn api.main:app, 헬스체크 = /v1/health.
+ - FastAPI가 순수 HTML UI 전부를 서빙하므로 백엔드 1개 배포로
+   대시보드·에디터·비교·시나리오·설정·확장 다운로드(/extension.zip)가 모두 동작.
+ - 웹(Next.js, web/)은 선택 사항 — 로컬 또는 Vercel 등 별도 배포 권장.
+ - APK(Capacitor)·맥 앱은 클라우드 배포가 아니라 로컬 빌드 산출물
+   (docs/APK.md, docs/MAC_APP.md 참고).
+ - 서비스 주소: https://agentguard.maeum.ai
+
+[1] 배포 전 점검 (docs/OPEN_SOURCE.md 체크리스트 요약)
+--------------------------------------------------------------------------------
+ 1) 비밀 유출 확인
+    - dist/extension-key.pem (CRX 서명 개인키)이 절대 커밋되면 안 됨.
+      dist/ 는 .gitignore 대상이지만 git status 로 최종 확인.
+    - .env / .env.* 없음 확인 (.env.example 만 커밋).
+    - 자기 검사: python cli.py $(git ls-files "*.py" "*.js") --fail-on yellow
+ 2) 테스트 전부 통과 확인
+    AG_AI_PROVIDER=off python -m unittest discover -s tests    # 46개 전부
+ 3) 내부 문서 비공개 확인
+    .gitignore 의 내부 문서 패턴(PRESENTER_GUIDE*, MASTER_STATUS*, ENTERPRISE*,
+    OPEN_SOURCE*, 개발해야하는*, AI 시대의*, 가드코치기능*)이 유지되는지 확인.
+    ※ 2026-07-27부터 영어 버전(.en.md)도 같은 패턴으로 제외됨.
+ 4) 운영 수칙 (docs/HANDOFF_2026-07-25.md)
+    - uvicorn 워커는 1개 유지 (파일 저장소 lock이 프로세스 단위.
+      워커 2개 이상은 SQLite 전환이 선행조건).
+
+[2] sandbox_4 작업 규칙에 맞는 실행 방법 (에이전트/자동화 필수)
+--------------------------------------------------------------------------------
+ 이 워크스페이스의 CLAUDE.md 규칙상 다음을 지켜야 한다:
+ - 모든 작업은 sandbox_4/ 안에서만. 로그도 sandbox_4/.logs/ 안에만 둔다.
+ - 30초 이상 걸리는 작업(빌드, 모델 pull, npm install 등)은 백그라운드 스크립트로:
+     (sandbox_4 루트에서)
+     ./scripts/bg.sh .logs/ag-tests.log  sh -c 'cd agentguard && AG_AI_PROVIDER=off python -m unittest discover -s tests'
+     ./scripts/bg.sh .logs/ag-web.log    sh -c 'cd agentguard/web && npm install && npm run build'
+   결과는 .logs/ 안의 로그 파일을 전용 읽기 도구(read_files)로 확인한다.
+ - 명령 가드: rm/rmdir, git commit, git push, git reset --hard, git clean,
+   sudo, dd, mkfs, shutdown, reboot 은 에이전트가 실행 금지.
+   → 따라서 "커밋과 푸시"는 반드시 사용자가 직접 실행한다 (아래 [3]).
+ - AI 생성 코드 실행은 샌드박스 컨테이너(localhost:8787/api/*) 안에서만.
+   호스트에서 직접 실행하지 않는다.
+
+[3] 배포 절차 (사용자가 직접 실행하는 단계)
+--------------------------------------------------------------------------------
+ 에이전트는 [1]~[2]의 검증까지만 수행하고, 아래 git/배포 단계는 사용자가 직접:
+
+ 1) 변경 확인:        git status && git diff --stat
+ 2) 커밋:             git add -A && git commit -m "docs: add English versions + deploy guide"
+ 3) 푸시(=배포 트리거): git push origin <작업브랜치>
+    - main 은 브랜치 보호(PR 필수·리뷰 필수·CI 4잡 통과 필수)가 걸려 있으므로
+      PR을 만들어 CI(엔진 테스트 / CLI 게이트 / JS 문법 / API 스모크) 통과 후 머지.
+    - main 머지 = Railway 자동 재배포 (main = 프로덕션).
+ 4) Railway Variables (저장소에 절대 넣지 않음):
+    - AG_AI_PROVIDER   (기본 auto; off = 오프라인 규칙만)
+    - ANTHROPIC_API_KEY / OPENROUTER_API_KEY  (선택 — 클라우드 판단 엔진)
+    - AG_API_KEY       (선택 — 기업 모드 잠금해제: /v1/scans?scope=all)
+    - AG_HISTORY_PATH / AG_CACHE_DIR (선택)
+    ※ Ollama는 로컬 전용. 클라우드 배포에는 없으므로 Claude/OpenRouter
+      또는 오프라인 규칙으로 동작한다.
+
+[4] 배포 후 확인
+--------------------------------------------------------------------------------
+ 1) 헬스체크:  curl https://agentguard.maeum.ai/v1/health
+ 2) 페이지:    /  /editor  /compare  /scenarios  /settings  /audit  → 200 확인
+ 3) 확장 다운로드: /extension.zip 응답 확인 (main.py가 즉석 생성 — 무중단)
+ 4) 격리 동작: 브라우저 2개(시크릿 창)로 각자 검사 → /v1/scans 이력이
+    서로 안 보이면 정상 (X-AG-Client 격리, HANDOFF 문서 참고)
+ ※ 로컬에서 curl 확인도 sandbox_4 규칙상 run_commands(터미널)로만 수행.
+
+[5] 로컬(온디바이스) 설치형 "배포" — 참고
+--------------------------------------------------------------------------------
+ ./install.sh              # Ollama 확인 → Qwen3 4B pull → 백엔드 → 브라우저
+ (모델 pull은 ~2.5GB, 30초 초과 → 반드시 bg.sh 로 백그라운드 실행할 것)
+
+================================================================================
+ ENGLISH VERSION
+================================================================================
+
+[0] Deployment at a glance
+ - Backend (engine + all pure-HTML UI) = Railway. main branch = production.
+   railway.json is auto-detected: builder=NIXPACKS,
+   buildCommand = python scripts/pack_extension.py (continues on failure via || echo),
+   startCommand = python -m uvicorn api.main:app, healthcheck = /v1/health.
+ - FastAPI serves the whole pure-HTML UI, so one backend deployment powers
+   dashboard / editor / compare / scenarios / settings / extension download.
+ - Web (Next.js, web/) is optional — deploy separately (Vercel etc.).
+ - APK / Mac app are local build artifacts (docs/APK.en.md, docs/MAC_APP.en.md).
+ - Service address: https://agentguard.maeum.ai
+
+[1] Pre-deploy checks (summary of docs/OPEN_SOURCE.en.md)
+ - dist/extension-key.pem (CRX signing key) must NEVER be committed; verify git status.
+ - No .env / .env.* files (only .env.example is committed).
+ - Self-scan: python cli.py $(git ls-files "*.py" "*.js") --fail-on yellow
+ - All tests pass: AG_AI_PROVIDER=off python -m unittest discover -s tests  (46 tests)
+ - Internal docs stay ignored (.gitignore patterns now also cover the .en.md versions).
+ - Keep uvicorn at 1 worker (file-store lock is per-process; SQLite migration
+   is the prerequisite for 2+ workers).
+
+[2] sandbox_4 workspace rules (mandatory for agents/automation)
+ - Everything stays inside sandbox_4/; logs only under sandbox_4/.logs/.
+ - Anything longer than ~30s (builds, model pulls, npm install) runs in the
+   background:  ./scripts/bg.sh .logs/<name>.log <command>   (from sandbox_4 root),
+   then read the log in .logs/ with the dedicated file-reading tool.
+ - Command guard: agents must not run rm/rmdir, git commit/push/reset --hard/clean,
+   sudo, dd, mkfs, shutdown, reboot.
+   → Therefore the commit & push steps are performed BY THE USER (see [3]).
+ - AI-generated code executes only inside the sandbox container (localhost:8787/api/*).
+
+[3] Deployment steps (performed by the user)
+ 1) git status && git diff --stat
+ 2) git add -A && git commit -m "docs: add English versions + deploy guide"
+ 3) git push origin <branch> → open a PR → CI (4 jobs) must pass → merge to main
+    → Railway redeploys automatically (main = production).
+ 4) Railway Variables (never in the repo): AG_AI_PROVIDER,
+    ANTHROPIC_API_KEY / OPENROUTER_API_KEY (optional), AG_API_KEY (optional,
+    unlocks enterprise mode), AG_HISTORY_PATH / AG_CACHE_DIR (optional).
+    Note: Ollama is local-only; cloud runs on Claude/OpenRouter or offline rules.
+
+[4] Post-deploy verification
+ - curl https://agentguard.maeum.ai/v1/health
+ - Pages return 200: /  /editor  /compare  /scenarios  /settings  /audit
+ - /extension.zip responds (generated on the fly by main.py — zero downtime)
+ - Isolation: two browsers (incognito) scan separately → their /v1/scans
+   histories must not see each other (X-AG-Client isolation, see HANDOFF doc).
+
+[5] Local (on-device) installable "deployment" — reference
+ ./install.sh   # checks Ollama → pulls Qwen3 4B (~2.5GB, run via bg.sh!) →
+                # starts backend → opens browser
+================================================================================
