@@ -70,6 +70,13 @@ let CUR_HOST = "";
 async function loadToggles() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   try { CUR_HOST = tab && tab.url ? new URL(tab.url).hostname : ""; } catch (e) { CUR_HOST = ""; }
+  // 설정 탭(options_ui)이나 chrome:// 페이지에서는 '현재 사이트' 개념이 없다 —
+  // 확장 ID 같은 깨진 문자열 대신, 사이트별 끄기·페이지 검사 UI 를 숨긴다
+  const onWebPage = !!(tab && tab.url && /^https?:/i.test(tab.url));
+  if (!onWebPage) {
+    const sb = document.querySelector(".sitebox"); if (sb) sb.style.display = "none";
+    $("#scanBtn").style.display = "none";
+  }
   $("#siteName").textContent = CUR_HOST || "이 페이지";
   const c = Object.assign({ enabled: true, disabledSites: [] }, await chrome.storage.local.get(["enabled", "disabledSites"]));
   $("#masterToggle").checked = c.enabled;

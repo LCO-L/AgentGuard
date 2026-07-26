@@ -25,8 +25,9 @@
     '.panel.show{display:block}' +
     '.bar{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid #EEF0F3;font-size:12px;font-weight:700}' +
     '.bar .x{border:0;background:transparent;font-size:18px;cursor:pointer;color:#6B7280}' +
-    '.bar .cog{border:0;background:transparent;font-size:14px;cursor:pointer;opacity:.7;padding:0 2px}' +
-    '.bar .cog:hover{opacity:1}' +
+    '.bar .cog{border:1px solid #E8E8EA;background:#fff;border-radius:99px;padding:3px 10px;' +
+    'font-size:11px;font-weight:700;color:#6B7280;cursor:pointer;white-space:nowrap;font-family:inherit}' +
+    '.bar .cog:hover{color:#16181D;border-color:#C9CDD4}' +
     '.lv{padding:3px 9px;border-radius:99px;font-size:11px}' +
     '.lv.red{background:rgba(229,72,77,.12);color:#E5484D}.lv.yellow{background:rgba(255,178,36,.16);color:#B45309}.lv.green{background:rgba(48,164,108,.12);color:#30A46C}' +
     '.top{padding:14px 16px 8px;display:flex;gap:11px}' +
@@ -61,7 +62,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function (m) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[m]; }); }
   var LV = { red: "위험", yellow: "주의", green: "안전" }, DOT = { red: "🛑", yellow: "⚠️", green: "✅" }, COL = { red: "#E5484D", yellow: "#FFB224", green: "#30A46C" };
   // 패널 우측 버튼 묶음: ⚙️ 설정(기존 설정 화면을 탭으로) + × 닫기
-  var BTNS = '<span style="display:flex;gap:6px;align-items:center"><button class="cog" title="설정">⚙️</button><button class="x">×</button></span>';
+  var BTNS = '<span style="display:flex;gap:6px;align-items:center"><button class="cog" title="엔진·서버 설정 열기">⚙️ 설정</button><button class="x">×</button></span>';
   var ENG = { ollama: "🖥️ 온디바이스 Ollama", claude: "☁️ Claude", openrouter: "☁️ OpenRouter", fallback: "⚙️ 오프라인 규칙", off: "⚙️ 오프라인 규칙", local: "⚙️ 오프라인 규칙" };
 
   function openPanel() { panel.classList.add("show"); }
@@ -90,7 +91,7 @@
       .map(function (r) { return '<div class="r"><div class="k">' + esc(r[0]) + '</div><div class="v">' + esc(r[1]) + '</div></div>'; }).join("");
     var eng = ENG[v.engine] || ENG[(c.source || "fallback")] || "⚙️ 오프라인 규칙";
     panel.innerHTML =
-      '<div class="bar"><span>검사한 것 · <b>' + esc(v.surface_kind || "") + '</b></span><span style="display:flex;gap:8px;align-items:center"><span class="lv ' + o + '">' + LV[o] + '</span><button class="cog" title="설정">⚙️</button><button class="x">×</button></span></div>' +
+      '<div class="bar"><span>검사한 것 · <b>' + esc(v.surface_kind || "") + '</b></span><span style="display:flex;gap:8px;align-items:center"><span class="lv ' + o + '">' + LV[o] + '</span><button class="cog" title="엔진·서버 설정 열기">⚙️ 설정</button><button class="x">×</button></span></div>' +
       '<div class="top"><div class="dot ' + o + '">' + DOT[o] + '</div><div class="hl">' + esc(c.headline || "") + '</div></div>' +
       '<div class="sbar"><i style="width:' + sc + '%;background:' + COL[o] + '"></i></div><div class="stx">위험 점수 ' + sc + ' / 100</div>' +
       '<div class="rows">' + rows + '</div>' +
