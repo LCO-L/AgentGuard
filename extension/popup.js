@@ -109,5 +109,90 @@ $("#logBox").addEventListener("toggle", (e) => {
 $("#logClear").onclick = () =>
   chrome.runtime.sendMessage({ type: "AG_LOG_CLEAR" }, paintLog);
 
+// ── 온디바이스 원클릭 실행 — 백엔드의 /v1/ai/ondevice/* 로직 재사용(설정 페이지와 동일) ──
+// 핵심: 온디바이스는 '사용자 컴퓨터의 로컬 백엔드'에서 완결된다. 실행을 누르면
+// localhost:8000 을 먼저 자동 감지하고, 살아 있으면 그쪽으로 전환해 실행한다.
+(function () {
+  const btn = $("#odBtn"), body = $("#odBody"), bar = $("#odBar"), msg = $("#odMsg"), link = $("#odLink");
+  if (!btn) return;
+  let poll = null;
+  let userRun = false;  // 사용자가 '실행'을 눌렀을 때만 provider 자동 전환(몰래 설정 변경 금지)
+  const RUNNING = ["checking", "starting", "pulling"];
+  const LOCAL = "http://localhost:8000";
+
+  function isLocalBase() { return /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(apiBase()); }
+  async function probeLocal() {
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 1500);
+      const r = await fetch(LOCAL + "/v1/health", { signal: ctl.signal });
+      clearTimeout(t); return r.ok;
+    } catch (e) { return false; }
+  }
+  function paint(d) {
+    if (!d || !d.state) return;
+    body.style.display = "block";
+    bar.style.width = (d.progress || 0) + "%";
+    msg.textContent = d.message || "";
+    msg.style.color = d.state === "ready" ? "#30A46C"
+      : (d.state === "error" || d.state === "no_ollama" || d.state === "blocked") ? "#E5484D" : "#1E5BFF";
+    link.style.display = d.state === "no_ollama" ? "inline-block" : "none";
+    btn.disabled = RUNNING.includes(d.state);
+    btn.textContent = btn.disabled ? "준비 중…"
+      : (d.state === "ready" ? "✓ 온디바이스 준비 완료 — 다시 실행" : "🖥️ 온디바이스 실행 — Ollama 자동 준비");
+    if (d.state === "ready" && userRun) {
+      CFG.provider = "ollama"; if (d.model) CFG.ollamaModel = d.model;
+      paintProv(); save(); refreshStatus();
+    }
+    if (d.state === "blocked" || d.state === "error" || d.state === "no_ollama") {
+      msg.textContent = (d.message || "자동 실행에 실패했어요") +
+        (isLocalBase() ? "" : " — 온디바이스는 내 컴퓨터의 AgentGuard 백엔드에서 완결돼요 (github.com/LCO-L/AgentGuard → ./install.sh)");
+    }
+  }
+  function startPoll() {
+    if (poll) clearInterval(poll);
+    poll = setInterval(async () => {
+      try {
+        const r = await fetch(apiBase() + "/v1/ai/ondevice/status");
+        const d = await r.json(); paint(d);
+        if (!RUNNING.includes(d.state)) clearInterval(poll);
+      } catch (e) { clearInterval(poll); }
+    }, 1200);
+  }
+  btn.onclick = async () => {
+    userRun = true;
+    body.style.display = "block"; btn.disabled = true; msg.textContent = "준비 중…"; msg.style.color = "#1E5BFF";
+    // 1) 로컬 백엔드 자동 감지 — 있으면 그쪽으로 전환(온디바이스는 내 컴퓨터에서 완결)
+    if (!isLocalBase() && await probeLocal()) {
+      CFG.apiBase = LOCAL; $("#apiBase").value = LOCAL; save();
+      msg.textContent = "내 컴퓨터의 AgentGuard 백엔드를 찾았어요 — 여기서 실행할게요";
+    } else if (!isLocalBase()) {
+      // 로컬 백엔드가 없음 — 원격 서버에 설치 시도하지 않고 안내
+      btn.disabled = false;
+      msg.style.color = "#E5484D";
+      msg.textContent = "내 컴퓨터에서 AgentGuard 백엔드를 찾지 못했어요. " +
+        "온디바이스는 로컬 백엔드에서 완결돼요 — 터미널에서 ./install.sh 한 줄이면 준비됩니다 (github.com/LCO-L/AgentGuard)";
+      return;
+    }
+    // 2) 로컬 백엔드의 온디바이스 원클릭(설치→서브→모델 pull) 실행
+    try {
+      const r = await fetch(apiBase() + "/v1/ai/ondevice/start", { method: "POST" });
+      const d = await r.json(); paint(d);
+      if (d.state === "blocked") { btn.disabled = false; return; }
+    } catch (e) {
+      msg.textContent = "백엔드에 연결할 수 없어요"; msg.style.color = "#E5484D"; btn.disabled = false; return;
+    }
+    startPoll();
+  };
+  // 설정을 열었을 때: 로컬 백엔드가 있으면 그쪽 상태를, 없으면 현재 백엔드 상태를 이어서 표시
+  (async () => {
+    try {
+      const base = (!isLocalBase() && await probeLocal()) ? LOCAL : apiBase();
+      const r = await fetch(base + "/v1/ai/ondevice/status");
+      const d = await r.json();
+      if (d && d.state && d.state !== "idle") { paint(d); if (RUNNING.includes(d.state)) startPoll(); }
+    } catch (e) { /* 백엔드 없으면 조용히 */ }
+  })();
+})();
+
 load();
 loadToggles();

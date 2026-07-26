@@ -81,6 +81,15 @@
   <div class="row keybox" id="box-ollama">
     <label>Ollama 주소</label>
     <input id="ollamaUrl" placeholder="http://localhost:11434">
+    <button class="btn primary" id="odBtn" style="width:100%;margin-top:7px">🖥️ 온디바이스 실행 — Ollama 자동 준비</button>
+    <div id="odBody" style="display:none;margin-top:6px">
+      <div style="height:6px;border-radius:99px;background:#EEF0F3;overflow:hidden">
+        <div id="odBar" style="height:100%;width:0;background:var(--accent);transition:width .5s"></div>
+      </div>
+      <div id="odMsg" style="margin-top:4px;font-size:11px;font-weight:700;color:var(--accent);line-height:1.5"></div>
+      <a id="odLink" href="https://ollama.com/download" target="_blank" rel="noreferrer"
+         style="display:none;font-size:11px;font-weight:800;color:var(--accent)">Ollama 설치하기 →</a>
+    </div>
   </div>
   <div class="row keybox" id="box-claude">
     <label>Claude API 키 (로컬 저장)</label>
