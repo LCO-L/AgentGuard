@@ -310,6 +310,40 @@
     "기기 밖으로 안 나가요": "never leave the device",
     "온디바이스 실행 켜기 →": "Turn on on-device →",
 
+    // ── 회사 페이지(/company · 마음컴퍼니) ──
+    "AgentGuard — 만든 곳, 마음컴퍼니": "AgentGuard — Made by MAEUM (maeum.io)",
+    "마음컴퍼니": "MAEUM",
+    "AI를 직접 만들고, 현장에 들이고, 가르칩니다. AgentGuard는 마음컴퍼니가 만들고 운영하는 온디바이스 보안 제품입니다.":
+      "We build AI, deploy it in the field, and teach it. AgentGuard is an on-device security product built and operated by MAEUM.",
+    "외주 · FDE": "Contract · FDE",
+    "함께 만드는 개발": "Building together",
+    "팀 안에 들어가 함께 만드는": "We work in the",
+    "방식으로 일합니다. 웹·앱 개발, AI 통합, SaaS 구축, 워크플로 자동화를 수행합니다.":
+      "way — embedded in your team. Web/app development, AI integration, SaaS builds, and workflow automation.",
+    "역량은 이 제품이 증명합니다 — AgentGuard 하나로": "This product is the proof — AgentGuard alone spans",
+    "백엔드(FastAPI) · 웹(Next.js) · 크롬 확장(MV3) · PWA · 안드로이드(Capacitor) · macOS 앱 · 온디바이스 AI(Ollama)":
+      "backend (FastAPI) · web (Next.js) · Chrome extension (MV3) · PWA · Android (Capacitor) · macOS app · on-device AI (Ollama)",
+    "까지 단독 구축했습니다.": "— all built solo.",
+    "외주·협업 문의 → lee@maeum.io": "Contract & collaboration → lee@maeum.io",
+    "온디바이스 AI 런타임": "On-device AI runtime",
+    "데이터가 기기 밖으로 나가지 않게": "So data never leaves the device",
+    "자체 온디바이스 AI 런타임 기술(특허 출원)을 보유하고 있습니다. AgentGuard의 \"원본은 기기 안에서만\" 원칙도 같은 철학 위에 서 있습니다.":
+      "We hold proprietary on-device AI runtime technology (patent pending). AgentGuard's \"originals stay on the device\" principle stands on the same philosophy.",
+    "제품": "Products",
+    "직접 만들고 운영하는 앱": "Apps we build and run ourselves",
+    "온디바이스 보안 도우미 —": "On-device security assistant —",
+    "지금 이 서비스": "this very service",
+    "컨설팅 · 강의": "Consulting · lectures",
+    "배운 것을 나눕니다": "We share what we learn",
+    "AI 도입 컨설팅, 강의·강연을 진행합니다. 만들면서 얻은 현장 지식을 그대로 전합니다.":
+      "AI adoption consulting, lectures, and talks — field knowledge earned by building, passed on as-is.",
+    "마음컴퍼니 · 대표 이동훈 · 사업자등록번호 353-26-02178 · 광주광역시":
+      "MAEUM · CEO Donghun Lee · Business reg. 353-26-02178 · Gwangju, Korea",
+    "개인정보처리방침": "Privacy Policy",
+    "만든 곳:": "Made by:",
+    "마음컴퍼니 (maeum.io)": "MAEUM (maeum.io)",
+    "— 외주·협업 문의 환영": "— contract & collaboration inquiries welcome",
+
     // ── 통역 카드(오프라인 폴백, interpret.py) ──
     "특별한 위험을 찾지 못했어요.": "We found no particular risk.",
     "숨은 위험이 보이지 않아요.": "No hidden risks in sight.",

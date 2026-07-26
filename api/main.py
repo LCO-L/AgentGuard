@@ -96,6 +96,18 @@ def create_app() -> FastAPI:
         """한/영 전환(i18n) 엔진 — 모든 순수 HTML 페이지 공용."""
         return _serve("i18n.js", "application/javascript; charset=utf-8")
 
+    @app.get("/privacy", response_class=HTMLResponse, tags=["meta"])
+    def privacy() -> HTMLResponse:
+        """개인정보처리방침(한/영) — 크롬 웹스토어 제출용 공개 URL."""
+        html = _UI_DIR / "privacy.html"
+        return HTMLResponse(html.read_text(encoding="utf-8"))
+
+    @app.get("/company", response_class=HTMLResponse, tags=["meta"])
+    def company() -> HTMLResponse:
+        """만든 곳 — 마음컴퍼니(maeum.io) 소개 · 외주/FDE 문의."""
+        html = _UI_DIR / "company.html"
+        return HTMLResponse(html.read_text(encoding="utf-8"))
+
     @app.get("/onboarding.js", tags=["meta"])
     def onboarding_js() -> Response:
         """첫 방문 온보딩 투어(말풍선 코치마크 + 확장 설치 안내)."""

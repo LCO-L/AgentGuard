@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!-- © 2026 DONGHUN LEE · AgentGuard · MIT License. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentGuard — 개인정보처리방침 (Privacy Policy)</title>
+<style>
+  :root{
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --ink:#101319; --sub:#697080; --line:rgba(16,19,25,.08); --bg:#F6F6F7; --card:#fff; --accent:#1E5BFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.75;word-break:keep-all;
+    padding:34px 20px 80px;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;}
+  .wrap{max-width:720px;margin:0 auto;}
+  h1{font-size:24px;letter-spacing:-.03em;margin-bottom:4px;}
+  .date{font-size:12.5px;color:var(--sub);margin-bottom:22px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px;
+    box-shadow:0 1px 2px rgba(16,19,25,.04);}
+  h2{font-size:16px;letter-spacing:-.02em;margin-bottom:8px;}
+  h3{font-size:13.5px;margin:14px 0 4px;}
+  p,li{font-size:13.5px;color:#3C414C;}
+  ul{padding-left:18px;margin:6px 0;}
+  b{color:var(--ink);}
+  .en{color:#3C414C;}
+  hr{border:0;border-top:1px solid var(--line);margin:40px 0 28px;}
+  a{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AgentGuard 개인정보처리방침</h1>
+  <div class="date">시행일: 2026-07-27 · 적용 대상: AgentGuard 크롬 확장 프로그램 · 웹 서비스</div>
+
+  <div class="card">
+    <h2>요약 — 세 가지 원칙</h2>
+    <ul>
+      <li><b>온디바이스 우선</b> — 페이지 인라인 검사(밑줄)와 입력창 보호는 브라우저 안에서만 동작하며 아무 데도 전송하지 않습니다.</li>
+      <li><b>비저장</b> — 사용자가 요청한 상세 검사에서도 서버는 원문·API 키·마스킹 매핑을 저장하지 않습니다.</li>
+      <li><b>비판매</b> — 어떤 데이터도 판매·광고·제3자 제공에 사용하지 않습니다. 추적기·분석 스크립트도 없습니다.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>1. 수집·처리하는 정보</h2>
+    <h3>① 사용자가 검사를 요청한 콘텐츠</h3>
+    <p>우클릭으로 검사를 선택한 링크·이미지 주소·선택 텍스트, 끌어다 놓은 파일, "이 페이지 검사"를 눌렀을 때의
+    페이지 텍스트가 <b>사용자가 설정한 백엔드</b>(기본: 본인 컴퓨터의 로컬 서버, 또는 공개 데모 서버)로 전송되어
+    검사됩니다. 서버는 위험 판정에 필요한 처리만 하고 <b>원문을 저장하지 않습니다.</b> 검사 이력에는
+    메타데이터(시각·유형·등급·발견 규칙 수)만 남습니다.</p>
+    <h3>② AI 입력창 보호</h3>
+    <p>ChatGPT 등 AI 사이트의 입력창 내용은 <b>브라우저 안에서 로컬로만</b> 검사됩니다(agscan.js).
+    마스킹을 선택하면 치환도 브라우저 안에서 수행되며, 원문·복원 매핑은 외부로 나가지 않습니다.</p>
+    <h3>③ 설정값</h3>
+    <p>백엔드 주소, 선택한 AI 엔진, 사용자가 직접 입력한 API 키(BYOK)는 <b>이 브라우저의
+    chrome.storage.local 에만</b> 저장됩니다. 키는 검사 요청 시 헤더로만 전달되고 서버에 저장되지 않습니다.</p>
+    <h3>④ 익명 식별자</h3>
+    <p>검사 이력을 브라우저 단위로 분리하기 위한 <b>무작위 익명 ID</b>(X-AG-Client)를 사용합니다.
+    계정·이메일·이름 등 개인 식별 정보는 수집하지 않습니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>2. 하지 않는 것</h2>
+    <ul>
+      <li>개인정보 판매·대여·광고 목적 제공 — <b>없음</b></li>
+      <li>서드파티 분석·추적 스크립트 — <b>없음</b></li>
+      <li>브라우징 기록 수집 — <b>없음</b> (검사는 사용자가 명시적으로 요청할 때만)</li>
+      <li>원문·비밀값·마스킹 매핑의 서버 저장 — <b>없음</b> (비저장 원칙)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3. 보관·삭제 및 문의</h2>
+    <p>검사 이력 메타데이터는 최근 항목만 순환 보관되며, 온프레미스/로컬 설치에서는 전적으로 사용자 통제하에 있습니다.
+    소스 코드는 MIT 라이선스로 공개되어 있어 처리 과정을 직접 확인할 수 있습니다:
+    <a href="https://github.com/LCO-L/AgentGuard">github.com/LCO-L/AgentGuard</a>.
+    문의·삭제 요청은 GitHub 이슈 또는 저장소에 기재된 연락처로 주세요.</p>
+  </div>
+
+  <hr>
+
+  <h1 class="en">AgentGuard Privacy Policy (English)</h1>
+  <div class="date">Effective: 2026-07-27 · Applies to: the AgentGuard Chrome extension and web service</div>
+
+  <div class="card en">
+    <h2>Summary — three principles</h2>
+    <ul>
+      <li><b>On-device first</b> — inline page checks (underlines) and AI input-box protection run entirely inside your browser and transmit nothing.</li>
+      <li><b>No storage</b> — even for detailed scans you request, the server never stores originals, API keys, or masking mappings.</li>
+      <li><b>No selling</b> — no data is sold, used for ads, or shared with third parties. No trackers or analytics scripts.</li>
+    </ul>
+  </div>
+
+  <div class="card en">
+    <h2>1. What we process</h2>
+    <p><b>Content you explicitly ask to scan</b> (a right-clicked link/image/selection, a dropped file, or page text
+    when you press "scan this page") is sent to <b>the backend you configure</b> — by default your own local server,
+    or the public demo server — for analysis. The server processes it only to produce a verdict and
+    <b>does not store the original</b>. Scan history keeps metadata only (time, type, grade, rule count).</p>
+    <p><b>AI input-box guard</b>: text in AI chat inputs (ChatGPT etc.) is scanned <b>locally in your browser</b>;
+    masking is applied locally, and originals/restore mappings never leave your machine.</p>
+    <p><b>Settings</b> (backend address, chosen engine, your own BYOK API key) live only in
+    <b>chrome.storage.local</b>. Keys travel only as request headers and are never stored server-side.</p>
+    <p><b>Anonymous ID</b>: a random identifier (X-AG-Client) separates scan history per browser.
+    We collect no accounts, emails, names, or other personal identifiers.</p>
+  </div>
+
+  <div class="card en">
+    <h2>2. What we never do</h2>
+    <ul>
+      <li>Sell, rent, or share personal data; no advertising use</li>
+      <li>No third-party analytics or tracking scripts</li>
+      <li>No collection of browsing history — scanning happens only on your explicit request</li>
+      <li>No server-side storage of originals, secrets, or masking mappings</li>
+    </ul>
+  </div>
+
+  <div class="card en">
+    <h2>3. Retention & contact</h2>
+    <p>Scan-history metadata is kept on a rolling basis; on local/on-prem installs it is fully under your control.
+    The source code is MIT-licensed and auditable:
+    <a href="https://github.com/LCO-L/AgentGuard">github.com/LCO-L/AgentGuard</a>.
+    For questions or deletion requests, open a GitHub issue or use the contact in the repository.</p>
+  </div>
+</div>
+<script src="/nav.js"></script>
+</body>
+</html>

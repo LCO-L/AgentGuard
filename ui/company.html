@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!-- © 2026 DONGHUN LEE · AgentGuard · MIT License. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentGuard — 만든 곳, 마음컴퍼니</title>
+<style>
+  :root{
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","SF Pro Text","Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    --ink:#101319; --ink-2:#3C414C; --sub:#697080; --muted:#9BA1AE;
+    --line:rgba(16,19,25,.08); --bg:#F6F6F7; --card:#fff;
+    --accent:#1E5BFF; --accent-weak:rgba(30,91,255,.08);
+    --shadow:0 1px 2px rgba(16,19,25,.04), 0 8px 24px -12px rgba(16,19,25,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.7;word-break:keep-all;
+    padding:34px 20px 80px;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;}
+  .wrap{max-width:680px;margin:0 auto;}
+  .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);}
+  h1{font-size:26px;letter-spacing:-.032em;margin-top:8px;line-height:1.2;}
+  .tagline{font-size:14.5px;color:var(--sub);margin:8px 0 24px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:12px;box-shadow:var(--shadow);}
+  h2{font-size:15.5px;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  h2 .n{font-size:10.5px;font-weight:700;color:var(--accent);background:var(--accent-weak);border-radius:99px;padding:2px 9px;letter-spacing:.02em;}
+  p,li{font-size:13.5px;color:var(--ink-2);}
+  ul{padding-left:18px;margin:6px 0;}
+  b{color:var(--ink);}
+  a{color:var(--accent);text-decoration:none;font-weight:600;}
+  a:hover{text-decoration:underline;}
+  .prods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  @media(max-width:560px){.prods{grid-template-columns:1fr;}}
+  .prod{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);background:rgba(16,19,25,.015);}
+  .prod b{display:block;font-size:13px;}
+  .cta{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff !important;border-radius:10px;
+    padding:11px 18px;font-size:13.5px;font-weight:700;margin-top:10px;box-shadow:0 6px 16px -6px rgba(16,19,25,.4);}
+  .cta:hover{text-decoration:none;transform:translateY(-1px);}
+  .foot{font-size:11.5px;color:var(--muted);text-align:center;margin-top:22px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">COMPANY</div>
+  <h1>마음컴퍼니 <span style="color:var(--muted);font-weight:600">· maeum.io</span></h1>
+  <div class="tagline">AI를 직접 만들고, 현장에 들이고, 가르칩니다. AgentGuard는 마음컴퍼니가 만들고 운영하는 온디바이스 보안 제품입니다.</div>
+
+  <div class="card">
+    <h2><span class="n">외주 · FDE</span>함께 만드는 개발</h2>
+    <p>팀 안에 들어가 함께 만드는 <b>Forward Deployed Engineering</b> 방식으로 일합니다.
+    웹·앱 개발, AI 통합, SaaS 구축, 워크플로 자동화를 수행합니다.</p>
+    <p style="margin-top:8px">역량은 이 제품이 증명합니다 — AgentGuard 하나로
+    <b>백엔드(FastAPI) · 웹(Next.js) · 크롬 확장(MV3) · PWA · 안드로이드(Capacitor) · macOS 앱 ·
+    온디바이스 AI(Ollama)</b>까지 단독 구축했습니다.</p>
+    <a class="cta" href="mailto:lee@maeum.io">외주·협업 문의 → lee@maeum.io</a>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">온디바이스 AI 런타임</span>데이터가 기기 밖으로 나가지 않게</h2>
+    <p>자체 온디바이스 AI 런타임 기술(특허 출원)을 보유하고 있습니다.
+    AgentGuard의 "원본은 기기 안에서만" 원칙도 같은 철학 위에 서 있습니다.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">제품</span>직접 만들고 운영하는 앱</h2>
+    <div class="prods">
+      <div class="prod"><b>AgentGuard</b>온디바이스 보안 도우미 — <a href="/">지금 이 서비스</a></div>
+      <div class="prod"><b>마음의 캠프파이어</b><a href="https://love.maeum.ai" rel="noreferrer">love.maeum.ai</a></div>
+      <div class="prod"><b>마음·빌드</b><a href="https://build.maeum.ai" rel="noreferrer">build.maeum.ai</a></div>
+      <div class="prod"><b>GC OS</b><a href="https://gorillaboss.me" rel="noreferrer">gorillaboss.me</a></div>
+      <div class="prod"><b>NameGood</b><a href="https://namegood.jp" rel="noreferrer">namegood.jp</a></div>
+      <div class="prod"><b>MAEUM Learn</b><a href="https://edu.maeum.ai" rel="noreferrer">edu.maeum.ai</a></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">컨설팅 · 강의</span>배운 것을 나눕니다</h2>
+    <p>AI 도입 컨설팅, 강의·강연을 진행합니다. 만들면서 얻은 현장 지식을 그대로 전합니다.</p>
+  </div>
+
+  <div class="foot">
+    마음컴퍼니 · 대표 이동훈 · 사업자등록번호 353-26-02178 · 광주광역시<br>
+    <a href="https://maeum.io" rel="noreferrer">maeum.io</a> · <a href="mailto:lee@maeum.io">lee@maeum.io</a> · <a href="/privacy">개인정보처리방침</a>
+  </div>
+</div>
+<script src="/i18n.js"></script>
+<script src="/nav.js"></script>
+</body>
+</html>
