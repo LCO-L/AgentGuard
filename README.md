@@ -15,8 +15,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**탐지율 100% · 오탐률 4.3% · 평균 응답 0.3ms** — 59케이스 벤치(악성 36·정상 23, 오프라인 규칙 엔진, AI 불필요)
-<br>재현: `AG_AI_PROVIDER=off python scripts/bench_scenarios.py`
+**탐지율 100% · 오탐률 4.3% · 평균 응답 0.3ms** — 59케이스 벤치(악성 36·정상 23), 오프라인 규칙 엔진(AI 불필요)
+<br>AI 엔진(온디바이스 Ollama) 포함 실측: **탐지율 100% · 오탐률 4.3%** · 평균 4.7s — [실행 기록](docs/BENCH_RESULTS.md)
+<br>재현: `python scripts/bench_scenarios.py` (AI 포함: `--provider ollama`)
 
 </div>
 
@@ -234,7 +235,7 @@ Ollama·Claude·OpenRouter(하나의 인터페이스), 순수 HTML/JS + Next.js(
 ```bash
 AG_AI_PROVIDER=off python -m unittest discover -s tests    # 46개 전부 통과
 python scripts/bench_scenarios.py                          # 59케이스: 탐지율 100% · 오탐 4.3% · 평균 0.3ms
-python scripts/bench_scenarios.py --provider ollama        # AI 엔진(2층 의도 분석) 포함 벤치 — Ollama 필요
+python scripts/bench_scenarios.py --provider ollama        # AI 포함 실측: 탐지율 100% · 오탐 4.3% · 평균 4.7s
 ```
 
 벤치마크는 실제 4개 진입점(파일 스캔·텍스트 스캔·에디터 인스펙션·링크 스캔)을 그대로 태웁니다.

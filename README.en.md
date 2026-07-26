@@ -15,8 +15,9 @@ and explains them in words anyone understands, like "This file contains a comman
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.en.md)
 
-**Detection 100% · False positives 4.3% · Avg response 0.3ms** — 59-case benchmark (36 malicious · 23 benign, offline rule engine, no AI required)
-<br>Reproduce: `AG_AI_PROVIDER=off python scripts/bench_scenarios.py`
+**Detection 100% · False positives 4.3% · Avg response 0.3ms** — 59-case benchmark (36 malicious · 23 benign), offline rule engine (no AI required)
+<br>Measured with the AI engine (on-device Ollama): **detection 100% · FP 4.3%** · avg 4.7s — [run log](docs/BENCH_RESULTS.md)
+<br>Reproduce: `python scripts/bench_scenarios.py` (with AI: `--provider ollama`)
 
 </div>
 
@@ -235,7 +236,7 @@ Ollama · Claude · OpenRouter (one interface), pure HTML/JS + Next.js (frontend
 ```bash
 AG_AI_PROVIDER=off python -m unittest discover -s tests    # all 46 pass
 python scripts/bench_scenarios.py                          # 59 cases: detection 100% · FP 4.3% · avg 0.3ms
-python scripts/bench_scenarios.py --provider ollama        # benchmark including the AI engine (layer-2 intent) — needs Ollama
+python scripts/bench_scenarios.py --provider ollama        # measured with AI: detection 100% · FP 4.3% · avg 4.7s
 ```
 
 The benchmark drives the four real entry points (file scan · text scan · editor inspection · link scan) as-is.
