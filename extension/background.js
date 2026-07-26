@@ -125,10 +125,22 @@ function notify(v, url) {
 async function runScan(tabId, kind, payload) {
   try {
     chrome.tabs.sendMessage(tabId, { type: "AG_BUSY", kind });
-    let v;
-    if (kind === "url") v = await scanApi("/v1/scan/url", { url: payload.url });
-    else v = await scanApi("/v1/scan/text", { text: payload.text || "", source: payload.source || "선택" });
+    const c = await getCfg();
+    const path = kind === "url" ? "/v1/scan/url" : "/v1/scan/text";
+    const body = kind === "url" ? { url: payload.url }
+      : { text: payload.text || "", source: payload.source || "선택" };
+    // 규칙 결과를 먼저 즉시 보여주고(빠름), 온디바이스 AI 통역이 오면 카드를 교체(느려도 무중단)
+    let v = await callApi(path, body);
     chrome.tabs.sendMessage(tabId, { type: "AG_RESULT", verdict: v });
+    const willInterpret = c.provider === "ollama" && c.ollamaModel &&
+      isLocalUrl((c.ollamaUrl || "http://localhost:11434")) &&
+      ((v.card && v.card.source) || v.engine || "") !== "ollama";
+    if (willInterpret) {
+      chrome.tabs.sendMessage(tabId, { type: "AG_INTERPRETING" });
+      const v2 = await ollamaInterpret(c, v);
+      if (v2 && v2.engine === "ollama") chrome.tabs.sendMessage(tabId, { type: "AG_RESULT", verdict: v2 });
+      else chrome.tabs.sendMessage(tabId, { type: "AG_INTERPRET_DONE" });
+    }
   } catch (e) {
     chrome.tabs.sendMessage(tabId, { type: "AG_ERROR", error: String(e && e.message || e) });
   }
@@ -152,21 +164,29 @@ async function ollamaInterpret(c, v) {
   try {
     if (!v || c.provider !== "ollama" || !c.ollamaModel) return v;
     const oURL = (c.ollamaUrl || "http://localhost:11434").replace(/\/$/, "");
-    // 로컬 백엔드를 쓰면 서버가 이미 Ollama 로 통역함 — 원격 백엔드일 때만 직결 보강
-    if (!isLocalUrl(oURL) || isLocalUrl(c.apiBase)) return v;
+    if (!isLocalUrl(oURL)) return v;  // 직결 대상은 로컬 Ollama 뿐
+    // 로컬 백엔드(:8000)를 쓰면 서버가 이미 Ollama 로 통역하므로, 규칙(fallback)일 때만 보강한다.
+    // 원격 백엔드면 무조건 로컬 Ollama 로 통역(그래야 '오프라인 규칙'이 아니라 온디바이스 AI 판단이 뜬다).
+    const src = (v.card && v.card.source) || v.engine || "";
+    const backendIsLocal = isLocalUrl(c.apiBase);
+    if (backendIsLocal && src && src !== "fallback" && src !== "off" && src !== "local") return v;
+    // 이미 로컬 Ollama 로 통역된 결과면 그대로
+    if (src === "ollama") return v;
     const meta = (v.findings || []).slice(0, 8)
-      .map((f) => ({ rule: f.rule_id, sev: f.severity, what: f.what }));
+      .map((f) => ({ rule: f.rule_id, sev: f.severity, what: f.what || f.title || f.rule_id }));
     if (!meta.length) return v;
     const sys = "너는 보안 통역사다. 아래 '위험 메타' 목록만 근거로, 컴퓨터를 모르는 사람에게 " +
       "쉬운 한국어로 설명하라. 과장 금지, 목록에 없는 사실 금지, 각 항목 1~2문장. " +
       '반드시 JSON 하나만 출력: {"headline":"한 줄 요약","hidden":"무엇이 숨어있나",' +
       '"how":"어떻게 작동하나","impact":"내 기기에 무슨 피해","action":"지금 할 일(짧게)"}';
-    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 25000);
+    // 4B CPU 콜드스타트는 카드 한 장 생성에 수십 초 걸릴 수 있다 → 넉넉히 90초.
+    // keep_alive로 모델을 10분 상주시켜 다음 검사는 즉시 응답.
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 90000);
     const r = await fetch(oURL + "/api/chat", {
       method: "POST", signal: ctl.signal,
       body: JSON.stringify({
-        model: c.ollamaModel, stream: false, think: false, format: "json",
-        options: { temperature: 0 },
+        model: c.ollamaModel, stream: false, format: "json", keep_alive: "10m",
+        options: { temperature: 0, num_ctx: 4096, num_predict: 400 },
         messages: [{ role: "system", content: sys },
                    { role: "user", content: JSON.stringify(meta) }]
       })

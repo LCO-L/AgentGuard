@@ -160,9 +160,19 @@
   else setTimeout(gatedRun, 400);
 
   // ── background 메시지 ──
+  // 판단 배지 옆 '온디바이스 AI가 통역 중' 표시 토글
+  function setInterpreting(on) {
+    var el = root.querySelector(".eng");
+    if (!el) return;
+    if (on) el.innerHTML = '🖥️ 온디바이스 AI가 쉬운 말로 통역 중… <span style="opacity:.6">(내 컴퓨터에서 처리)</span>';
+  }
   chrome.runtime.onMessage.addListener(function (msg) {
     if (msg.type === "AG_BUSY") showBusy(msg.kind);
     else if (msg.type === "AG_RESULT") showCard(msg.verdict);
+    else if (msg.type === "AG_INTERPRETING") setInterpreting(true);
+    else if (msg.type === "AG_INTERPRET_DONE") { /* 통역 실패/불필요 — 규칙 카드 그대로 유지 */
+      var el = root.querySelector(".eng"); if (el) el.innerHTML = "🔒 기기 안에서 검사 · 판단: ⚙️ 오프라인 규칙";
+    }
     else if (msg.type === "AG_ERROR") showError(msg.error);
     else if (msg.type === "AG_SCAN_PAGE") {
       var text = (document.body ? document.body.innerText : "").slice(0, 40000);
