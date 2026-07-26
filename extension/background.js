@@ -73,7 +73,7 @@ chrome.downloads.onCreated.addListener(async (item) => {
   const url = item.finalUrl || item.url || "";
   if (!/^https?:/i.test(url)) return;
   try {
-    const v = await callApi("/v1/scan/url", { url });
+    const v = await scanApi("/v1/scan/url", { url });
     if (v && (v.overall === "red" || v.overall === "yellow")) {
       notify(v, url);
       // 활성 탭에도 카드 전달
@@ -100,8 +100,8 @@ async function runScan(tabId, kind, payload) {
   try {
     chrome.tabs.sendMessage(tabId, { type: "AG_BUSY", kind });
     let v;
-    if (kind === "url") v = await callApi("/v1/scan/url", { url: payload.url });
-    else v = await callApi("/v1/scan/text", { text: payload.text || "", source: payload.source || "선택" });
+    if (kind === "url") v = await scanApi("/v1/scan/url", { url: payload.url });
+    else v = await scanApi("/v1/scan/text", { text: payload.text || "", source: payload.source || "선택" });
     chrome.tabs.sendMessage(tabId, { type: "AG_RESULT", verdict: v });
   } catch (e) {
     chrome.tabs.sendMessage(tabId, { type: "AG_ERROR", error: String(e && e.message || e) });
@@ -115,6 +115,58 @@ async function callApi(path, body) {
   });
   if (!r.ok) throw new Error("HTTP " + r.status);
   return r.json();
+}
+
+// ── Ollama 직결 통역 — 백엔드가 원격이라 사용자 로컬 Ollama 에 못 닿을 때,
+//    확장이 직접 로컬 Ollama 로 통역 카드를 보강한다(익스텐션 단독 온디바이스).
+//    원문이 아니라 '위험 메타(findings)'만 전달 — 비유출 원칙은 로컬에서도 지킨다.
+function isLocalUrl(u) { return /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(u || ""); }
+
+async function ollamaInterpret(c, v) {
+  try {
+    if (!v || c.provider !== "ollama" || !c.ollamaModel) return v;
+    const oURL = (c.ollamaUrl || "http://localhost:11434").replace(/\/$/, "");
+    // 로컬 백엔드를 쓰면 서버가 이미 Ollama 로 통역함 — 원격 백엔드일 때만 직결 보강
+    if (!isLocalUrl(oURL) || isLocalUrl(c.apiBase)) return v;
+    const meta = (v.findings || []).slice(0, 8)
+      .map((f) => ({ rule: f.rule_id, sev: f.severity, what: f.what }));
+    if (!meta.length) return v;
+    const sys = "너는 보안 통역사다. 아래 '위험 메타' 목록만 근거로, 컴퓨터를 모르는 사람에게 " +
+      "쉬운 한국어로 설명하라. 과장 금지, 목록에 없는 사실 금지, 각 항목 1~2문장. " +
+      '반드시 JSON 하나만 출력: {"headline":"한 줄 요약","hidden":"무엇이 숨어있나",' +
+      '"how":"어떻게 작동하나","impact":"내 기기에 무슨 피해","action":"지금 할 일(짧게)"}';
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 25000);
+    const r = await fetch(oURL + "/api/chat", {
+      method: "POST", signal: ctl.signal,
+      body: JSON.stringify({
+        model: c.ollamaModel, stream: false, think: false, format: "json",
+        options: { temperature: 0 },
+        messages: [{ role: "system", content: sys },
+                   { role: "user", content: JSON.stringify(meta) }]
+      })
+    });
+    clearTimeout(tm);
+    if (!r.ok) return v;
+    const d = await r.json();
+    const txt = (d.message && d.message.content) || "";
+    const s = txt.indexOf("{"), e = txt.lastIndexOf("}");
+    if (s < 0 || e <= s) return v;
+    const j = JSON.parse(txt.slice(s, e + 1));
+    if (j && j.headline) {
+      v.card = Object.assign({}, v.card, j, { source: "ollama" });
+      v.engine = "ollama";
+    }
+  } catch (e) { /* 직결 실패 시 규칙 카드 그대로 — 항상 결과는 나온다 */ }
+  return v;
+}
+
+async function scanApi(path, body) {
+  const c = await getCfg();
+  const r = await fetch(c.apiBase.replace(/\/$/, "") + path, {
+    method: "POST", headers: aiHeaders(c), body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return ollamaInterpret(c, await r.json());
 }
 
 // ── (B) LLM 심층 검사 계층 — 결과 캐싱(Map) + 차단 로그 ──
@@ -171,7 +223,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg.type === "AG_SCAN_TEXT") {
-    callApi("/v1/scan/text", { text: msg.text, source: msg.source || "페이지" })
+    scanApi("/v1/scan/text", { text: msg.text, source: msg.source || "페이지" })
       .then((v) => { if (sender.tab && sender.tab.id) chrome.tabs.sendMessage(sender.tab.id, { type: "AG_RESULT", verdict: v }); })
       .catch((e) => { if (sender.tab && sender.tab.id) chrome.tabs.sendMessage(sender.tab.id, { type: "AG_ERROR", error: String(e) }); });
     return false;
