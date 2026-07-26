@@ -256,6 +256,7 @@ Optional environment variables: `AG_AI_PROVIDER` · `ANTHROPIC_API_KEY` · `OPEN
 - [`docs/DEMO_SCENARIOS.en.md`](docs/DEMO_SCENARIOS.en.md) — walkthrough examples for every feature
 - [`docs/PRODUCTS.en.md`](docs/PRODUCTS.en.md) — one engine, many artifacts
 - [`docs/ONDEVICE_OLLAMA.en.md`](docs/ONDEVICE_OLLAMA.en.md) — on-device setup & troubleshooting
+- [`docs/AIRGAP.en.md`](docs/AIRGAP.en.md) — air-gapped operation guide · data boundary per configuration
 - [`docs/IOS_SHORTCUT.en.md`](docs/IOS_SHORTCUT.en.md) — "long-press to scan" on iPhone
 - [`docs/APK.en.md`](docs/APK.en.md) · [`docs/MAC_APP.en.md`](docs/MAC_APP.en.md) — Android & Mac app builds
 - [`CONTRIBUTING.en.md`](CONTRIBUTING.en.md) — how to contribute (starting from a one-line scenario)

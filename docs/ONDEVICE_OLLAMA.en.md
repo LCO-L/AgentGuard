@@ -5,6 +5,7 @@
 > Runs AgentGuard's layer 2 (intent analysis), interpretation, and chat **inside your computer, no internet**.
 > The heart of on-device mode is that originals and prompts never leave the device.
 > **Even without Ollama**, every feature works identically via the offline rule engine (Ollama only raises quality).
+> For fully air-gapped import & verification, see [`AIRGAP.en.md`](AIRGAP.en.md).
 
 ## 1. Install (3 steps)
 

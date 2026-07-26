@@ -255,6 +255,7 @@ SQL을 SQL룰이 잡은 것 — 스크립트가 미탐·오탐 목록까지 정�
 - [`docs/DEMO_SCENARIOS.md`](docs/DEMO_SCENARIOS.md) — 모든 기능을 따라해 볼 수 있는 예시 모음
 - [`docs/PRODUCTS.md`](docs/PRODUCTS.md) — 하나의 엔진, 여러 산출물
 - [`docs/ONDEVICE_OLLAMA.md`](docs/ONDEVICE_OLLAMA.md) — 온디바이스 설정·문제 해결
+- [`docs/AIRGAP.md`](docs/AIRGAP.md) — 폐쇄망(에어갭) 운영 가이드 · 구성별 데이터 경계
 - [`docs/IOS_SHORTCUT.md`](docs/IOS_SHORTCUT.md) — 아이폰에서 "꾹 눌러 검사"
 - [`docs/APK.md`](docs/APK.md) · [`docs/MAC_APP.md`](docs/MAC_APP.md) — 안드로이드·맥 앱 빌드
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — 기여 방법 (시나리오 한 줄부터)
