@@ -26,7 +26,7 @@ ollama pull hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M
 
 1. **Ollama 설치** — `brew`가 있으면 brew로, 없으면 **공식 배포본을 직접 내려받아**(`~/.agentguard/`) 실행 파일 확보 → *Homebrew가 없어도 됩니다*
 2. **`ollama serve` 자동 기동**
-3. **Qwen3 4B(unsloth 4bit ~2.5GB) 자동 pull** — 이미 받은 채팅 모델이 있으면 그걸로 즉시 시작(추가 다운로드 없음)
+3. **Qwen3 4B(unsloth 4bit ~2.5GB) 자동 pull** — 지정 모델 고정(다른 설치 모델로 대체하지 않음), 이미 받았다면 즉시 시작
 4. **준비 완료** → 온디바이스로 검사
 
 > 설치형(내 컴퓨터에서 실행)에서 100% 자동. 클라우드 배포는 GPU·권한 한계로 성공이 환경에 따라 다릅니다.

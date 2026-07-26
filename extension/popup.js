@@ -4,9 +4,13 @@ const DEF = {
   ollamaUrl: "", ollamaModel: "", claudeKey: "", claudeModel: "",
   openrouterKey: "", openrouterModel: "", clientId: ""
 };
+// 온디바이스 기본 모델 — Qwen3 4B · unsloth 4bit(Q4_K_M). 온디바이스 실행 시 '이 모델을' 로컬에 받아 쓴다.
+const MODEL_DEFAULT = "hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M";
+const OLLAMA_DEFAULT = "http://localhost:11434";
 const $ = (s) => document.querySelector(s);
 let CFG = Object.assign({}, DEF);
 
+// ── 공용 헬퍼 ──
 function aiHeaders(c) {
   const h = { "Content-Type": "application/json" };
   if (c.clientId) h["X-AG-Client"] = c.clientId;
@@ -17,6 +21,14 @@ function aiHeaders(c) {
   return h;
 }
 function apiBase() { return (CFG.apiBase || DEF.apiBase).replace(/\/$/, ""); }
+function ollamaUrl() { return (CFG.ollamaUrl || OLLAMA_DEFAULT).replace(/\/$/, ""); }
+function isLocalUrl(u) { return /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(u || ""); }
+function timed(ms) { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; }
+// Ollama 직결 모드 = provider가 ollama & Ollama 주소가 로컬 → 상태/테스트를 Ollama에 직접 물어봐야 정확
+function isDirectOllama() { return CFG.provider === "ollama" && isLocalUrl(ollamaUrl()); }
+function modelInstalled(models, m) {
+  return models.some((n) => n === m || n === m + ":latest" || (m.endsWith(":latest") && n === m.slice(0, -7)));
+}
 
 function paintProv() {
   document.querySelectorAll("#prov button").forEach((b) => b.classList.toggle("on", b.dataset.p === CFG.provider));
@@ -34,23 +46,53 @@ async function load() {
 }
 
 document.querySelectorAll("#prov button").forEach((b) =>
-  b.onclick = () => { CFG.provider = b.dataset.p; paintProv(); save(); });
+  b.onclick = () => { CFG.provider = b.dataset.p; paintProv(); save(); refreshStatus(); });
 $("#apiBase").oninput = (e) => { CFG.apiBase = e.target.value.trim(); save(); };
 $("#ollamaUrl").oninput = (e) => { CFG.ollamaUrl = e.target.value.trim(); save(); };
 $("#claudeKey").oninput = (e) => { CFG.claudeKey = e.target.value.trim(); save(); };
 $("#openrouterKey").oninput = (e) => { CFG.openrouterKey = e.target.value.trim(); save(); };
 
+const mkPill = (n, ok) => `<span class="pill ${ok ? "ok" : ""}">${n} ${ok ? "●" : "○"}</span>`;
+
 async function refreshStatus() {
+  // 직결 모드: 클라우드 백엔드가 아니라 사용자 로컬 Ollama 를 직접 확인해야 정확하다
+  if (isDirectOllama()) {
+    try {
+      const r = await fetch(ollamaUrl() + "/api/tags", { signal: timed(1500) });
+      const ok = r.ok;
+      let extra = "";
+      if (ok) { try { const d = await r.json(); extra = ` · 모델 ${(d.models || []).length}개`; } catch (e) {} }
+      $("#status").innerHTML = mkPill("Ollama 직결", ok) + `<span class="pill">${ok ? "내 컴퓨터에서 판단" + extra : "Ollama 꺼짐"}</span>`;
+    } catch (e) { $("#status").innerHTML = mkPill("Ollama 직결", false) + '<span class="pill">Ollama 꺼짐 — 실행 필요</span>'; }
+    return;
+  }
   try {
     const r = await fetch(apiBase() + "/v1/ai/status", { headers: aiHeaders(CFG) });
     const d = await r.json(); const p = d.providers || {};
-    const mk = (n, ok) => `<span class="pill ${ok ? "ok" : ""}">${n} ${ok ? "●" : "○"}</span>`;
-    $("#status").innerHTML = mk("Ollama", p.ollama) + mk("Claude", p.claude) + mk("OpenRouter", p.openrouter);
+    $("#status").innerHTML = mkPill("Ollama", p.ollama) + mkPill("Claude", p.claude) + mkPill("OpenRouter", p.openrouter);
   } catch (e) { $("#status").innerHTML = '<span class="pill">백엔드에 연결할 수 없어요</span>'; }
 }
 
 $("#testBtn").onclick = async () => {
   const t = $("#test"); t.className = "test"; t.textContent = "테스트 중…";
+  // 직결 모드: Ollama 에 직접 1토큰 추론 테스트
+  if (isDirectOllama()) {
+    const model = CFG.ollamaModel || MODEL_DEFAULT;
+    try {
+      const t0 = performance.now();
+      const r = await fetch(ollamaUrl() + "/api/chat", {
+        method: "POST", signal: timed(90000),
+        body: JSON.stringify({ model, stream: false, think: false,
+          messages: [{ role: "user", content: "hi" }], options: { num_predict: 1 } })
+      });
+      if (r.status === 403) { t.className = "test bad"; t.textContent = "✗ Ollama가 확장 연결을 막아요(403) — 아래 온디바이스 실행을 눌러 자동 우회하세요"; return; }
+      if (!r.ok) { t.className = "test bad"; t.textContent = "✗ Ollama HTTP " + r.status + " — 모델이 설치됐는지 확인하세요"; return; }
+      const d = await r.json();
+      if (d.message || d.done) { t.className = "test ok"; t.textContent = `✓ 연결됨 · Ollama 직결 · ${Math.round(performance.now() - t0)}ms · ${model.split("/").pop()}`; }
+      else { t.className = "test bad"; t.textContent = "✗ 응답이 비었어요 — 모델을 다시 준비해 보세요"; }
+    } catch (e) { t.className = "test bad"; t.textContent = "✗ Ollama에 연결할 수 없어요 — 실행 중인지 확인하세요"; }
+    return;
+  }
   try {
     const r = await fetch(apiBase() + "/v1/ai/test", { method: "POST", headers: aiHeaders(CFG), body: "{}" });
     const d = await r.json();
@@ -70,8 +112,6 @@ let CUR_HOST = "";
 async function loadToggles() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   try { CUR_HOST = tab && tab.url ? new URL(tab.url).hostname : ""; } catch (e) { CUR_HOST = ""; }
-  // 설정 탭(options_ui)이나 chrome:// 페이지에서는 '현재 사이트' 개념이 없다 —
-  // 확장 ID 같은 깨진 문자열 대신, 사이트별 끄기·페이지 검사 UI 를 숨긴다
   const onWebPage = !!(tab && tab.url && /^https?:/i.test(tab.url));
   if (!onWebPage) {
     const sb = document.querySelector(".sitebox"); if (sb) sb.style.display = "none";
@@ -112,41 +152,30 @@ $("#logClear").onclick = () =>
 // ══════════════════════════════════════════════════════════════════
 //  온디바이스 원클릭 — 어떤 환경에서도 '되는 데까지 자동', 죽은 골목 없음.
 //  1) 로컬 AgentGuard 백엔드(:8000) 발견 → 풀 엔진 원클릭(설치→serve→pull)
-//  2) 백엔드 없이 Ollama(:11434)만 발견 → 확장이 직결: 모델 자동 pull(REST,
-//     진행률) → 1토큰 추론 검증 → provider 저장. 판단이 내 컴퓨터에서 돈다.
+//  2) 백엔드 없이 Ollama(:11434)만 발견 → 확장이 직결: 지정 모델(Qwen3 4B 4bit)을
+//     로컬에 pull(진행률) → 1토큰 추론 검증 → provider 저장.
 //  3) 둘 다 없음 → 에러가 아니라 "지금도 규칙으로 보호 중" + 공식 설치 링크.
+//  ★ 정책: '지정 모델(MODEL_DEFAULT) 고정'. 이미 깔린 아무 모델이나 대체 선택하지 않는다.
 // ══════════════════════════════════════════════════════════════════
 (function () {
   const btn = $("#odBtn"), body = $("#odBody"), bar = $("#odBar"), msg = $("#odMsg"), link = $("#odLink");
   if (!btn) return;
   let poll = null;
-  let userRun = false;  // 사용자가 '실행'을 눌렀을 때만 provider 자동 전환(몰래 설정 변경 금지)
+  let userRun = false;
   const RUNNING = ["checking", "starting", "pulling"];
   const LOCAL = "http://localhost:8000";
-  const OLLAMA_DEFAULT = "http://localhost:11434";
-  const MODEL_DEFAULT = "hf.co/unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M";
-
-  function ollamaUrl() { return (CFG.ollamaUrl || OLLAMA_DEFAULT).replace(/\/$/, ""); }
-  function isLocalBase() { return /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(apiBase()); }
-  function timed(ms) { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; }
 
   async function probeLocal() {
     try { const r = await fetch(LOCAL + "/v1/health", { signal: timed(1500) }); return r.ok; }
     catch (e) { return false; }
   }
   async function probeOllama() {
-    // Ollama 직결 감지 — 설치된 모델 목록 반환(없으면 null)
     try {
       const r = await fetch(ollamaUrl() + "/api/tags", { signal: timed(1500) });
       if (!r.ok) return null;
       const d = await r.json();
       return (d.models || []).map((m) => m.name || m.model).filter(Boolean);
     } catch (e) { return null; }
-  }
-  function pickChatModel(models) {
-    const chat = models.filter((n) => !/embed/i.test(n));
-    if (!chat.length) return null;
-    return chat.find((n) => /qwen3/i.test(n)) || chat.find((n) => /8b/i.test(n)) || chat[0];
   }
 
   function show(pct, text, color) {
@@ -160,13 +189,13 @@ $("#logClear").onclick = () =>
     btn.disabled = false;
     btn.textContent = "✓ 온디바이스 준비 완료 — 다시 실행";
     link.style.display = "none";
+    refreshStatus();
   }
 
-  // ── ② Ollama 직결 경로: 모델 확보(REST pull, NDJSON 진행률) → 추론 검증 → 저장 ──
+  // ── ② Ollama 직결: 지정 모델 pull(NDJSON 진행률) → 추론 검증 → 저장 ──
   async function ollamaPull(model) {
-    const resp = await fetch(ollamaUrl() + "/api/pull", {
-      method: "POST", body: JSON.stringify({ model: model })
-    });
+    const resp = await fetch(ollamaUrl() + "/api/pull", { method: "POST", body: JSON.stringify({ model }) });
+    if (resp.status === 403) { const e = new Error("ORIGIN_403"); e.origin403 = true; throw e; }
     if (!resp.ok || !resp.body) throw new Error("pull HTTP " + resp.status);
     const reader = resp.body.getReader(); const dec = new TextDecoder();
     let buf = "";
@@ -177,48 +206,44 @@ $("#logClear").onclick = () =>
       const lines = buf.split("\n"); buf = lines.pop() || "";
       for (const ln of lines) {
         if (!ln.trim()) continue;
-        try {
-          const j = JSON.parse(ln);
-          if (j.error) throw new Error(j.error);
-          if (j.total && j.completed != null) {
-            const pct = Math.min(99, Math.round(j.completed * 100 / j.total));
-            show(Math.max(10, pct), model + " 다운로드 중… " + pct + "% (최초 1회)");
-          } else if (j.status) show(10, j.status);
-        } catch (e) { if (String(e.message || e).length > 3 && !/JSON/.test(String(e))) throw e; }
+        let j; try { j = JSON.parse(ln); } catch (e) { continue; }
+        if (j.error) throw new Error(j.error);
+        if (j.total && j.completed != null) {
+          const pct = Math.min(99, Math.round(j.completed * 100 / j.total));
+          show(Math.max(10, pct), model.split("/").pop() + " 다운로드 중… " + pct + "% (최초 1회, ~2.5GB)");
+        } else if (j.status) show(10, j.status);
       }
     }
   }
   async function ollamaVerify(model) {
     const r = await fetch(ollamaUrl() + "/api/chat", {
       method: "POST", signal: timed(90000),
-      body: JSON.stringify({ model: model, stream: false, think: false,
+      body: JSON.stringify({ model, stream: false, think: false,
         messages: [{ role: "user", content: "hi" }], options: { num_predict: 1 } })
     });
-    if (r.status === 403) {  // 구형 Ollama: Origin 제거로도 안 되면 서버 설정 필요
-      const e = new Error("ORIGIN_403"); e.origin403 = true; throw e;
-    }
+    if (r.status === 403) { const e = new Error("ORIGIN_403"); e.origin403 = true; throw e; }
     if (!r.ok) throw new Error("chat HTTP " + r.status);
     const d = await r.json();
     if (!(d.message || d.done)) throw new Error("no response");
   }
   async function runDirectOllama(models) {
-    let model = pickChatModel(models);
-    if (!model) {
-      show(10, "채팅 모델이 없어요 — 소형 4bit 모델을 자동으로 받아올게요");
-      await ollamaPull(MODEL_DEFAULT);
-      model = MODEL_DEFAULT;
+    // ★ 지정 모델 고정 — 있으면 그대로, 없으면 반드시 그 모델을 받아온다(다른 모델 대체 금지)
+    const model = MODEL_DEFAULT;
+    if (modelInstalled(models, model)) {
+      show(70, "지정 모델 확인: Qwen3 4B(unsloth 4bit) — 연결 확인 중…");
     } else {
-      show(60, "설치된 모델 발견: " + model + " — 연결 확인 중…");
+      show(10, "지정 모델을 내 컴퓨터에 받아올게요: Qwen3 4B · unsloth 4bit");
+      await ollamaPull(model);
     }
-    show(90, model + " 추론 확인 중…");
+    show(92, "Qwen3 4B 추론 확인 중…");
     await ollamaVerify(model);
     CFG.provider = "ollama"; CFG.ollamaUrl = ollamaUrl(); CFG.ollamaModel = model;
     $("#ollamaUrl").value = CFG.ollamaUrl;
     paintProv(); save();
-    setReady("준비 완료! " + model + " · Ollama 직결 — 판단이 내 컴퓨터에서 이뤄져요 🖥️");
+    setReady("준비 완료! Qwen3 4B(unsloth 4bit) · Ollama 직결 — 판단이 내 컴퓨터에서 이뤄져요 🖥️");
   }
 
-  // ── ① 로컬 백엔드 경로: 서버의 원클릭 오케스트레이션(설치→serve→pull) 재사용 ──
+  // ── ① 로컬 백엔드: 서버의 원클릭 오케스트레이션 재사용 ──
   function paint(d) {
     if (!d || !d.state) return;
     show(d.progress || 0, d.message || "",
@@ -250,41 +275,35 @@ $("#logClear").onclick = () =>
     else btn.disabled = false;
   }
 
-  // ── 원클릭 캐스케이드 ──
   btn.onclick = async () => {
     userRun = true;
     btn.disabled = true;
     show(3, "내 컴퓨터에서 실행 환경을 찾는 중…");
     try {
-      // ① 로컬 AgentGuard 백엔드
-      if (isLocalBase() || await probeLocal()) {
-        if (!isLocalBase()) {
+      if (isLocalUrl(apiBase()) || await probeLocal()) {
+        if (!isLocalUrl(apiBase())) {
           CFG.apiBase = LOCAL; $("#apiBase").value = LOCAL; save();
           show(6, "내 컴퓨터의 AgentGuard 백엔드를 찾았어요 — 여기서 실행할게요");
         }
         await runViaBackend();
         return;
       }
-      // ② Ollama 직결
       const models = await probeOllama();
       if (models) {
         show(8, "Ollama 발견 — 내 컴퓨터의 Ollama와 직결할게요");
         await runDirectOllama(models);
         return;
       }
-      // ③ 안내(죽은 골목 아님 — 규칙 보호는 이미 켜져 있음)
       btn.disabled = false;
       link.style.display = "inline-block";
       show(0, "Ollama가 아직 없어요. 아래 '설치하기'로 공식 설치 후 이 버튼을 다시 누르면 " +
-        "모델 준비→연결까지 자동으로 끝나요. 지금도 페이지·입력창은 온디바이스 규칙으로 보호 중이에요 🛡️",
+        "지정 모델(Qwen3 4B 4bit) 다운로드→연결까지 자동으로 끝나요. 지금도 페이지·입력창은 온디바이스 규칙으로 보호 중이에요 🛡️",
         "#B45309");
     } catch (e) {
       btn.disabled = false;
       if (e && e.origin403) {
-        // 확장의 Origin 제거로도 403 → 구형 Ollama. 한 줄 설정이면 끝.
-        show(0, "Ollama가 브라우저 확장의 연결을 막고 있어요(403). 터미널에서 아래 한 줄이면 해결돼요:\n" +
-          "launchctl setenv OLLAMA_ORIGINS \"*\" 후 Ollama 재시작 (Windows: 시스템 환경변수 OLLAMA_ORIGINS=*).\n" +
-          "또는 설치형 백엔드(./install.sh)를 쓰면 이 과정이 아예 필요 없어요.", "#E5484D");
+        show(0, "Ollama가 브라우저 확장의 연결을 막고 있어요(403). 확장을 새로고침(chrome://extensions → ↻)하면 자동 우회가 적용돼요. " +
+          "그래도면 터미널에서: launchctl setenv OLLAMA_ORIGINS \"*\" 후 Ollama 재시작 (Windows: 환경변수 OLLAMA_ORIGINS=*).", "#E5484D");
       } else {
         show(0, "온디바이스 준비 중 문제가 생겼어요: " + String(e && e.message || e).slice(0, 120) +
           " — 다시 눌러 재시도할 수 있어요", "#E5484D");
@@ -293,20 +312,18 @@ $("#logClear").onclick = () =>
   };
 
   // 설정을 열었을 때: 진행/완료 상태 이어보기(로컬 백엔드 우선, 없으면 Ollama 직결 상태)
-  // CFG 가 storage 에서 로드된 '후'에 실행돼야 하므로 load() 완료 시점에 호출된다.
   window.__odInit = async () => {
     try {
       if (await probeLocal()) {
-        const base = isLocalBase() ? apiBase() : LOCAL;
+        const base = isLocalUrl(apiBase()) ? apiBase() : LOCAL;
         const r = await fetch(base + "/v1/ai/ondevice/status");
         const d = await r.json();
         if (d && d.state && d.state !== "idle") { paint(d); if (RUNNING.includes(d.state)) startPoll(); }
         return;
       }
-      // Ollama 직결로 이미 쓰고 있으면 준비 상태 표시(설정 변경 없음)
       if (CFG.provider === "ollama" && CFG.ollamaModel) {
         const models = await probeOllama();
-        if (models && models.length) setReady("온디바이스 연결됨 · " + CFG.ollamaModel + " (Ollama 직결)");
+        if (models && modelInstalled(models, CFG.ollamaModel)) setReady("온디바이스 연결됨 · Qwen3 4B(unsloth 4bit) · Ollama 직결");
       }
     } catch (e) { /* 조용히 */ }
   };

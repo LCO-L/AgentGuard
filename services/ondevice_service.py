@@ -90,15 +90,6 @@ def _model_installed(model: str) -> bool:
     return model in installed or f"{model}:latest" in installed
 
 
-def _best_installed(model: str) -> str | None:
-    """요청 모델이 없으면 설치된 채팅 모델 중 최적(8B급 우선, 임베딩 제외)."""
-    installed = [n for n in _installed_models() if "embed" not in n.lower()]
-    if not installed:
-        return None
-    big = [n for n in installed if "8b" in n.lower()]
-    return big[0] if big else installed[0]
-
-
 def _verify_inference(model: str) -> tuple[bool, str]:
     """모델이 '실제로' 추론되는지 1토큰 생성으로 확인 — llama-server segfault 등 조기 감지.
 
@@ -394,13 +385,10 @@ def _run(model: str) -> None:
                                             "터미널에서 `ollama serve`를 확인하세요.")
                 return
 
-        # ③ 모델 준비 — 설치됨 → 추론검증 후 ready / 비슷한 모델 있음 → 그걸로 / 없음 → pull
+        # ③ 모델 준비 — 지정 모델 고정: 설치됨 → 추론검증 후 ready / 없음 → 반드시 pull
+        #    (다른 설치 모델로 대체하지 않는다 — 온디바이스 기본은 항상 Qwen3 4B·unsloth 4bit)
         if _model_installed(model):
             _mark_ready(model)
-            return
-        alt = _best_installed(model)
-        if alt:
-            _mark_ready(alt, " (설치된 모델로 바로 시작)")
             return
 
         _set(state="pulling", progress=10,

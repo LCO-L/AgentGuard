@@ -26,7 +26,7 @@ Press **[Run on-device]** in `/settings` and everything below proceeds **automat
 
 1. **Install Ollama** — via `brew` if present; otherwise the **official build is downloaded directly** (`~/.agentguard/`) → *no Homebrew required*
 2. **`ollama serve` starts automatically**
-3. **Qwen3 4B (unsloth 4bit, ~2.5GB) auto-pull** — if a chat model is already downloaded, it starts with that immediately (no extra download)
+3. **Qwen3 4B (unsloth 4bit, ~2.5GB) auto-pull** — the designated model is pinned (no substitution with other installed models); starts immediately if already downloaded
 4. **Ready** → scan on-device
 
 > 100% automatic for the installable version (running on your own machine). On cloud deployments success varies with GPU/permission limits.
