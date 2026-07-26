@@ -170,8 +170,15 @@
     if (msg.type === "AG_BUSY") showBusy(msg.kind);
     else if (msg.type === "AG_RESULT") showCard(msg.verdict);
     else if (msg.type === "AG_INTERPRETING") setInterpreting(true);
-    else if (msg.type === "AG_INTERPRET_DONE") { /* 통역 실패/불필요 — 규칙 카드 그대로 유지 */
-      var el = root.querySelector(".eng"); if (el) el.innerHTML = "🔒 기기 안에서 검사 · 판단: ⚙️ 오프라인 규칙";
+    else if (msg.type === "AG_INTERPRET_DONE") { /* 통역 실패/불필요 — 규칙 카드 유지 + 실패면 이유 표시 */
+      var el = root.querySelector(".eng");
+      if (el) {
+        var info = msg.info || {};
+        // 진짜 실패만 빨간 이유 표시(불필요/이미통역 등 정상 사유는 조용히)
+        var bad = /^(http-|timeout$|network$|empty$|parse$|no-model$)/.test(info.reason || "");
+        el.innerHTML = "🔒 기기 안에서 검사 · 판단: ⚙️ 오프라인 규칙" +
+          (bad ? '<br><span style="color:#E5484D">온디바이스 통역 실패: ' + esc(info.msg || info.reason) + "</span>" : "");
+      }
     }
     else if (msg.type === "AG_ERROR") showError(msg.error);
     else if (msg.type === "AG_SCAN_PAGE") {

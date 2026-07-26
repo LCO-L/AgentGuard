@@ -43,6 +43,34 @@ function aiHeaders(c) {
   return h;
 }
 
+// ── 온디바이스 통역 진단 ──
+// 실패를 '조용히 삼키지' 않는다. 실제 이유(403/타임아웃/파싱/네트워크)를 세 곳에 남긴다:
+//   ① 서비스워커 콘솔([AG] 접두어)  ② 카드 엔진 줄  ③ 팝업 상태(스토리지 lastInterpret)
+const IRR = {
+  ok: "온디바이스 AI 통역 완료",
+  provider: "판단 엔진이 온디바이스가 아니에요",
+  "no-model": "온디바이스 모델이 지정되지 않았어요 — 팝업에서 '온디바이스 실행'",
+  "not-local": "Ollama 주소가 내 컴퓨터(localhost)가 아니에요",
+  "no-findings": "위험 신호가 없어 통역할 내용이 없어요",
+  already: "이미 AI가 통역한 결과예요",
+  "server-side": "로컬 백엔드가 이미 통역했어요",
+  "http-403": "Ollama가 확장의 연결을 막았어요(403 · Origin 차단)",
+  timeout: "90초 안에 응답이 없었어요(모델 첫 로딩이 느릴 수 있어요)",
+  network: "Ollama에 연결하지 못했어요(꺼져 있거나 주소가 달라요)",
+  empty: "Ollama 응답이 비었어요",
+  parse: "AI 응답에서 JSON을 찾지 못했어요"
+};
+let LAST_INTERPRET = null;
+function agLog() { try { console.log.apply(console, ["[AG]"].concat([].slice.call(arguments))); } catch (e) {} }
+function noteInterpret(o) {
+  LAST_INTERPRET = Object.assign({
+    ts: Date.now(),
+    msg: IRR[o.reason] || (o.status ? "Ollama 오류 HTTP " + o.status : "Ollama " + o.reason)
+  }, o);
+  agLog("interpret", LAST_INTERPRET);
+  try { chrome.storage.local.set({ lastInterpret: LAST_INTERPRET }); } catch (e) {}
+}
+
 // ── 탭 메시지 안전 전송 ──
 // 확장 설치/리로드 '이전'에 열려 있던 탭에는 content script 가 없어서
 // sendMessage 가 "Receiving end does not exist" 로 터진다(콘솔 노이즈 + 카드 미표시).
@@ -91,7 +119,8 @@ async function ensureOllamaAccess() {
         action: { type: "modifyHeaders", requestHeaders: [{ header: "origin", operation: "remove" }] },
         condition: {
           regexFilter: "^https?://(localhost|127\\.0\\.0\\.1):11434/",
-          resourceTypes: ["xmlhttprequest"]
+          // 서비스워커 fetch 가 "other" 로 분류되는 크롬 버전이 있어 둘 다 커버
+          resourceTypes: ["xmlhttprequest", "other"]
         }
       }]
     });
@@ -149,14 +178,13 @@ async function runScan(tabId, kind, payload) {
     // 규칙 결과를 먼저 즉시 보여주고(빠름), 온디바이스 AI 통역이 오면 카드를 교체(느려도 무중단)
     let v = await callApi(path, body);
     sendToTab(tabId, { type: "AG_RESULT", verdict: v });
-    const willInterpret = c.provider === "ollama" && c.ollamaModel &&
-      isLocalUrl((c.ollamaUrl || "http://localhost:11434")) &&
-      ((v.card && v.card.source) || v.engine || "") !== "ollama";
-    if (willInterpret) {
+    if (c.provider === "ollama") {
+      // 게이트 판단은 ollamaInterpret 안에서 전부 하고, 각 사유를 noteInterpret 로 남긴다.
+      // interpretClean: 발견 0(안전)도 통역 — 안 하면 안전 카드가 영원히 '오프라인 규칙'으로 남는다.
       sendToTab(tabId, { type: "AG_INTERPRETING" });
-      const v2 = await ollamaInterpret(c, v);
+      const v2 = await ollamaInterpret(c, v, { interpretClean: true });
       if (v2 && v2.engine === "ollama") sendToTab(tabId, { type: "AG_RESULT", verdict: v2 });
-      else sendToTab(tabId, { type: "AG_INTERPRET_DONE" });
+      else sendToTab(tabId, { type: "AG_INTERPRET_DONE", info: LAST_INTERPRET });
     }
   } catch (e) {
     sendToTab(tabId, { type: "AG_ERROR", error: String(e && e.message || e) });
@@ -177,49 +205,87 @@ async function callApi(path, body) {
 //    원문이 아니라 '위험 메타(findings)'만 전달 — 비유출 원칙은 로컬에서도 지킨다.
 function isLocalUrl(u) { return /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(u || ""); }
 
-async function ollamaInterpret(c, v) {
+// 모델 출력에서 카드 JSON 추출 — num_predict 초과로 꼬리가 잘린 JSON도 필드별로 살린다.
+function parseCardJson(txt) {
+  const s = txt.indexOf("{"), e = txt.lastIndexOf("}");
+  if (s >= 0 && e > s) {
+    try {
+      const j = JSON.parse(txt.slice(s, e + 1));
+      if (j && typeof j === "object" && j.headline) return j;
+    } catch (err) { /* 아래 필드별 복구로 */ }
+  }
+  const j = {};
+  for (const k of ["headline", "hidden", "how", "impact", "action"]) {
+    const m = txt.match(new RegExp('"' + k + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+    if (m) { try { j[k] = JSON.parse('"' + m[1] + '"'); } catch (e2) { j[k] = m[1]; } }
+  }
+  return j.headline ? j : null;
+}
+
+async function ollamaInterpret(c, v, opt) {
+  opt = opt || {};
+  if (!v) return v;
+  // ── 게이트: 모든 '통역 안 함' 사유를 명시적으로 기록(조용한 실패 금지) ──
+  if (c.provider !== "ollama") { noteInterpret({ reason: "provider", provider: c.provider }); return v; }
+  if (!c.ollamaModel) { noteInterpret({ reason: "no-model" }); return v; }
+  const oURL = (c.ollamaUrl || "http://localhost:11434").replace(/\/$/, "");
+  if (!isLocalUrl(oURL)) { noteInterpret({ reason: "not-local", url: oURL }); return v; }
+  // 로컬 백엔드(:8000)를 쓰면 서버가 이미 Ollama 로 통역하므로, 규칙(fallback)일 때만 보강한다.
+  // 원격 백엔드면 무조건 로컬 Ollama 로 통역(그래야 '오프라인 규칙'이 아니라 온디바이스 AI 판단이 뜬다).
+  const src = (v.card && v.card.source) || v.engine || "";
+  const backendIsLocal = isLocalUrl(c.apiBase);
+  if (backendIsLocal && src && src !== "fallback" && src !== "off" && src !== "local") { noteInterpret({ reason: "server-side", src }); return v; }
+  if (src === "ollama") { noteInterpret({ reason: "already" }); return v; }
+  const meta = (v.findings || []).slice(0, 8)
+    .map((f) => ({ rule: f.rule_id, sev: f.severity, what: f.what || f.title || f.rule_id }));
+  if (!meta.length) {
+    // ★ 이전 버그: 발견 0(안전 판정)이면 여기서 조용히 끝나 안전 카드가 '항상' 오프라인 규칙으로 남았다.
+    //   우클릭 검사(runScan)는 안전도 통역하고, 다운로드 사전검사(scanApi)는 건너뛴다(알림도 안 띄우므로).
+    if (!opt.interpretClean) { noteInterpret({ reason: "no-findings" }); return v; }
+    meta.push({ rule: "CLEAN", sev: "green", what: "위험 신호가 발견되지 않음" });
+  }
+  const sys = "너는 보안 통역사다. 아래 '위험 메타' 목록만 근거로, 컴퓨터를 모르는 사람에게 " +
+    "쉬운 한국어로 설명하라. 과장 금지, 목록에 없는 사실 금지, 각 항목 1~2문장. " +
+    "목록이 '위험 신호가 발견되지 않음'뿐이면 안전하다고 안심시켜라. " +
+    '반드시 JSON 하나만 출력: {"headline":"한 줄 요약","hidden":"무엇이 숨어있나",' +
+    '"how":"어떻게 작동하나","impact":"내 기기에 무슨 피해","action":"지금 할 일(짧게)"}';
+  // 4B CPU 콜드스타트는 카드 한 장 생성에 수십 초 걸릴 수 있다 → 넉넉히 90초.
+  // keep_alive로 모델을 10분 상주시켜 다음 검사는 즉시 응답.
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 90000);
+  let r;
   try {
-    if (!v || c.provider !== "ollama" || !c.ollamaModel) return v;
-    const oURL = (c.ollamaUrl || "http://localhost:11434").replace(/\/$/, "");
-    if (!isLocalUrl(oURL)) return v;  // 직결 대상은 로컬 Ollama 뿐
-    // 로컬 백엔드(:8000)를 쓰면 서버가 이미 Ollama 로 통역하므로, 규칙(fallback)일 때만 보강한다.
-    // 원격 백엔드면 무조건 로컬 Ollama 로 통역(그래야 '오프라인 규칙'이 아니라 온디바이스 AI 판단이 뜬다).
-    const src = (v.card && v.card.source) || v.engine || "";
-    const backendIsLocal = isLocalUrl(c.apiBase);
-    if (backendIsLocal && src && src !== "fallback" && src !== "off" && src !== "local") return v;
-    // 이미 로컬 Ollama 로 통역된 결과면 그대로
-    if (src === "ollama") return v;
-    const meta = (v.findings || []).slice(0, 8)
-      .map((f) => ({ rule: f.rule_id, sev: f.severity, what: f.what || f.title || f.rule_id }));
-    if (!meta.length) return v;
-    const sys = "너는 보안 통역사다. 아래 '위험 메타' 목록만 근거로, 컴퓨터를 모르는 사람에게 " +
-      "쉬운 한국어로 설명하라. 과장 금지, 목록에 없는 사실 금지, 각 항목 1~2문장. " +
-      '반드시 JSON 하나만 출력: {"headline":"한 줄 요약","hidden":"무엇이 숨어있나",' +
-      '"how":"어떻게 작동하나","impact":"내 기기에 무슨 피해","action":"지금 할 일(짧게)"}';
-    // 4B CPU 콜드스타트는 카드 한 장 생성에 수십 초 걸릴 수 있다 → 넉넉히 90초.
-    // keep_alive로 모델을 10분 상주시켜 다음 검사는 즉시 응답.
-    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 90000);
-    const r = await fetch(oURL + "/api/chat", {
+    r = await fetch(oURL + "/api/chat", {
       method: "POST", signal: ctl.signal,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: c.ollamaModel, stream: false, format: "json", keep_alive: "10m",
-        options: { temperature: 0, num_ctx: 4096, num_predict: 400 },
+        // think:false — 팝업 검증(ollamaVerify)과 동일하게. 빠지면 thinking 프리앰블로 낭비/파싱 실패 여지.
+        model: c.ollamaModel, stream: false, format: "json", think: false, keep_alive: "10m",
+        // 한국어 카드 5필드는 400토큰에서 잘려 JSON 파싱이 깨질 수 있다 → 800으로 여유.
+        options: { temperature: 0, num_ctx: 4096, num_predict: 800 },
         messages: [{ role: "system", content: sys },
                    { role: "user", content: JSON.stringify(meta) }]
       })
     });
+  } catch (e) {
     clearTimeout(tm);
-    if (!r.ok) return v;
-    const d = await r.json();
-    const txt = (d.message && d.message.content) || "";
-    const s = txt.indexOf("{"), e = txt.lastIndexOf("}");
-    if (s < 0 || e <= s) return v;
-    const j = JSON.parse(txt.slice(s, e + 1));
-    if (j && j.headline) {
-      v.card = Object.assign({}, v.card, j, { source: "ollama" });
-      v.engine = "ollama";
-    }
-  } catch (e) { /* 직결 실패 시 규칙 카드 그대로 — 항상 결과는 나온다 */ }
+    noteInterpret({ reason: (e && e.name === "AbortError") ? "timeout" : "network", err: String(e && e.message || e) });
+    return v;
+  }
+  clearTimeout(tm);
+  if (!r.ok) {
+    let bodyTxt = ""; try { bodyTxt = (await r.text()).slice(0, 200); } catch (e) {}
+    noteInterpret({ reason: r.status === 403 ? "http-403" : ("http-" + r.status), status: r.status, body: bodyTxt });
+    return v;
+  }
+  let d = null;
+  try { d = await r.json(); } catch (e) {}
+  const txt = (d && d.message && d.message.content) || "";
+  if (!txt.trim()) { noteInterpret({ reason: "empty" }); return v; }
+  const j = parseCardJson(txt);
+  if (!j) { noteInterpret({ reason: "parse", sample: txt.slice(0, 160) }); return v; }
+  v.card = Object.assign({}, v.card, j, { source: "ollama" });
+  v.engine = "ollama";
+  noteInterpret({ reason: "ok", model: c.ollamaModel });
   return v;
 }
 
@@ -286,9 +352,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg.type === "AG_SCAN_TEXT") {
-    scanApi("/v1/scan/text", { text: msg.text, source: msg.source || "페이지" })
-      .then((v) => { if (sender.tab && sender.tab.id) sendToTab(sender.tab.id, { type: "AG_RESULT", verdict: v }); })
-      .catch((e) => { if (sender.tab && sender.tab.id) sendToTab(sender.tab.id, { type: "AG_ERROR", error: String(e) }); });
+    // runScan 으로 통일 — 규칙 카드 즉시 표시 → 온디바이스 통역 교체(2단계 렌더) + 실패 사유 표시
+    if (sender.tab && sender.tab.id)
+      runScan(sender.tab.id, "text", { text: msg.text, source: msg.source || "페이지" });
     return false;
   }
   if (msg.type === "AG_GET_CFG") { getCfg().then(sendResponse); return true; }

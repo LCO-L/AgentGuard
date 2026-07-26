@@ -1,0 +1,102 @@
+================================================================================
+ 문제 상황 기록 — 크롬 확장 단독에서 온디바이스 AI 판단이 안 됨
+ 작성: 2026-07-27 · 대상: extension/ (background.js, popup.js, content.js)
+================================================================================
+
+[증상]
+ 확장에서 우클릭 검사를 하면 카드는 뜨는데, 판단 라벨이 항상
+   "🔒 기기 안에서 검사 · 판단: ⚙️ 오프라인 규칙"
+ 으로만 나온다. 온디바이스 Ollama 로 통역(쉬운 말 카드)이 안 붙는다.
+
+ * 온디바이스 준비 자체는 성공: 팝업에서 "준비 완료! Qwen3 4B(unsloth 4bit) ·
+   Ollama 직결" 까지 뜸. 모델도 지정 모델(unsloth 4B Q4_K_M)로 잘 잡힘.
+ * 즉 "모델 준비"는 되는데 "실제 검사 시 그 모델로 통역"이 안 되는 상태.
+
+[현재 구조 — 왜 이렇게 되는가]
+ 확장 단독 사용자는 로컬 백엔드(:8000)가 없으므로 기본 백엔드가 클라우드
+ (https://agentguard.maeum.ai)다. 그래서 검사 흐름이 이렇게 된다:
+   ① 규칙 검사: 클라우드 백엔드 /v1/scan/* 호출 → findings + 카드(오프라인 규칙)
+   ② 통역 보강: background.js 의 ollamaInterpret() 가 사용자 로컬 Ollama
+      (localhost:11434) 에 직접 /api/chat 호출 → 카드를 온디바이스 AI 로 교체
+ ②가 실패하면 ①의 규칙 카드가 그대로 남아 "오프라인 규칙"으로 표시된다.
+ => 지금 ②(ollamaInterpret)가 조용히 실패하고 catch 로 삼켜지는 중으로 추정.
+
+[의심 원인 — 아직 미확정]
+ 1) 403 (Origin 차단)  ★가장 유력
+    - 브라우저가 확장 요청에 Origin: chrome-extension://<id> 를 붙임 →
+      Ollama 기본 설정이 이 오리진을 허용 안 해 403.
+    - 대응 시도: manifest 에 declarativeNetRequestWithHostAccess 권한 +
+      background 에서 localhost:11434 요청의 Origin 헤더를 제거하는 DNR 규칙 등록.
+    - 미확정 지점: 이 DNR 규칙이 '서비스워커(background)의 fetch'에도 적용되는가?
+      (팝업 fetch 엔 적용돼 연결 테스트가 통과했을 수 있음. SW 는 별개일 수 있음)
+ 2) 콜드스타트 타임아웃
+    - 4B CPU 첫 추론이 카드 생성(수백 토큰)에 수십 초 → 기존 25초 타임아웃 초과.
+    - 대응: 90초로 늘리고 keep_alive:"10m" 추가함. (원인이 이거면 해결됐을 수)
+ 3) JSON 파싱 실패 / 빈 응답
+    - format:"json" 인데 모델이 엉뚱한 출력 → txt 에서 {…} 못 찾아 return v.
+
+[지금까지 한 수정 (extension/)]
+ - manifest.json: declarativeNetRequestWithHostAccess 권한, options_ui,
+   아이콘 4종, version 1.0.2
+ - background.js:
+   · ensureOllamaAccess(): localhost:11434 요청 Origin 헤더 제거 DNR 규칙(id 8787)
+   · ollamaInterpret(): 로컬 Ollama /api/chat 로 카드 통역(타임아웃 90s, keep_alive)
+   · 게이트 조건 단순화(원격 백엔드+규칙카드면 무조건 로컬 통역)
+   · runScan(): 규칙 카드 먼저 표시 → 통역 오면 카드 교체(2단계 렌더)
+   · sendToTab(): content script 없는 탭엔 scripting 으로 주입 후 재시도
+     (리로드 직후 기존 탭에서 "Receiving end does not exist" 나던 것 대응)
+ - popup.js: 온디바이스 원클릭 캐스케이드(로컬 백엔드→Ollama 직결→안내),
+   지정 모델 고정, 직결 모드일 때 상태/연결테스트를 Ollama 에 직접 질의, v태그 표시
+ - content.js: "온디바이스 AI 통역 중…" 배지, 통역 완료 시 카드 교체
+ - services/ondevice_service.py: 다른 설치 모델 대체(_best_installed) 제거 → 지정 모델 고정
+
+[다음에 할 것 — 원인 특정용]
+ * ollamaInterpret 의 catch 를 '조용히 삼키지 말고' 실제 에러를 노출:
+   - 콘솔에 [AG] 접두어로 status/message 로깅
+   - content 카드 엔진 줄에 "온디바이스 통역 실패: <이유>" 임시 표시
+   => 다음 실행에서 화면/콘솔에 뜨는 실제 이유(403 / abort / parse)를 보고 확정.
+ * 확인 방법: chrome://extensions → AgentGuard → "서비스 워커" 클릭 →
+   콘솔에서 우클릭 검사 시 찍히는 로그 확인. 그 로그를 캡처해 공유.
+
+[근본 대안 (원인이 403/DNR 미적용으로 확정될 경우)]
+ A. Ollama 쪽 설정: OLLAMA_ORIGINS="*" 로 확장 오리진 허용(사용자 1회 설정).
+ B. 설치형 로컬 백엔드(:8000) 사용 유도 — 서버↔서버라 Origin 문제 원천 없음.
+    이게 가장 견고. 확장은 로컬 백엔드가 있으면 그쪽을 자동으로 씀(cascade ①).
+ C. 통역 fetch 를 offscreen document 등 다른 컨텍스트에서 시도(효과 불확실).
+
+[결론 한 줄]
+ "모델 준비"까지는 되지만 "검사 시 로컬 Ollama 통역 호출"이 실패해 규칙 카드로
+ 폴백 중. 실패의 실제 원인(가장 유력: SW fetch 의 403)을 로그로 특정하는 것이
+ 다음 단계. 확정되면 위 A/B/C 중 하나로 마무리.
+================================================================================
+
+[처리 기록 — 2026-07-27 · v1.0.3]
+ 코드 정독으로 '조용한 실패' 지점을 특정·전부 수정. 403 가설보다 유력한
+ 원인이 코드에 있었다:
+
+ ★원인 1 (최유력): ollamaInterpret 의 `if (!meta.length) return v`
+   — findings 0(안전 판정)이면 통역을 아예 안 함. 정상 링크/페이지를
+   검사하면 '항상' 오프라인 규칙으로 남는다. 증상과 정확히 일치.
+   → 수정: 우클릭 검사(runScan)는 안전 판정도 CLEAN 메타로 통역.
+     다운로드 사전검사(scanApi)만 기존대로 건너뜀(알림 안 띄우므로).
+ ★원인 2: num_predict 400 — 한국어 카드 5필드가 400토큰에서 잘려
+   JSON 파싱 실패 → catch 로 삼켜짐. → 800으로 상향 + 잘린 JSON 도
+   필드별 정규식으로 복구하는 parseCardJson() 추가.
+ ★원인 3: 팝업 검증(ollamaVerify)엔 있는 think:false 가 통역 호출엔
+   없었음(팝업은 되고 SW 는 안 되는 실제 차이점). → 동일하게 추가.
+ 그 외: Content-Type 헤더 추가, DNR resourceTypes 에 "other" 추가
+   (SW fetch 분류 차이 커버).
+
+ 계측(조용한 실패 금지):
+ - background.js: noteInterpret() — 모든 게이트/실패 사유를
+   ①SW 콘솔 [AG] 로그 ②storage.lastInterpret ③AG_INTERPRET_DONE.info 로 기록.
+   사유 코드: provider/no-model/not-local/no-findings/already/server-side/
+   http-403/http-<n>/timeout/network/empty/parse/ok
+ - content.js: 진짜 실패(http-*/timeout/network/empty/parse/no-model)면
+   엔진 줄에 "온디바이스 통역 실패: <이유>" 빨간 표시.
+ - AG_SCAN_TEXT(이 페이지 검사)도 runScan 경유로 통일 — 2단계 렌더 적용.
+
+ 확인 방법: chrome://extensions → ↻ 리로드(헤더 v1.0.3 확인) → 우클릭 검사
+ → 카드 엔진 줄이 "🖥️ 온디바이스 Ollama"로 교체되는지. 실패 시 이유가
+ 카드/SW 콘솔([AG])/chrome.storage.local.lastInterpret 에 남는다.
+================================================================================
