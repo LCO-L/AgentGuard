@@ -43,6 +43,23 @@ function aiHeaders(c) {
   return h;
 }
 
+// ── 탭 메시지 안전 전송 ──
+// 확장 설치/리로드 '이전'에 열려 있던 탭에는 content script 가 없어서
+// sendMessage 가 "Receiving end does not exist" 로 터진다(콘솔 노이즈 + 카드 미표시).
+// 해법: 실패하면 scripting 으로 주입 후 1회 재시도. (세 스크립트 모두 중복 마운트 가드 있음)
+async function sendToTab(tabId, msg) {
+  try { return await chrome.tabs.sendMessage(tabId, msg); }
+  catch (e) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ["agscan.js", "content.js", "inputguard.js"]
+      });
+      return await chrome.tabs.sendMessage(tabId, msg);
+    } catch (e2) { return null; }  // chrome:// 등 주입 불가 탭 — 조용히 무시
+  }
+}
+
 // ── 컨텍스트 메뉴 ──
 const MENUS = [
   { id: "ag-link", title: "🛡️ AgentGuard로 이 링크 검사", contexts: ["link"] },
@@ -90,7 +107,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "ag-sel") return runScan(tab.id, "text", { text: info.selectionText, source: "선택 텍스트" });
   if (info.menuItemId === "ag-page") {
     // 페이지 본문은 content script 가 수집(문서 접근) → content 에 지시
-    chrome.tabs.sendMessage(tab.id, { type: "AG_SCAN_PAGE" });
+    sendToTab(tab.id, { type: "AG_SCAN_PAGE" });
   }
 });
 
@@ -104,7 +121,7 @@ chrome.downloads.onCreated.addListener(async (item) => {
       notify(v, url);
       // 활성 탭에도 카드 전달
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab && tab.id) chrome.tabs.sendMessage(tab.id, { type: "AG_RESULT", verdict: v });
+      if (tab && tab.id) sendToTab(tab.id, { type: "AG_RESULT", verdict: v });
     }
   } catch (e) { /* 백엔드 없으면 조용히 무시 */ }
 });
@@ -124,25 +141,25 @@ function notify(v, url) {
 // ── 검사 실행 → content 로 결과 ──
 async function runScan(tabId, kind, payload) {
   try {
-    chrome.tabs.sendMessage(tabId, { type: "AG_BUSY", kind });
+    sendToTab(tabId, { type: "AG_BUSY", kind });
     const c = await getCfg();
     const path = kind === "url" ? "/v1/scan/url" : "/v1/scan/text";
     const body = kind === "url" ? { url: payload.url }
       : { text: payload.text || "", source: payload.source || "선택" };
     // 규칙 결과를 먼저 즉시 보여주고(빠름), 온디바이스 AI 통역이 오면 카드를 교체(느려도 무중단)
     let v = await callApi(path, body);
-    chrome.tabs.sendMessage(tabId, { type: "AG_RESULT", verdict: v });
+    sendToTab(tabId, { type: "AG_RESULT", verdict: v });
     const willInterpret = c.provider === "ollama" && c.ollamaModel &&
       isLocalUrl((c.ollamaUrl || "http://localhost:11434")) &&
       ((v.card && v.card.source) || v.engine || "") !== "ollama";
     if (willInterpret) {
-      chrome.tabs.sendMessage(tabId, { type: "AG_INTERPRETING" });
+      sendToTab(tabId, { type: "AG_INTERPRETING" });
       const v2 = await ollamaInterpret(c, v);
-      if (v2 && v2.engine === "ollama") chrome.tabs.sendMessage(tabId, { type: "AG_RESULT", verdict: v2 });
-      else chrome.tabs.sendMessage(tabId, { type: "AG_INTERPRET_DONE" });
+      if (v2 && v2.engine === "ollama") sendToTab(tabId, { type: "AG_RESULT", verdict: v2 });
+      else sendToTab(tabId, { type: "AG_INTERPRET_DONE" });
     }
   } catch (e) {
-    chrome.tabs.sendMessage(tabId, { type: "AG_ERROR", error: String(e && e.message || e) });
+    sendToTab(tabId, { type: "AG_ERROR", error: String(e && e.message || e) });
   }
 }
 
@@ -270,8 +287,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg.type === "AG_SCAN_TEXT") {
     scanApi("/v1/scan/text", { text: msg.text, source: msg.source || "페이지" })
-      .then((v) => { if (sender.tab && sender.tab.id) chrome.tabs.sendMessage(sender.tab.id, { type: "AG_RESULT", verdict: v }); })
-      .catch((e) => { if (sender.tab && sender.tab.id) chrome.tabs.sendMessage(sender.tab.id, { type: "AG_ERROR", error: String(e) }); });
+      .then((v) => { if (sender.tab && sender.tab.id) sendToTab(sender.tab.id, { type: "AG_RESULT", verdict: v }); })
+      .catch((e) => { if (sender.tab && sender.tab.id) sendToTab(sender.tab.id, { type: "AG_ERROR", error: String(e) }); });
     return false;
   }
   if (msg.type === "AG_GET_CFG") { getCfg().then(sendResponse); return true; }
