@@ -7,6 +7,12 @@
   :root{--ink:#16181D;--sub:#6B7280;--line:#E8E8EA;--accent:#1E5BFF;--green:#30A46C;--red:#E5484D;}
   *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",system-ui,sans-serif;}
   body{width:340px;padding:14px;color:var(--ink);background:#fff;}
+  /* 옵션 페이지(탭)로 열릴 때: 가운데 정렬 카드형 (팝업 창에서는 min-width 미충족으로 무시됨) */
+  @media(min-width:420px){
+    html{background:#F6F6F7;}
+    body{margin:32px auto;border:1px solid var(--line);border-radius:16px;
+      box-shadow:0 8px 30px rgba(16,19,25,.08);padding:20px;}
+  }
   .hd{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
   .hd b{font-size:15px;font-weight:800;} .hd .u{color:var(--accent);}
   .hint{font-size:11.5px;color:var(--sub);margin-bottom:10px;line-height:1.5;}

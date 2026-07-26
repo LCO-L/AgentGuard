@@ -177,4 +177,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return false;
   }
   if (msg.type === "AG_GET_CFG") { getCfg().then(sendResponse); return true; }
+  if (msg.type === "AG_OPEN_SETTINGS") {
+    // 우하단 배지 패널의 ⚙️ → 기존 설정 화면(popup.html)을 탭으로
+    chrome.runtime.openOptionsPage();
+    return false;
+  }
 });
