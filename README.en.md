@@ -15,6 +15,9 @@ and explains them in words anyone understands, like "This file contains a comman
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.en.md)
 
+**Detection 100% · False positives 4.3% · Avg response 0.3ms** — 59-case benchmark (36 malicious · 23 benign, offline rule engine, no AI required)
+<br>Reproduce: `AG_AI_PROVIDER=off python scripts/bench_scenarios.py`
+
 </div>
 
 ---
@@ -230,8 +233,17 @@ Ollama · Claude · OpenRouter (one interface), pure HTML/JS + Next.js (frontend
 ## Tests and deployment
 
 ```bash
-AG_AI_PROVIDER=off python -m unittest discover -s tests   # all 46 pass
+AG_AI_PROVIDER=off python -m unittest discover -s tests    # all 46 pass
+python scripts/bench_scenarios.py                          # 59 cases: detection 100% · FP 4.3% · avg 0.3ms
+python scripts/bench_scenarios.py --provider ollama        # benchmark including the AI engine (layer-2 intent) — needs Ollama
 ```
+
+The benchmark drives the four real entry points (file scan · text scan · editor inspection · link scan) as-is.
+The default (offline rules) is the **detection floor** — deterministic and reproducible with no network or AI;
+the AI engine *adds* layer-2 intent analysis on top (detection ≥ rules; latency depends on the model).
+The single false positive is parameter-bound SQL caught by the SQL rule — the script honestly prints the full miss/FP lists.
+Every run is auto-recorded in [`docs/BENCH_RESULTS.md`](docs/BENCH_RESULTS.md) (the receipts behind the numbers),
+and individual scan history lands in `.cache/history.jsonl` (the `/audit` page), same as the product.
 
 Deployment flows GitHub → Railway. `railway.json` is auto-detected (Nixpacks → uvicorn →
 `/v1/health`), and since FastAPI serves the entire pure-HTML UI, a single backend powers every page.

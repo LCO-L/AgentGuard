@@ -15,6 +15,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+**탐지율 100% · 오탐률 4.3% · 평균 응답 0.3ms** — 59케이스 벤치(악성 36·정상 23, 오프라인 규칙 엔진, AI 불필요)
+<br>재현: `AG_AI_PROVIDER=off python scripts/bench_scenarios.py`
+
 </div>
 
 ---
@@ -229,8 +232,17 @@ Ollama·Claude·OpenRouter(하나의 인터페이스), 순수 HTML/JS + Next.js(
 ## 테스트와 배포
 
 ```bash
-AG_AI_PROVIDER=off python -m unittest discover -s tests   # 46개 전부 통과
+AG_AI_PROVIDER=off python -m unittest discover -s tests    # 46개 전부 통과
+python scripts/bench_scenarios.py                          # 59케이스: 탐지율 100% · 오탐 4.3% · 평균 0.3ms
+python scripts/bench_scenarios.py --provider ollama        # AI 엔진(2층 의도 분석) 포함 벤치 — Ollama 필요
 ```
+
+벤치마크는 실제 4개 진입점(파일 스캔·텍스트 스캔·에디터 인스펙션·링크 스캔)을 그대로 태웁니다.
+기본값(오프라인 규칙)은 네트워크·AI 없이 결정적으로 재현되는 **탐지 하한선**이고, AI 엔진은 2층 의도
+분석을 그 위에 *추가*합니다(탐지율 ≥ 규칙, 응답시간은 모델 속도에 좌우). 오탐 1건은 파라미터 바인딩
+SQL을 SQL룰이 잡은 것 — 스크립트가 미탐·오탐 목록까지 정직하게 출력합니다.
+실행할 때마다 결과가 [`docs/BENCH_RESULTS.md`](docs/BENCH_RESULTS.md)에 자동 기록되고(숫자의 영수증),
+개별 스캔 이력은 제품과 동일하게 `.cache/history.jsonl`(`/audit` 페이지)에 남습니다.
 
 배포는 GitHub → Railway 로 이어집니다. `railway.json`이 자동 인식되고(Nixpacks → uvicorn →
 `/v1/health`), 순수 HTML UI 전부를 FastAPI가 서빙하므로 백엔드 하나로 모든 페이지가 동작합니다.
