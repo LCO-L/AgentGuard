@@ -91,6 +91,11 @@ def create_app() -> FastAPI:
         """통합 상단 네비게이션(모든 순수 HTML 페이지 공용)."""
         return _serve("nav.js", "application/javascript; charset=utf-8")
 
+    @app.get("/i18n.js", tags=["meta"])
+    def i18n_js() -> Response:
+        """한/영 전환(i18n) 엔진 — 모든 순수 HTML 페이지 공용."""
+        return _serve("i18n.js", "application/javascript; charset=utf-8")
+
     @app.get("/onboarding.js", tags=["meta"])
     def onboarding_js() -> Response:
         """첫 방문 온보딩 투어(말풍선 코치마크 + 확장 설치 안내)."""

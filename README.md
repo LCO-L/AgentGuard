@@ -82,6 +82,7 @@ AgentGuard는 그 사이를 통역합니다.
 ## 직접 써보기
 
 가장 빠른 길: [agentguard.maeum.ai](https://agentguard.maeum.ai) 접속 → 텍스트 탭 → 데모 버튼 클릭.
+UI는 한/영을 지원합니다 — 상단 네비의 **EN** 버튼 또는 `?lang=en` 으로 전환 (브라우저 언어 자동 감지).
 
 | 눌러볼 것 | 무슨 일이 일어나나 |
 |---|---|

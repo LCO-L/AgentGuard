@@ -365,7 +365,9 @@
     return out.trim();
   }
   // 텍스트 1개 → 발견 목록 [{severity,label,msg,decoded}]
-  function scanText(t) {
+  // (주의: 백엔드 스캔 scanText 와 별개 — 이름이 겹치면 선언 호이스팅으로 덮어써서
+  //  scanPage/공개 API 가 카드를 안 띄우는 버그가 됨)
+  function scanLocal(t) {
     var found = [];
     if (!t) return found;
     if (ZW.test(t)) { var d = decodeZeroWidth(t); found.push({ severity: "red", label: "보이지 않는 글자", msg: d ? "글자 사이에 숨긴 명령을 찾았어요." : "눈에 안 보이는 특수문자가 섞여 있어요.", decoded: d }); }
@@ -411,7 +413,7 @@
     while ((node = walker.nextNode()) && count < 5000) { targets.push(node); count++; }
     var hits = 0;
     targets.forEach(function (n) {
-      var f = scanText(n.nodeValue);
+      var f = scanLocal(n.nodeValue);
       if (!f.length) return;
       hits++;
       _pageFindings.push({ text: n.nodeValue, findings: f });
@@ -443,7 +445,7 @@
     scanFile: function (f) { open(); scanFile(f); },
     scanPage: function () { open(); scanPage(); },
     highlightPage: highlightPage,                   // 실시간 인라인 하이라이트
-    scanTextLocal: scanText,                         // 온디바이스 경량 스캐너(백엔드 불필요)
+    scanTextLocal: scanLocal,                        // 온디바이스 경량 스캐너(백엔드 불필요)
     ingest: function (v) { open(); addCard(v); },   // 외부(익스텐션)에서 결과 주입
     config: CFG
   };

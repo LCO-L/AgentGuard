@@ -57,6 +57,10 @@
     "#ag-topnav .agx svg{width:14px;height:14px}" +
     "#ag-topnav .agx:hover{transform:translateY(-1px);background:#23262E}" +
     "#ag-topnav .agx:active{transform:translateY(0)}" +
+    "#ag-topnav .aglang{border:1px solid rgba(16,19,25,.14);background:#fff;color:#3C414C;" +
+    "border-radius:9px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;" +
+    "font-family:inherit;white-space:nowrap;transition:color .14s,border-color .14s}" +
+    "#ag-topnav .aglang:hover{color:#101319;border-color:rgba(16,19,25,.28)}" +
     "#ag-help-fab{position:fixed;right:22px;bottom:150px;z-index:2147483647;width:46px;height:46px;" +
     "border-radius:50%;border:0;background:#0E1116;color:#fff;font-size:19px;font-weight:800;cursor:pointer;" +
     "font-family:inherit;display:flex;align-items:center;justify-content:center;" +
@@ -98,12 +102,20 @@
   var nav = document.createElement("nav");
   nav.id = "ag-topnav";
   nav.setAttribute("aria-label", "AgentGuard");
+  // 한/영 전환 버튼(i18n.js 의 AGLang 사용 — 없으면 숨김)
+  var curLang = (window.AGLang && window.AGLang.get) ? window.AGLang.get() : null;
+  var langBtn = curLang
+    ? '<button class="aglang" type="button" id="ag-lang-btn" title="언어 전환 / Language">' +
+      (curLang === "en" ? "한국어" : "EN") + "</button>"
+    : "";
   nav.innerHTML =
     '<a class="agb" href="/"><img src="/icon.svg" alt=""> <span class="t">AgentGuard</span></a>' +
-    '<div class="agl">' + items + "</div>" +
+    '<div class="agl">' + items + "</div>" + langBtn +
     '<a class="agx" href="/extension.zip" download title="크롬 확장 프로그램(zip) 다운로드 → 압축해제 후 로드">' +
     ICONS.ext + '<span class="tx">확장 설치</span></a>';
   document.body.insertBefore(nav, document.body.firstChild);
+  var lb = document.getElementById("ag-lang-btn");
+  if (lb) lb.onclick = function () { if (window.AGLang) window.AGLang.toggle(); };
 
   // 항상 떠 있는 '?' 도움말 플로팅 버튼(우하단) → 온보딩 투어(있으면 즉시, 없으면 홈에서 시작)
   if (!document.getElementById("ag-help-fab")) {

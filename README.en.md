@@ -82,6 +82,7 @@ It's like finishing your homework at your own desk instead of sending it out to 
 ## Try it yourself
 
 Fastest path: open [agentguard.maeum.ai](https://agentguard.maeum.ai) → Text tab → click a demo button.
+The UI is bilingual — switch with the **EN / 한국어** button in the top nav or `?lang=en` (browser language auto-detected).
 
 | Try this | What happens |
 |---|---|
